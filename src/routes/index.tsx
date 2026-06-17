@@ -239,18 +239,27 @@ function Landing() {
             </p>
           </div>
           <div className="grid md:grid-cols-2 lg:grid-cols-5 gap-4">
-            {tickets.map((t) => (
+            {tickets.map((t) => {
+              const isEarly = t.name === "Early Investors";
+              return (
               <div
                 key={t.name}
                 className={`relative p-8 flex flex-col border ${
                   t.featured
                     ? "border-gold bg-gradient-to-b from-card to-background shadow-gold"
+                    : isEarly
+                    ? "border-gold/60 bg-background"
                     : "border-border/40 bg-background hover:border-gold/40 transition"
                 }`}
               >
                 {t.featured && (
                   <span className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 bg-gold text-primary-foreground text-[10px] tracking-widest uppercase">
                     Recomendado
+                  </span>
+                )}
+                {isEarly && (
+                  <span className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 bg-background border border-gold text-gold text-[10px] tracking-widest uppercase">
+                    À venda
                   </span>
                 )}
                 <p className="text-[10px] tracking-[0.3em] uppercase text-gold/80">{t.tag}</p>
@@ -262,18 +271,23 @@ function Landing() {
                   </p>
                 </div>
                 <p className="text-xs text-muted-foreground mb-6 mt-auto">{t.seats}</p>
-                <a
-                  href="#contacto"
-                  className={`text-center py-3 text-xs tracking-widest uppercase transition ${
-                    t.featured
-                      ? "bg-gradient-gold text-primary-foreground hover:opacity-90"
-                      : "border border-border hover:border-gold hover:text-gold"
-                  }`}
-                >
-                  Reservar
-                </a>
+                {isEarly ? (
+                  <Link
+                    to="/comprar"
+                    className="text-center py-3 text-xs tracking-widest uppercase transition bg-gradient-gold text-primary-foreground hover:opacity-90 shadow-gold"
+                  >
+                    Comprar
+                  </Link>
+                ) : (
+                  <span
+                    className="text-center py-3 text-xs tracking-widest uppercase border border-border/60 text-muted-foreground cursor-not-allowed"
+                  >
+                    Em breve
+                  </span>
+                )}
               </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </section>

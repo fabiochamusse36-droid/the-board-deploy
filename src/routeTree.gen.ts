@@ -9,38 +9,65 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as ComprarRouteImport } from './routes/comprar'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ConfirmacaoReferenceRouteImport } from './routes/confirmacao.$reference'
 
+const ComprarRoute = ComprarRouteImport.update({
+  id: '/comprar',
+  path: '/comprar',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ConfirmacaoReferenceRoute = ConfirmacaoReferenceRouteImport.update({
+  id: '/confirmacao/$reference',
+  path: '/confirmacao/$reference',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/comprar': typeof ComprarRoute
+  '/confirmacao/$reference': typeof ConfirmacaoReferenceRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/comprar': typeof ComprarRoute
+  '/confirmacao/$reference': typeof ConfirmacaoReferenceRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/comprar': typeof ComprarRoute
+  '/confirmacao/$reference': typeof ConfirmacaoReferenceRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths: '/' | '/comprar' | '/confirmacao/$reference'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to: '/' | '/comprar' | '/confirmacao/$reference'
+  id: '__root__' | '/' | '/comprar' | '/confirmacao/$reference'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ComprarRoute: typeof ComprarRoute
+  ConfirmacaoReferenceRoute: typeof ConfirmacaoReferenceRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/comprar': {
+      id: '/comprar'
+      path: '/comprar'
+      fullPath: '/comprar'
+      preLoaderRoute: typeof ComprarRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -48,11 +75,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/confirmacao/$reference': {
+      id: '/confirmacao/$reference'
+      path: '/confirmacao/$reference'
+      fullPath: '/confirmacao/$reference'
+      preLoaderRoute: typeof ConfirmacaoReferenceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ComprarRoute: ComprarRoute,
+  ConfirmacaoReferenceRoute: ConfirmacaoReferenceRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
