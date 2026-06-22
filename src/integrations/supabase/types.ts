@@ -59,6 +59,45 @@ export type Database = {
         }
         Relationships: []
       }
+      sponsor_inquiries: {
+        Row: {
+          company: string
+          contact_name: string
+          created_at: string
+          email: string
+          id: string
+          message: string | null
+          phone: string | null
+          status: string
+          tier: string
+          updated_at: string
+        }
+        Insert: {
+          company: string
+          contact_name: string
+          created_at?: string
+          email: string
+          id?: string
+          message?: string | null
+          phone?: string | null
+          status?: string
+          tier: string
+          updated_at?: string
+        }
+        Update: {
+          company?: string
+          contact_name?: string
+          created_at?: string
+          email?: string
+          id?: string
+          message?: string | null
+          phone?: string | null
+          status?: string
+          tier?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
