@@ -9,10 +9,16 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as PatrociniosRouteImport } from './routes/patrocinios'
 import { Route as ComprarRouteImport } from './routes/comprar'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ConfirmacaoReferenceRouteImport } from './routes/confirmacao.$reference'
 
+const PatrociniosRoute = PatrociniosRouteImport.update({
+  id: '/patrocinios',
+  path: '/patrocinios',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ComprarRoute = ComprarRouteImport.update({
   id: '/comprar',
   path: '/comprar',
@@ -32,35 +38,46 @@ const ConfirmacaoReferenceRoute = ConfirmacaoReferenceRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/comprar': typeof ComprarRoute
+  '/patrocinios': typeof PatrociniosRoute
   '/confirmacao/$reference': typeof ConfirmacaoReferenceRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/comprar': typeof ComprarRoute
+  '/patrocinios': typeof PatrociniosRoute
   '/confirmacao/$reference': typeof ConfirmacaoReferenceRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/comprar': typeof ComprarRoute
+  '/patrocinios': typeof PatrociniosRoute
   '/confirmacao/$reference': typeof ConfirmacaoReferenceRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/comprar' | '/confirmacao/$reference'
+  fullPaths: '/' | '/comprar' | '/patrocinios' | '/confirmacao/$reference'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/comprar' | '/confirmacao/$reference'
-  id: '__root__' | '/' | '/comprar' | '/confirmacao/$reference'
+  to: '/' | '/comprar' | '/patrocinios' | '/confirmacao/$reference'
+  id: '__root__' | '/' | '/comprar' | '/patrocinios' | '/confirmacao/$reference'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ComprarRoute: typeof ComprarRoute
+  PatrociniosRoute: typeof PatrociniosRoute
   ConfirmacaoReferenceRoute: typeof ConfirmacaoReferenceRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/patrocinios': {
+      id: '/patrocinios'
+      path: '/patrocinios'
+      fullPath: '/patrocinios'
+      preLoaderRoute: typeof PatrociniosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/comprar': {
       id: '/comprar'
       path: '/comprar'
@@ -88,6 +105,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ComprarRoute: ComprarRoute,
+  PatrociniosRoute: PatrociniosRoute,
   ConfirmacaoReferenceRoute: ConfirmacaoReferenceRoute,
 }
 export const routeTree = rootRouteImport
