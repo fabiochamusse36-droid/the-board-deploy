@@ -41,16 +41,6 @@ const ConfirmacaoReferenceRoute = ConfirmacaoReferenceRouteImport.update({
   path: '/confirmacao/$reference',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AdmissaoIndexRoute = AdmissaoIndexRouteImport.update({
-  id: '/admissao/',
-  path: '/admissao/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AdmissaoObrigadoRoute = AdmissaoObrigadoRouteImport.update({
-  id: '/admissao/obrigado',
-  path: '/admissao/obrigado',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const AdmissaoObrigadoRoute = AdmissaoObrigadoRouteImport.update({
   id: '/admissao/obrigado',
   path: '/admissao/obrigado',
