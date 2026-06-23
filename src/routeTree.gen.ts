@@ -12,7 +12,9 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as PatrociniosRouteImport } from './routes/patrocinios'
 import { Route as ComprarRouteImport } from './routes/comprar'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AdmissaoIndexRouteImport } from './routes/admissao.index'
 import { Route as ConfirmacaoReferenceRouteImport } from './routes/confirmacao.$reference'
+import { Route as AdmissaoObrigadoRouteImport } from './routes/admissao.obrigado'
 
 const PatrociniosRoute = PatrociniosRouteImport.update({
   id: '/patrocinios',
@@ -29,9 +31,29 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdmissaoIndexRoute = AdmissaoIndexRouteImport.update({
+  id: '/admissao/',
+  path: '/admissao/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ConfirmacaoReferenceRoute = ConfirmacaoReferenceRouteImport.update({
   id: '/confirmacao/$reference',
   path: '/confirmacao/$reference',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdmissaoIndexRoute = AdmissaoIndexRouteImport.update({
+  id: '/admissao/',
+  path: '/admissao/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdmissaoObrigadoRoute = AdmissaoObrigadoRouteImport.update({
+  id: '/admissao/obrigado',
+  path: '/admissao/obrigado',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdmissaoObrigadoRoute = AdmissaoObrigadoRouteImport.update({
+  id: '/admissao/obrigado',
+  path: '/admissao/obrigado',
   getParentRoute: () => rootRouteImport,
 } as any)
 
@@ -39,34 +61,61 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/comprar': typeof ComprarRoute
   '/patrocinios': typeof PatrociniosRoute
+  '/admissao/obrigado': typeof AdmissaoObrigadoRoute
   '/confirmacao/$reference': typeof ConfirmacaoReferenceRoute
+  '/admissao/': typeof AdmissaoIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/comprar': typeof ComprarRoute
   '/patrocinios': typeof PatrociniosRoute
+  '/admissao/obrigado': typeof AdmissaoObrigadoRoute
   '/confirmacao/$reference': typeof ConfirmacaoReferenceRoute
+  '/admissao': typeof AdmissaoIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/comprar': typeof ComprarRoute
   '/patrocinios': typeof PatrociniosRoute
+  '/admissao/obrigado': typeof AdmissaoObrigadoRoute
   '/confirmacao/$reference': typeof ConfirmacaoReferenceRoute
+  '/admissao/': typeof AdmissaoIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/comprar' | '/patrocinios' | '/confirmacao/$reference'
+  fullPaths:
+    | '/'
+    | '/comprar'
+    | '/patrocinios'
+    | '/admissao/obrigado'
+    | '/confirmacao/$reference'
+    | '/admissao/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/comprar' | '/patrocinios' | '/confirmacao/$reference'
-  id: '__root__' | '/' | '/comprar' | '/patrocinios' | '/confirmacao/$reference'
+  to:
+    | '/'
+    | '/comprar'
+    | '/patrocinios'
+    | '/admissao/obrigado'
+    | '/confirmacao/$reference'
+    | '/admissao'
+  id:
+    | '__root__'
+    | '/'
+    | '/comprar'
+    | '/patrocinios'
+    | '/admissao/obrigado'
+    | '/confirmacao/$reference'
+    | '/admissao/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ComprarRoute: typeof ComprarRoute
   PatrociniosRoute: typeof PatrociniosRoute
+  AdmissaoObrigadoRoute: typeof AdmissaoObrigadoRoute
   ConfirmacaoReferenceRoute: typeof ConfirmacaoReferenceRoute
+  AdmissaoIndexRoute: typeof AdmissaoIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -92,11 +141,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admissao/': {
+      id: '/admissao/'
+      path: '/admissao'
+      fullPath: '/admissao/'
+      preLoaderRoute: typeof AdmissaoIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/confirmacao/$reference': {
       id: '/confirmacao/$reference'
       path: '/confirmacao/$reference'
       fullPath: '/confirmacao/$reference'
       preLoaderRoute: typeof ConfirmacaoReferenceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admissao/obrigado': {
+      id: '/admissao/obrigado'
+      path: '/admissao/obrigado'
+      fullPath: '/admissao/obrigado'
+      preLoaderRoute: typeof AdmissaoObrigadoRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -106,18 +169,10 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ComprarRoute: ComprarRoute,
   PatrociniosRoute: PatrociniosRoute,
+  AdmissaoObrigadoRoute: AdmissaoObrigadoRoute,
   ConfirmacaoReferenceRoute: ConfirmacaoReferenceRoute,
+  AdmissaoIndexRoute: AdmissaoIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
