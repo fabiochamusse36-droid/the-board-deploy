@@ -76,14 +76,15 @@ function Landing() {
             {navLinks.map((l) => (
               <a key={l.href} href={l.href} className="hover:text-gold transition">{l.label}</a>
             ))}
+            <Link to="/admissao" className="hover:text-gold transition">Admissão</Link>
           </div>
           <div className="flex items-center gap-3">
-            <a
-              href="#bilhetes"
+            <Link
+              to="/admissao"
               className="hidden sm:inline-flex text-xs tracking-widest uppercase px-5 py-2.5 border border-gold text-gold hover:bg-gold hover:text-primary-foreground transition"
             >
-              Reservar
-            </a>
+              Candidatar-me
+            </Link>
             <button
               type="button"
               aria-label={mobileOpen ? "Fechar menu" : "Abrir menu"}
@@ -111,6 +112,13 @@ function Landing() {
                   {l.label}
                 </a>
               ))}
+              <Link
+                to="/admissao"
+                onClick={() => setMobileOpen(false)}
+                className="text-center py-3 border border-gold/60 text-gold text-xs uppercase tracking-widest"
+              >
+                Admissão
+              </Link>
               <Link
                 to="/comprar"
                 onClick={() => setMobileOpen(false)}
@@ -443,7 +451,7 @@ function Landing() {
             Inicie a sua candidatura ou solicite o dossier de patrocínio.
           </p>
           <div className="mt-12 flex flex-col sm:flex-row gap-4 justify-center">
-            <Link to="/comprar" className="px-10 py-5 bg-gradient-gold text-primary-foreground font-medium tracking-widest text-xs uppercase shadow-gold hover:opacity-90 transition">
+            <Link to="/admissao" className="px-10 py-5 bg-gradient-gold text-primary-foreground font-medium tracking-widest text-xs uppercase shadow-gold hover:opacity-90 transition">
               Candidatar-me
             </Link>
             <Link to="/patrocinios" className="px-10 py-5 border border-gold/60 text-gold font-medium tracking-widest text-xs uppercase hover:bg-gold/10 transition">
