@@ -467,13 +467,20 @@ function Landing() {
 
       {/* FOOTER */}
       <footer className="border-t border-border/40 py-10">
-        <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row gap-4 justify-between items-center text-xs text-muted-foreground">
+        <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row gap-6 justify-between items-center text-xs text-muted-foreground">
           <p className="font-display tracking-[0.25em] text-foreground">
             THE <span className="text-gold">BOARD</span> · BIG PLAYERS FORUM
           </p>
+          <nav className="flex flex-wrap gap-x-6 gap-y-2 justify-center tracking-widest uppercase text-[10px]">
+            <Link to="/admissao" className="hover:text-gold transition">Admissão</Link>
+            <Link to="/comprar" className="hover:text-gold transition">Bilhetes</Link>
+            <Link to="/patrocinios" className="hover:text-gold transition">Patrocínios</Link>
+            <a href="mailto:reservas@theboard-forum.com" className="hover:text-gold transition">Contacto</a>
+          </nav>
           <p className="tracking-widest uppercase">© 2026 · Edição Moçambique &amp; Angola</p>
         </div>
       </footer>
+
     </div>
   );
 }
