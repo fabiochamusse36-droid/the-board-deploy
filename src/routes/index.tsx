@@ -242,7 +242,7 @@ function Landing() {
       </section>
 
       {/* AGENDA */}
-      <section id="agenda" className="py-32">
+      <section id="agenda" className="py-32 scroll-mt-24">
         <div className="max-w-5xl mx-auto px-6">
           <div className="mb-16 text-center">
             <p className="text-[10px] tracking-[0.4em] uppercase text-gold mb-4">03 — Agenda</p>
