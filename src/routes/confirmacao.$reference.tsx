@@ -31,6 +31,7 @@ function Confirmacao() {
   const { reference } = Route.useParams();
   const [order, setOrder] = useState<Order | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     let active = true;
@@ -39,6 +40,16 @@ function Confirmacao() {
       .catch((e) => active && setError(e instanceof Error ? e.message : "Erro"));
     return () => { active = false; };
   }, [reference]);
+
+  async function copyReference() {
+    try {
+      await navigator.clipboard.writeText(reference);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      setCopied(false);
+    }
+  }
 
   if (error) {
     return (
@@ -54,6 +65,7 @@ function Confirmacao() {
   if (!order) {
     return <div className="min-h-screen flex items-center justify-center text-muted-foreground text-xs tracking-widest uppercase">A carregar…</div>;
   }
+
 
   const isMpesa = order.payment_method === "mpesa";
 
