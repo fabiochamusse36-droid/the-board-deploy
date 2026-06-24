@@ -86,11 +86,19 @@ function Confirmacao() {
         {/* Reference card */}
         <div className="border border-gold/60 bg-gradient-to-b from-card to-background p-8 md:p-10 mb-8 text-center shadow-gold">
           <p className="text-[10px] tracking-[0.3em] uppercase text-muted-foreground">Referência de pagamento</p>
-          <p className="font-display text-3xl md:text-4xl text-gradient-gold mt-3 tracking-widest">{order.reference}</p>
+          <p className="font-display text-3xl md:text-4xl text-gradient-gold mt-3 tracking-widest break-all">{order.reference}</p>
+          <button
+            type="button"
+            onClick={copyReference}
+            className="mt-4 inline-flex items-center gap-2 px-4 py-2 border border-gold/50 text-gold text-[10px] tracking-widest uppercase hover:bg-gold/10 transition"
+          >
+            {copied ? "Copiado ✓" : "Copiar referência"}
+          </button>
           <div className="hairline-gold mx-auto my-6 max-w-[80px]" />
           <p className="font-display text-4xl">{order.amount_mt.toLocaleString("pt-PT")} <span className="text-base text-muted-foreground">MT</span></p>
           <p className="text-sm text-muted-foreground mt-2">{order.ticket_type}</p>
         </div>
+
 
         {/* Payment instructions */}
         <div className="border border-border/40 bg-card/40 p-8 md:p-10 mb-8">
