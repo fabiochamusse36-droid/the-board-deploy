@@ -1,20 +1,26 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
+import { z } from "zod";
+
+const searchSchema = z.object({
+  reference: z.string().trim().min(4).max(40).optional(),
+});
 
 export const Route = createFileRoute("/admissao/")({
+  validateSearch: (s: Record<string, unknown>) => searchSchema.parse(s),
   head: () => ({
     meta: [
       { title: "Admissão — THE BOARD Big Players Forum 2026" },
       {
         name: "description",
         content:
-          "Questionário de qualificação e admissão de operadores de mercado para o THE BOARD — Maputo 2026.",
+          "Formulário de Admissão Executiva — validação de perfil para o THE BOARD, Maputo 2026.",
       },
       { property: "og:title", content: "Admissão — THE BOARD 2026" },
       {
         property: "og:description",
         content:
-          "Trader Profile Assessment — candidatura à mesa do Big Players Forum, Maputo 2026.",
+          "Trader Profile Assessment — admissão à mesa do Big Players Forum, Maputo 2026.",
       },
     ],
   }),
