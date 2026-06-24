@@ -407,7 +407,7 @@ function Landing() {
                   </ul>
                   <Link
                     to="/patrocinios"
-                    search={{ tier: s.id } as never}
+                    search={{ tier: s.id }}
                     className={`mt-10 py-3 text-center text-xs tracking-widest uppercase transition ${
                       s.highlight
                         ? "bg-gradient-gold text-primary-foreground hover:opacity-90"
@@ -416,6 +416,7 @@ function Landing() {
                   >
                     Solicitar proposta
                   </Link>
+
                 </div>
               ))}
             </div>
