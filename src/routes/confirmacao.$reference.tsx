@@ -123,7 +123,7 @@ function Confirmacao() {
         {/* Payment instructions */}
         <div className="border border-border/40 bg-card/40 p-8 md:p-10 mb-8">
           <h2 className="font-display text-xl mb-6">
-            {isMpesa ? "Pagamento por M-Pesa" : "Transferência bancária"}
+            {isMpesa ? "Pagamento por M-Pesa" : isManual ? "Pagamento Manual" : "Transferência bancária"}
           </h2>
 
           {isMpesa ? (
@@ -134,6 +134,12 @@ function Confirmacao() {
               <li><span className="text-gold mr-2">4.</span>Valor: <span className="text-foreground font-medium">{order.amount_mt.toLocaleString("pt-PT")} MT</span></li>
               <li><span className="text-gold mr-2">5.</span>Indique a referência <span className="text-foreground font-display">{order.reference}</span> no campo de mensagem.</li>
             </ol>
+          ) : isManual ? (
+            <p className="text-sm text-muted-foreground leading-relaxed">
+              Para concluir o pagamento manual, contacte diretamente a organização indicando a sua
+              referência <span className="text-foreground font-display">{order.reference}</span>.
+              Um membro da equipa coordenará o método de pagamento mais conveniente.
+            </p>
           ) : (
             <dl className="space-y-4 text-sm">
               <div className="flex justify-between border-b border-border/40 pb-3">
@@ -166,9 +172,14 @@ function Confirmacao() {
                 reservas@theboard-forum.com
               </a>{" "}
               indicando a referência <span className="text-foreground font-display">{order.reference}</span>.
-              O bilhete será emitido em até 24h úteis para <span className="text-foreground">{order.buyer_email}</span>.
             </p>
           </div>
+        </div>
+
+        {/* Refund / admission policy */}
+        <div className="border border-border/40 bg-background/60 p-5 mb-8 text-xs text-muted-foreground leading-relaxed">
+          A admissão final está sujeita à validação executiva. Caso o perfil não seja elegível para a
+          categoria solicitada, o valor será reembolsado conforme a política do evento.
         </div>
 
         {/* Summary */}
@@ -180,10 +191,19 @@ function Confirmacao() {
           <div className="flex justify-between"><span className="text-muted-foreground">Estado</span><span className="text-gold uppercase tracking-widest text-xs">{order.status}</span></div>
         </div>
 
-        <div className="text-center">
-          <Link to="/" className="text-xs tracking-[0.3em] uppercase text-muted-foreground hover:text-gold">← Voltar ao início</Link>
+        <div className="flex flex-col sm:flex-row gap-3 justify-center text-xs tracking-widest uppercase">
+          <a
+            href={`mailto:reservas@theboard-forum.com?subject=Reserva ${order.reference}`}
+            className="px-5 py-3 border border-gold/40 text-gold hover:bg-gold/10 transition text-center"
+          >
+            Contactar organização
+          </a>
+          <Link to="/" className="px-5 py-3 border border-border/60 text-muted-foreground hover:text-gold hover:border-gold/40 transition text-center">
+            ← Voltar ao início
+          </Link>
         </div>
       </div>
     </div>
   );
 }
+
