@@ -121,6 +121,7 @@ function Landing() {
               </Link>
               <Link
                 to="/comprar"
+                search={{ ticket: "early-investors" as const }}
                 onClick={() => setMobileOpen(false)}
                 className="mt-2 text-center py-3 bg-gradient-gold text-primary-foreground text-xs uppercase tracking-widest shadow-gold"
               >
