@@ -68,6 +68,7 @@ function Confirmacao() {
 
 
   const isMpesa = order.payment_method === "mpesa";
+  const isManual = order.payment_method === "manual";
 
   return (
     <div className="min-h-screen bg-background text-foreground py-24 px-6">
