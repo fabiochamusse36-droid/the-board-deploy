@@ -480,7 +480,7 @@ function Landing() {
           </p>
           <nav className="flex flex-wrap gap-x-6 gap-y-2 justify-center tracking-widest uppercase text-[10px]">
             <Link to="/admissao" className="hover:text-gold transition">Admissão</Link>
-            <Link to="/comprar" className="hover:text-gold transition">Bilhetes</Link>
+            <Link to="/comprar" search={{ ticket: "early-investors" as const }} className="hover:text-gold transition">Bilhetes</Link>
             <Link to="/patrocinios" className="hover:text-gold transition">Patrocínios</Link>
             <a href="mailto:reservas@theboard-forum.com" className="hover:text-gold transition">Contacto</a>
           </nav>
