@@ -30,10 +30,10 @@ export type SponsorTierRaw = {
 export type KpiRaw = { value: string; label: string };
 
 export const TICKETS_DATA: TicketRaw[] = [
-  { id: "early-investors", name: "Early Investors", price_mt: 2500, description: "Acesso geral antecipado", tag: "Lote 1", seats: "50 lugares", available: true },
-  { id: "executive-access", name: "Executive Access", price_mt: 3500, description: "Acesso geral padrão", tag: "Lote 2", seats: "100 lugares", featured: true, available: false },
+  { id: "early-investors", name: "Investidores Iniciais", price_mt: 2500, description: "Acesso geral antecipado", tag: "Lote 1", seats: "50 lugares", available: true },
+  { id: "executive-access", name: "Executive Access", price_mt: 3500, description: "Acesso geral padrão", tag: "Lote 2", seats: "100 lugares", available: false },
   { id: "last-call", name: "Last Call", price_mt: 5000, description: "Acesso geral de última hora", tag: "Lote 3", seats: "30 lugares", available: false },
-  { id: "vip-board", name: "VIP Board Member", price_mt: 7500, description: "Lounge exclusivo + jantar", tag: "VIP", seats: "20 lugares", available: false },
+  { id: "vip-board", name: "VIP Board Member", price_mt: 7500, description: "Lounge exclusivo + jantar premium", tag: "VIP", seats: "20 lugares", featured: true, available: true },
   { id: "streaming-premium", name: "Streaming Premium", price_mt: 1500, description: "Acesso digital global", tag: "Online", seats: "Ilimitado", available: false },
 ];
 

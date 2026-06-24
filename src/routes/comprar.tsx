@@ -1,13 +1,40 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { useState } from "react";
+import { useMemo, useState } from "react";
+import { z } from "zod";
 import { createOrder } from "@/lib/orders.functions";
 
+const TICKETS = {
+  "early-investors": {
+    id: "early-investors" as const,
+    name: "Investidores Iniciais",
+    tag: "Lote 1 · Reserva Presencial",
+    price: 2500,
+    category: "Participante presencial",
+    description: "Acesso geral antecipado ao Big Players Forum.",
+  },
+  "vip-board": {
+    id: "vip-board" as const,
+    name: "VIP Board Member",
+    tag: "VIP · Reserva Premium",
+    price: 7500,
+    category: "VIP sujeita a validação executiva",
+    description: "Lounge exclusivo, jantar executivo e mesa restrita.",
+  },
+} as const;
+
+type TicketId = keyof typeof TICKETS;
+
+const searchSchema = z.object({
+  ticket: z.enum(["early-investors", "vip-board"]).optional(),
+});
+
 export const Route = createFileRoute("/comprar")({
+  validateSearch: (s: Record<string, unknown>) => searchSchema.parse(s),
   head: () => ({
     meta: [
-      { title: "Reservar Bilhete — THE BOARD 2026" },
-      { name: "description", content: "Reserve o seu lugar Early Investors no The Board Forum 2026." },
+      { title: "Criar Reserva — THE BOARD 2026" },
+      { name: "description", content: "Reserve o seu acesso ao The Board Big Players Forum 2026." },
     ],
   }),
   component: Comprar,
@@ -26,16 +53,46 @@ export const Route = createFileRoute("/comprar")({
 function Comprar() {
   const navigate = useNavigate();
   const submit = useServerFn(createOrder);
+  const { ticket: ticketParam } = Route.useSearch();
+  const ticketId: TicketId = ticketParam ?? "early-investors";
+  const ticket = TICKETS[ticketId];
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [form, setForm] = useState({ name: "", email: "", phone: "", payment_method: "mpesa" as "mpesa" | "bank" });
+  const [form, setForm] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    country: "Moçambique",
+    city: "",
+    quantity: 1,
+    payment_method: "mpesa" as "mpesa" | "bank" | "manual",
+    consent: false,
+  });
+
+  const total = useMemo(() => ticket.price * form.quantity, [ticket.price, form.quantity]);
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
+    if (!form.consent) {
+      setError("Confirme a declaração de reserva provisória para continuar.");
+      return;
+    }
     setLoading(true);
     try {
-      const res = await submit({ data: { ticket: "early-investors", ...form } });
+      const res = await submit({
+        data: {
+          ticket: ticket.id,
+          name: form.name,
+          email: form.email,
+          phone: form.phone,
+          country: form.country,
+          city: form.city,
+          quantity: form.quantity,
+          payment_method: form.payment_method,
+        },
+      });
       navigate({ to: "/confirmacao/$reference", params: { reference: res.reference } });
     } catch (err) {
       setError(err instanceof Error ? err.message : "Erro ao criar reserva");
@@ -48,77 +105,123 @@ function Comprar() {
       <div className="max-w-2xl mx-auto">
         <Link to="/" className="text-xs tracking-[0.3em] uppercase text-muted-foreground hover:text-gold">← Voltar</Link>
 
-        <div className="mt-10 mb-12 text-center">
-          <p className="text-[10px] tracking-[0.4em] uppercase text-gold mb-4">Reserva · Lote 1</p>
-          <h1 className="font-display text-4xl md:text-5xl">Early Investors</h1>
-          <p className="mt-4 text-muted-foreground">Acesso geral antecipado · 50 lugares</p>
-          <p className="font-display text-5xl text-gradient-gold mt-6">2.500 <span className="text-base text-muted-foreground">MT</span></p>
+        <div className="mt-10 mb-10 text-center">
+          <p className="text-[10px] tracking-[0.4em] uppercase text-gold mb-4">{ticket.tag}</p>
+          <h1 className="font-display text-4xl md:text-5xl">{ticket.name}</h1>
+          <p className="mt-3 text-muted-foreground">{ticket.description}</p>
+          <p className="mt-2 text-[10px] tracking-[0.3em] uppercase text-muted-foreground">{ticket.category}</p>
+          <p className="font-display text-5xl text-gradient-gold mt-6">
+            {ticket.price.toLocaleString("pt-PT")} <span className="text-base text-muted-foreground">MT</span>
+          </p>
+        </div>
+
+        <div className="mb-8 flex gap-3 text-[10px] tracking-widest uppercase justify-center">
+          {(Object.keys(TICKETS) as TicketId[]).map((id) => (
+            <Link
+              key={id}
+              to="/comprar"
+              search={{ ticket: id }}
+              className={`px-3 py-2 border transition ${
+                id === ticketId ? "border-gold text-gold bg-gold/10" : "border-border/60 text-muted-foreground hover:border-gold/40"
+              }`}
+            >
+              {TICKETS[id].tag.split("·")[0].trim()}
+            </Link>
+          ))}
+        </div>
+
+        <div className="border border-gold/30 bg-card/40 p-5 mb-6 text-xs text-muted-foreground leading-relaxed">
+          A reserva garante prioridade de vaga, mas a admissão final será confirmada após análise do
+          Formulário de Admissão Executiva. Caso o perfil não seja elegível para a categoria solicitada,
+          o valor será reembolsado conforme a política do evento.
         </div>
 
         <form onSubmit={onSubmit} className="space-y-6 border border-border/40 bg-card/40 p-8 md:p-10">
-          <div>
-            <label className="text-[10px] tracking-[0.3em] uppercase text-muted-foreground">Nome completo</label>
-            <input
-              required minLength={2} maxLength={120}
-              value={form.name}
-              onChange={(e) => setForm({ ...form, name: e.target.value })}
-              className="w-full mt-2 bg-background border border-border/60 px-4 py-3 focus:border-gold outline-none"
-            />
-          </div>
-          <div>
-            <label className="text-[10px] tracking-[0.3em] uppercase text-muted-foreground">Email</label>
-            <input
-              type="email" required maxLength={255}
-              value={form.email}
-              onChange={(e) => setForm({ ...form, email: e.target.value })}
-              className="w-full mt-2 bg-background border border-border/60 px-4 py-3 focus:border-gold outline-none"
-            />
-          </div>
-          <div>
-            <label className="text-[10px] tracking-[0.3em] uppercase text-muted-foreground">Telefone (com indicativo)</label>
-            <input
-              type="tel" required minLength={6} maxLength={30}
-              placeholder="+258 84 000 0000"
-              value={form.phone}
-              onChange={(e) => setForm({ ...form, phone: e.target.value })}
-              className="w-full mt-2 bg-background border border-border/60 px-4 py-3 focus:border-gold outline-none"
-            />
+          <div className="grid sm:grid-cols-2 gap-4">
+            <Field label="Nome completo">
+              <input required minLength={2} maxLength={120} value={form.name}
+                onChange={(e) => setForm({ ...form, name: e.target.value })} className={inputCls} />
+            </Field>
+            <Field label="Email">
+              <input type="email" required maxLength={255} value={form.email}
+                onChange={(e) => setForm({ ...form, email: e.target.value })} className={inputCls} />
+            </Field>
+            <Field label="WhatsApp (com indicativo)">
+              <input type="tel" required minLength={6} maxLength={30} placeholder="+258 84 000 0000"
+                value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} className={inputCls} />
+            </Field>
+            <Field label="País">
+              <input required maxLength={80} value={form.country}
+                onChange={(e) => setForm({ ...form, country: e.target.value })} className={inputCls} />
+            </Field>
+            <Field label="Cidade">
+              <input required maxLength={80} value={form.city}
+                onChange={(e) => setForm({ ...form, city: e.target.value })} className={inputCls} />
+            </Field>
+            <Field label="Quantidade">
+              <input type="number" min={1} max={10} value={form.quantity}
+                onChange={(e) => setForm({ ...form, quantity: Math.max(1, Math.min(10, Number(e.target.value) || 1)) })}
+                className={inputCls} />
+            </Field>
           </div>
 
           <div>
             <p className="text-[10px] tracking-[0.3em] uppercase text-muted-foreground mb-3">Método de pagamento</p>
-            <div className="grid grid-cols-2 gap-3">
-              {(["mpesa", "bank"] as const).map((m) => (
-                <button
-                  key={m}
-                  type="button"
+            <div className="grid grid-cols-3 gap-3">
+              {(["mpesa", "bank", "manual"] as const).map((m) => (
+                <button key={m} type="button"
                   onClick={() => setForm({ ...form, payment_method: m })}
-                  className={`py-4 text-xs tracking-widest uppercase border transition ${
+                  className={`py-3 text-[10px] tracking-widest uppercase border transition ${
                     form.payment_method === m
                       ? "border-gold text-gold bg-gold/10"
                       : "border-border/60 text-muted-foreground hover:border-gold/40"
-                  }`}
-                >
-                  {m === "mpesa" ? "M-Pesa" : "Transferência"}
+                  }`}>
+                  {m === "mpesa" ? "M-Pesa" : m === "bank" ? "Transferência" : "Pagamento Manual"}
                 </button>
               ))}
             </div>
           </div>
 
+          <div className="flex justify-between items-baseline border-t border-border/40 pt-5">
+            <span className="text-[10px] tracking-[0.3em] uppercase text-muted-foreground">Total</span>
+            <span className="font-display text-3xl text-gradient-gold">
+              {total.toLocaleString("pt-PT")} <span className="text-sm text-muted-foreground">MT</span>
+            </span>
+          </div>
+
+          <label className="flex items-start gap-3 cursor-pointer select-none">
+            <input type="checkbox" checked={form.consent}
+              onChange={(e) => setForm({ ...form, consent: e.target.checked })}
+              className="mt-1 accent-[color:var(--color-gold,#c9a449)]" />
+            <span className="text-xs text-muted-foreground leading-relaxed">
+              Confirmo que desejo criar uma reserva provisória e estou ciente de que a admissão final
+              está sujeita à validação da Direção Executiva.
+            </span>
+          </label>
+
           {error && <p className="text-sm text-destructive">{error}</p>}
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full py-4 bg-gradient-gold text-primary-foreground tracking-widest text-xs uppercase shadow-gold hover:opacity-90 transition disabled:opacity-50"
-          >
-            {loading ? "A processar…" : "Gerar referência de pagamento"}
+          <button type="submit" disabled={loading}
+            className="w-full py-4 bg-gradient-gold text-primary-foreground tracking-widest text-xs uppercase shadow-gold hover:opacity-90 transition disabled:opacity-50">
+            {loading ? "A processar…" : "Criar Reserva"}
           </button>
           <p className="text-xs text-muted-foreground text-center">
-            Receberá a referência de pagamento na próxima página. O bilhete é confirmado após validação manual do pagamento.
+            Receberá a referência de pagamento na próxima página. A credencial é emitida após validação
+            do perfil pela Direção Executiva.
           </p>
         </form>
       </div>
     </div>
+  );
+}
+
+const inputCls = "w-full mt-2 bg-background border border-border/60 px-4 py-3 text-sm focus:border-gold outline-none";
+
+function Field({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <label className="block">
+      <span className="text-[10px] tracking-[0.3em] uppercase text-muted-foreground">{label}</span>
+      {children}
+    </label>
   );
 }

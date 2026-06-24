@@ -121,6 +121,7 @@ function Landing() {
               </Link>
               <Link
                 to="/comprar"
+                search={{ ticket: "early-investors" as const }}
                 onClick={() => setMobileOpen(false)}
                 className="mt-2 text-center py-3 bg-gradient-gold text-primary-foreground text-xs uppercase tracking-widest shadow-gold"
               >
@@ -323,18 +324,24 @@ function Landing() {
                     </p>
                   </div>
                   <p className="text-xs text-muted-foreground mb-6 mt-auto">{t.seats}</p>
-                  {t.available ? (
+                  {t.available && (t.id === "early-investors" || t.id === "vip-board") ? (
                     <Link
                       to="/comprar"
-                      className="text-center py-3 text-xs tracking-widest uppercase transition bg-gradient-gold text-primary-foreground hover:opacity-90 shadow-gold"
+                      search={{ ticket: t.id as "early-investors" | "vip-board" }}
+                      className={`text-center py-3 text-xs tracking-widest uppercase transition ${
+                        t.featured
+                          ? "bg-gradient-gold text-primary-foreground hover:opacity-90 shadow-gold"
+                          : "border border-gold text-gold hover:bg-gold/10"
+                      }`}
                     >
-                      Comprar
+                      {t.id === "vip-board" ? "Reservar VIP" : "Comprar"}
                     </Link>
                   ) : (
                     <span className="text-center py-3 text-xs tracking-widest uppercase border border-border/60 text-muted-foreground cursor-not-allowed">
                       Em breve
                     </span>
                   )}
+
                 </div>
               ))}
             </div>
@@ -473,7 +480,7 @@ function Landing() {
           </p>
           <nav className="flex flex-wrap gap-x-6 gap-y-2 justify-center tracking-widest uppercase text-[10px]">
             <Link to="/admissao" className="hover:text-gold transition">Admissão</Link>
-            <Link to="/comprar" className="hover:text-gold transition">Bilhetes</Link>
+            <Link to="/comprar" search={{ ticket: "early-investors" as const }} className="hover:text-gold transition">Bilhetes</Link>
             <Link to="/patrocinios" className="hover:text-gold transition">Patrocínios</Link>
             <a href="mailto:reservas@theboard-forum.com" className="hover:text-gold transition">Contacto</a>
           </nav>

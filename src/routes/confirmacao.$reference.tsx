@@ -68,6 +68,7 @@ function Confirmacao() {
 
 
   const isMpesa = order.payment_method === "mpesa";
+  const isManual = order.payment_method === "manual";
 
   return (
     <div className="min-h-screen bg-background text-foreground py-24 px-6">
@@ -76,10 +77,10 @@ function Confirmacao() {
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-full border border-gold mb-6">
             <span className="text-gold font-display text-2xl">✓</span>
           </div>
-          <p className="text-[10px] tracking-[0.4em] uppercase text-gold mb-3">Reserva criada</p>
-          <h1 className="font-display text-3xl md:text-4xl">Aguardando pagamento</h1>
+          <p className="text-[10px] tracking-[0.4em] uppercase text-gold mb-3">Reserva provisória criada</p>
+          <h1 className="font-display text-3xl md:text-4xl">A sua vaga foi registada com prioridade</h1>
           <p className="mt-4 text-muted-foreground">
-            A sua reserva está provisória. Conclua o pagamento usando a referência abaixo.
+            Conclua o pagamento e preencha o Formulário de Admissão para validação do perfil.
           </p>
         </div>
 
@@ -97,13 +98,32 @@ function Confirmacao() {
           <div className="hairline-gold mx-auto my-6 max-w-[80px]" />
           <p className="font-display text-4xl">{order.amount_mt.toLocaleString("pt-PT")} <span className="text-base text-muted-foreground">MT</span></p>
           <p className="text-sm text-muted-foreground mt-2">{order.ticket_type}</p>
+          <p className="text-[10px] tracking-[0.3em] uppercase text-gold/80 mt-3">Estado: pagamento pendente</p>
         </div>
+
+        {/* Next step — admission */}
+        <div className="border border-gold/40 bg-gradient-to-b from-gold/5 to-transparent p-6 md:p-8 mb-8">
+          <p className="text-[10px] tracking-[0.4em] uppercase text-gold mb-3">Próxima etapa obrigatória</p>
+          <h2 className="font-display text-2xl">Formulário de Admissão Executiva</h2>
+          <p className="mt-3 text-sm text-muted-foreground leading-relaxed">
+            Após concluir o pagamento, preencha o Formulário de Admissão Executiva. A credencial final
+            será emitida apenas após validação do perfil pela Direção Executiva.
+          </p>
+          <Link
+            to="/admissao"
+            search={{ reference: order.reference }}
+            className="mt-5 inline-block px-6 py-3 bg-gradient-gold text-primary-foreground tracking-widest text-xs uppercase shadow-gold hover:opacity-90 transition"
+          >
+            Preencher Formulário de Admissão
+          </Link>
+        </div>
+
 
 
         {/* Payment instructions */}
         <div className="border border-border/40 bg-card/40 p-8 md:p-10 mb-8">
           <h2 className="font-display text-xl mb-6">
-            {isMpesa ? "Pagamento por M-Pesa" : "Transferência bancária"}
+            {isMpesa ? "Pagamento por M-Pesa" : isManual ? "Pagamento Manual" : "Transferência bancária"}
           </h2>
 
           {isMpesa ? (
@@ -114,6 +134,12 @@ function Confirmacao() {
               <li><span className="text-gold mr-2">4.</span>Valor: <span className="text-foreground font-medium">{order.amount_mt.toLocaleString("pt-PT")} MT</span></li>
               <li><span className="text-gold mr-2">5.</span>Indique a referência <span className="text-foreground font-display">{order.reference}</span> no campo de mensagem.</li>
             </ol>
+          ) : isManual ? (
+            <p className="text-sm text-muted-foreground leading-relaxed">
+              Para concluir o pagamento manual, contacte diretamente a organização indicando a sua
+              referência <span className="text-foreground font-display">{order.reference}</span>.
+              Um membro da equipa coordenará o método de pagamento mais conveniente.
+            </p>
           ) : (
             <dl className="space-y-4 text-sm">
               <div className="flex justify-between border-b border-border/40 pb-3">
@@ -146,9 +172,14 @@ function Confirmacao() {
                 reservas@theboard-forum.com
               </a>{" "}
               indicando a referência <span className="text-foreground font-display">{order.reference}</span>.
-              O bilhete será emitido em até 24h úteis para <span className="text-foreground">{order.buyer_email}</span>.
             </p>
           </div>
+        </div>
+
+        {/* Refund / admission policy */}
+        <div className="border border-border/40 bg-background/60 p-5 mb-8 text-xs text-muted-foreground leading-relaxed">
+          A admissão final está sujeita à validação executiva. Caso o perfil não seja elegível para a
+          categoria solicitada, o valor será reembolsado conforme a política do evento.
         </div>
 
         {/* Summary */}
@@ -160,10 +191,19 @@ function Confirmacao() {
           <div className="flex justify-between"><span className="text-muted-foreground">Estado</span><span className="text-gold uppercase tracking-widest text-xs">{order.status}</span></div>
         </div>
 
-        <div className="text-center">
-          <Link to="/" className="text-xs tracking-[0.3em] uppercase text-muted-foreground hover:text-gold">← Voltar ao início</Link>
+        <div className="flex flex-col sm:flex-row gap-3 justify-center text-xs tracking-widest uppercase">
+          <a
+            href={`mailto:reservas@theboard-forum.com?subject=Reserva ${order.reference}`}
+            className="px-5 py-3 border border-gold/40 text-gold hover:bg-gold/10 transition text-center"
+          >
+            Contactar organização
+          </a>
+          <Link to="/" className="px-5 py-3 border border-border/60 text-muted-foreground hover:text-gold hover:border-gold/40 transition text-center">
+            ← Voltar ao início
+          </Link>
         </div>
       </div>
     </div>
   );
 }
+
