@@ -86,6 +86,7 @@ const seatOptions = [
 
 function AdmissaoPage() {
   const navigate = useNavigate();
+  const { reference } = Route.useSearch();
   const [form, setForm] = useState<FormState>({
     name: "",
     email: "",
