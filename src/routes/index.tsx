@@ -323,18 +323,24 @@ function Landing() {
                     </p>
                   </div>
                   <p className="text-xs text-muted-foreground mb-6 mt-auto">{t.seats}</p>
-                  {t.available ? (
+                  {t.available && (t.id === "early-investors" || t.id === "vip-board") ? (
                     <Link
                       to="/comprar"
-                      className="text-center py-3 text-xs tracking-widest uppercase transition bg-gradient-gold text-primary-foreground hover:opacity-90 shadow-gold"
+                      search={{ ticket: t.id as "early-investors" | "vip-board" }}
+                      className={`text-center py-3 text-xs tracking-widest uppercase transition ${
+                        t.featured
+                          ? "bg-gradient-gold text-primary-foreground hover:opacity-90 shadow-gold"
+                          : "border border-gold text-gold hover:bg-gold/10"
+                      }`}
                     >
-                      Comprar
+                      {t.id === "vip-board" ? "Reservar VIP" : "Comprar"}
                     </Link>
                   ) : (
                     <span className="text-center py-3 text-xs tracking-widest uppercase border border-border/60 text-muted-foreground cursor-not-allowed">
                       Em breve
                     </span>
                   )}
+
                 </div>
               ))}
             </div>
