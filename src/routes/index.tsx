@@ -194,7 +194,7 @@ function Landing() {
       </section>
 
       {/* VISION */}
-      <section id="forum" className="py-32 relative">
+      <section id="forum" className="py-32 relative scroll-mt-24">
         <div className="max-w-6xl mx-auto px-6 grid md:grid-cols-12 gap-12 items-start">
           <div className="md:col-span-4">
             <p className="text-[10px] tracking-[0.4em] uppercase text-gold mb-4">01 — Visão</p>
@@ -242,7 +242,7 @@ function Landing() {
       </section>
 
       {/* AGENDA */}
-      <section id="agenda" className="py-32">
+      <section id="agenda" className="py-32 scroll-mt-24">
         <div className="max-w-5xl mx-auto px-6">
           <div className="mb-16 text-center">
             <p className="text-[10px] tracking-[0.4em] uppercase text-gold mb-4">03 — Agenda</p>
@@ -277,7 +277,7 @@ function Landing() {
       </section>
 
       {/* TICKETS */}
-      <section id="bilhetes" className="py-32 bg-card/40 border-y border-border/40">
+      <section id="bilhetes" className="py-32 bg-card/40 border-y border-border/40 scroll-mt-24">
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-16">
             <p className="text-[10px] tracking-[0.4em] uppercase text-gold mb-4">04 — Bilhética</p>
@@ -366,7 +366,7 @@ function Landing() {
       </section>
 
       {/* SPONSORS */}
-      <section id="patrocinios" className="py-32 bg-card/40 border-y border-border/40">
+      <section id="patrocinios" className="py-32 bg-card/40 border-y border-border/40 scroll-mt-24">
         <div className="max-w-6xl mx-auto px-6">
           <div className="text-center mb-16">
             <p className="text-[10px] tracking-[0.4em] uppercase text-gold mb-4">06 — Patrocínios</p>
@@ -407,7 +407,7 @@ function Landing() {
                   </ul>
                   <Link
                     to="/patrocinios"
-                    search={{ tier: s.id } as never}
+                    search={{ tier: s.id }}
                     className={`mt-10 py-3 text-center text-xs tracking-widest uppercase transition ${
                       s.highlight
                         ? "bg-gradient-gold text-primary-foreground hover:opacity-90"
@@ -416,6 +416,7 @@ function Landing() {
                   >
                     Solicitar proposta
                   </Link>
+
                 </div>
               ))}
             </div>
@@ -466,13 +467,20 @@ function Landing() {
 
       {/* FOOTER */}
       <footer className="border-t border-border/40 py-10">
-        <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row gap-4 justify-between items-center text-xs text-muted-foreground">
+        <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row gap-6 justify-between items-center text-xs text-muted-foreground">
           <p className="font-display tracking-[0.25em] text-foreground">
             THE <span className="text-gold">BOARD</span> · BIG PLAYERS FORUM
           </p>
+          <nav className="flex flex-wrap gap-x-6 gap-y-2 justify-center tracking-widest uppercase text-[10px]">
+            <Link to="/admissao" className="hover:text-gold transition">Admissão</Link>
+            <Link to="/comprar" className="hover:text-gold transition">Bilhetes</Link>
+            <Link to="/patrocinios" className="hover:text-gold transition">Patrocínios</Link>
+            <a href="mailto:reservas@theboard-forum.com" className="hover:text-gold transition">Contacto</a>
+          </nav>
           <p className="tracking-widest uppercase">© 2026 · Edição Moçambique &amp; Angola</p>
         </div>
       </footer>
+
     </div>
   );
 }
