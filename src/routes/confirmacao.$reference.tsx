@@ -76,10 +76,10 @@ function Confirmacao() {
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-full border border-gold mb-6">
             <span className="text-gold font-display text-2xl">✓</span>
           </div>
-          <p className="text-[10px] tracking-[0.4em] uppercase text-gold mb-3">Reserva criada</p>
-          <h1 className="font-display text-3xl md:text-4xl">Aguardando pagamento</h1>
+          <p className="text-[10px] tracking-[0.4em] uppercase text-gold mb-3">Reserva provisória criada</p>
+          <h1 className="font-display text-3xl md:text-4xl">A sua vaga foi registada com prioridade</h1>
           <p className="mt-4 text-muted-foreground">
-            A sua reserva está provisória. Conclua o pagamento usando a referência abaixo.
+            Conclua o pagamento e preencha o Formulário de Admissão para validação do perfil.
           </p>
         </div>
 
@@ -97,7 +97,26 @@ function Confirmacao() {
           <div className="hairline-gold mx-auto my-6 max-w-[80px]" />
           <p className="font-display text-4xl">{order.amount_mt.toLocaleString("pt-PT")} <span className="text-base text-muted-foreground">MT</span></p>
           <p className="text-sm text-muted-foreground mt-2">{order.ticket_type}</p>
+          <p className="text-[10px] tracking-[0.3em] uppercase text-gold/80 mt-3">Estado: pagamento pendente</p>
         </div>
+
+        {/* Next step — admission */}
+        <div className="border border-gold/40 bg-gradient-to-b from-gold/5 to-transparent p-6 md:p-8 mb-8">
+          <p className="text-[10px] tracking-[0.4em] uppercase text-gold mb-3">Próxima etapa obrigatória</p>
+          <h2 className="font-display text-2xl">Formulário de Admissão Executiva</h2>
+          <p className="mt-3 text-sm text-muted-foreground leading-relaxed">
+            Após concluir o pagamento, preencha o Formulário de Admissão Executiva. A credencial final
+            será emitida apenas após validação do perfil pela Direção Executiva.
+          </p>
+          <Link
+            to="/admissao"
+            search={{ reference: order.reference }}
+            className="mt-5 inline-block px-6 py-3 bg-gradient-gold text-primary-foreground tracking-widest text-xs uppercase shadow-gold hover:opacity-90 transition"
+          >
+            Preencher Formulário de Admissão
+          </Link>
+        </div>
+
 
 
         {/* Payment instructions */}
