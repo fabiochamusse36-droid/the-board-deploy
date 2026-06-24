@@ -194,7 +194,7 @@ function Landing() {
       </section>
 
       {/* VISION */}
-      <section id="forum" className="py-32 relative">
+      <section id="forum" className="py-32 relative scroll-mt-24">
         <div className="max-w-6xl mx-auto px-6 grid md:grid-cols-12 gap-12 items-start">
           <div className="md:col-span-4">
             <p className="text-[10px] tracking-[0.4em] uppercase text-gold mb-4">01 — Visão</p>
