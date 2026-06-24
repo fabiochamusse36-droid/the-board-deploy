@@ -366,7 +366,7 @@ function Landing() {
       </section>
 
       {/* SPONSORS */}
-      <section id="patrocinios" className="py-32 bg-card/40 border-y border-border/40">
+      <section id="patrocinios" className="py-32 bg-card/40 border-y border-border/40 scroll-mt-24">
         <div className="max-w-6xl mx-auto px-6">
           <div className="text-center mb-16">
             <p className="text-[10px] tracking-[0.4em] uppercase text-gold mb-4">06 — Patrocínios</p>
