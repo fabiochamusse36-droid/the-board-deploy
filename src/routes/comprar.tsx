@@ -94,6 +94,20 @@ function Comprar() {
           payment_method: form.payment_method,
         },
       });
+      // Persist mock client-side reservation state for the demo funnel.
+      saveReservation({
+        reference: res.reference,
+        ticketId: ticket.id,
+        ticketName: ticket.name,
+        amount: ticket.price * form.quantity,
+        quantity: form.quantity,
+        buyerName: form.name,
+        buyerEmail: form.email,
+        buyerPhone: form.phone,
+        country: form.country,
+        city: form.city,
+        paymentMethod: form.payment_method,
+      });
       navigate({ to: "/confirmacao/$reference", params: { reference: res.reference } });
     } catch (err) {
       setError(err instanceof Error ? err.message : "Erro ao criar reserva");
