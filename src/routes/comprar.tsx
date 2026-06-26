@@ -182,8 +182,8 @@ function Comprar() {
 
           <div>
             <p className="text-[10px] tracking-[0.3em] uppercase text-muted-foreground mb-3">Método de pagamento</p>
-            <div className="grid grid-cols-3 gap-3">
-              {(["mpesa", "bank", "manual"] as const).map((m) => (
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              {(["mpesa", "emola", "bank", "manual"] as const).map((m) => (
                 <button key={m} type="button"
                   onClick={() => setForm({ ...form, payment_method: m })}
                   className={`py-3 text-[10px] tracking-widest uppercase border transition ${
@@ -191,7 +191,11 @@ function Comprar() {
                       ? "border-gold text-gold bg-gold/10"
                       : "border-border/60 text-muted-foreground hover:border-gold/40"
                   }`}>
-                  {m === "mpesa" ? "M-Pesa" : m === "bank" ? "Transferência" : "Pagamento Manual"}
+                  {m === "mpesa" ? "M-Pesa" : m === "emola" ? "e-Mola" : m === "bank" ? "Transferência" : "Manual"}
+                </button>
+              ))}
+            </div>
+          </div>
                 </button>
               ))}
             </div>
