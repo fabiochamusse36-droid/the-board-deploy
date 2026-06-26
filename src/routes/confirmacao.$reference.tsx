@@ -266,7 +266,7 @@ function Confirmacao() {
           <div className="flex justify-between">
             <span className="text-muted-foreground">Estado</span>
             <span className="text-gold uppercase tracking-widest text-xs">
-              {isConfirmed ? "pagamento confirmado" : "pagamento pendente"}
+              {isConfirmed ? "pagamento confirmado" : "a processar pagamento"}
             </span>
           </div>
         </div>
