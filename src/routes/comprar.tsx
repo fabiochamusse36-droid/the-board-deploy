@@ -3,6 +3,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useMemo, useState } from "react";
 import { z } from "zod";
 import { createOrder } from "@/lib/orders.functions";
+import { saveReservation, type PaymentMethod } from "@/lib/reservations.mock";
 
 const TICKETS = {
   "early-investors": {
@@ -66,7 +67,7 @@ function Comprar() {
     country: "Moçambique",
     city: "",
     quantity: 1,
-    payment_method: "mpesa" as "mpesa" | "bank" | "manual",
+    payment_method: "mpesa" as PaymentMethod,
     consent: false,
   });
 
@@ -92,6 +93,20 @@ function Comprar() {
           quantity: form.quantity,
           payment_method: form.payment_method,
         },
+      });
+      // Persist mock client-side reservation state for the demo funnel.
+      saveReservation({
+        reference: res.reference,
+        ticketId: ticket.id,
+        ticketName: ticket.name,
+        amount: ticket.price * form.quantity,
+        quantity: form.quantity,
+        buyerName: form.name,
+        buyerEmail: form.email,
+        buyerPhone: form.phone,
+        country: form.country,
+        city: form.city,
+        paymentMethod: form.payment_method,
       });
       navigate({ to: "/confirmacao/$reference", params: { reference: res.reference } });
     } catch (err) {
@@ -167,8 +182,8 @@ function Comprar() {
 
           <div>
             <p className="text-[10px] tracking-[0.3em] uppercase text-muted-foreground mb-3">Método de pagamento</p>
-            <div className="grid grid-cols-3 gap-3">
-              {(["mpesa", "bank", "manual"] as const).map((m) => (
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              {(["mpesa", "emola", "bank", "manual"] as const).map((m) => (
                 <button key={m} type="button"
                   onClick={() => setForm({ ...form, payment_method: m })}
                   className={`py-3 text-[10px] tracking-widest uppercase border transition ${
@@ -176,7 +191,7 @@ function Comprar() {
                       ? "border-gold text-gold bg-gold/10"
                       : "border-border/60 text-muted-foreground hover:border-gold/40"
                   }`}>
-                  {m === "mpesa" ? "M-Pesa" : m === "bank" ? "Transferência" : "Pagamento Manual"}
+                  {m === "mpesa" ? "M-Pesa" : m === "emola" ? "e-Mola" : m === "bank" ? "Transferência" : "Manual"}
                 </button>
               ))}
             </div>
