@@ -67,7 +67,7 @@ function Comprar() {
     country: "Moçambique",
     city: "",
     quantity: 1,
-    payment_method: "mpesa" as "mpesa" | "bank" | "manual",
+    payment_method: "mpesa" as PaymentMethod,
     consent: false,
   });
 
