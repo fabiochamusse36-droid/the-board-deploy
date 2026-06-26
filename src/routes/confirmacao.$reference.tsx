@@ -45,12 +45,22 @@ function Confirmacao() {
     getOrder({ data: { reference } })
       .then((o) => active && setOrder(o))
       .catch((e) => active && setError(e instanceof Error ? e.message : "Erro"));
-    // Hydrate mock client-side state. If missing (e.g., reload on another
-    // device), keep null and treat as payment_pending by default.
     const { data } = getReservation(reference);
     if (active) setReservation(data);
     return () => { active = false; };
   }, [reference]);
+
+  // Automatic deterministic payment validation: processing → confirmed
+  // after ~2.5s. Internal mock; swapped for gateway webhook later.
+  useEffect(() => {
+    if (!order) return;
+    if (reservation?.paymentStatus === "payment_confirmed") return;
+    const t = window.setTimeout(() => {
+      const { data } = confirmPaymentMock(reference);
+      if (data) setReservation(data);
+    }, 2500);
+    return () => window.clearTimeout(t);
+  }, [order, reservation?.paymentStatus, reference]);
 
   async function copyReference() {
     try {
@@ -60,11 +70,6 @@ function Confirmacao() {
     } catch {
       setCopied(false);
     }
-  }
-
-  function handleSimulatePayment() {
-    const { data } = confirmPaymentMock(reference);
-    if (data) setReservation(data);
   }
 
   if (error) {
