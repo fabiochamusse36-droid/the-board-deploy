@@ -14,7 +14,7 @@ const createSchema = z.object({
   country: z.string().trim().max(80).optional().default(""),
   city: z.string().trim().max(80).optional().default(""),
   quantity: z.number().int().min(1).max(10).optional().default(1),
-  payment_method: z.enum(["mpesa", "bank", "manual"]),
+  payment_method: z.enum(["mpesa", "emola", "bank", "manual"]),
 });
 
 function genReference() {
