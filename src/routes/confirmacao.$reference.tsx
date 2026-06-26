@@ -45,12 +45,22 @@ function Confirmacao() {
     getOrder({ data: { reference } })
       .then((o) => active && setOrder(o))
       .catch((e) => active && setError(e instanceof Error ? e.message : "Erro"));
-    // Hydrate mock client-side state. If missing (e.g., reload on another
-    // device), keep null and treat as payment_pending by default.
     const { data } = getReservation(reference);
     if (active) setReservation(data);
     return () => { active = false; };
   }, [reference]);
+
+  // Automatic deterministic payment validation: processing → confirmed
+  // after ~2.5s. Internal mock; swapped for gateway webhook later.
+  useEffect(() => {
+    if (!order) return;
+    if (reservation?.paymentStatus === "payment_confirmed") return;
+    const t = window.setTimeout(() => {
+      const { data } = confirmPaymentMock(reference);
+      if (data) setReservation(data);
+    }, 2500);
+    return () => window.clearTimeout(t);
+  }, [order, reservation?.paymentStatus, reference]);
 
   async function copyReference() {
     try {
@@ -60,11 +70,6 @@ function Confirmacao() {
     } catch {
       setCopied(false);
     }
-  }
-
-  function handleSimulatePayment() {
-    const { data } = confirmPaymentMock(reference);
-    if (data) setReservation(data);
   }
 
   if (error) {
@@ -95,20 +100,24 @@ function Confirmacao() {
       <div className="max-w-2xl mx-auto">
         <div className="text-center mb-12">
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-full border border-gold mb-6">
-            <span className="text-gold font-display text-2xl">{isConfirmed ? "✓" : "•"}</span>
+            {isConfirmed ? (
+              <span className="text-gold font-display text-2xl">✓</span>
+            ) : (
+              <span className="block w-5 h-5 border-2 border-gold border-t-transparent rounded-full animate-spin" aria-hidden="true" />
+            )}
           </div>
           <p className="text-[10px] tracking-[0.4em] uppercase text-gold mb-3">
-            {isConfirmed ? "Pagamento confirmado" : "Reserva provisória criada"}
+            {isConfirmed ? "Pagamento confirmado" : "Validação em curso"}
           </p>
           <h1 className="font-display text-3xl md:text-4xl">
             {isConfirmed
               ? "Pagamento validado. Continue para a admissão."
-              : "A sua vaga foi registada com prioridade"}
+              : "Validação de pagamento em curso"}
           </h1>
           <p className="mt-4 text-muted-foreground">
             {isConfirmed
-              ? "Preencha agora o Formulário de Admissão Executiva para conclusão da validação do perfil."
-              : "Conclua o pagamento para liberar o Formulário de Admissão."}
+              ? "O pagamento foi validado. Preencha agora o Formulário de Admissão Executiva para concluir a validação do perfil."
+              : "Estamos a validar o pagamento associado à sua reserva. O Formulário de Admissão será liberado assim que a confirmação for recebida."}
           </p>
         </div>
 
@@ -126,9 +135,9 @@ function Confirmacao() {
           <div className="hairline-gold mx-auto my-6 max-w-[80px]" />
           <p className="font-display text-4xl">{order.amount_mt.toLocaleString("pt-PT")} <span className="text-base text-muted-foreground">MT</span></p>
           <p className="text-sm text-muted-foreground mt-2">{order.ticket_type}</p>
-          <p className="text-[10px] tracking-[0.3em] uppercase mt-3" style={{ color: isConfirmed ? "var(--color-gold, #c9a449)" : undefined }}>
+          <p className="text-[10px] tracking-[0.3em] uppercase mt-3">
             <span className={isConfirmed ? "text-gold" : "text-gold/80"}>
-              Estado: {isConfirmed ? "pagamento confirmado" : "pagamento pendente"}
+              Estado: {isConfirmed ? "pagamento confirmado" : "a processar pagamento"}
             </span>
           </p>
         </div>
@@ -141,8 +150,8 @@ function Confirmacao() {
           <h2 className="font-display text-2xl">Formulário de Admissão Executiva</h2>
           <p className="mt-3 text-sm text-muted-foreground leading-relaxed">
             {isConfirmed
-              ? "O pagamento foi validado. Preencha agora o Formulário de Admissão Executiva para conclusão da validação do perfil."
-              : "O Formulário de Admissão Executiva será liberado após a confirmação do pagamento. A credencial final será emitida apenas após validação do perfil pela Direção Executiva."}
+              ? "O pagamento foi validado. Preencha agora o Formulário de Admissão Executiva para concluir a validação do perfil."
+              : "O Formulário de Admissão Executiva será liberado assim que a confirmação do pagamento for recebida. A credencial final será emitida apenas após validação do perfil pela Direção Executiva."}
           </p>
 
           {isConfirmed ? (
@@ -154,31 +163,18 @@ function Confirmacao() {
               Preencher Formulário de Admissão
             </Link>
           ) : (
-            <>
-              <button
-                type="button"
-                disabled
-                className="mt-5 inline-block px-6 py-3 border border-border/60 text-muted-foreground tracking-widest text-xs uppercase cursor-not-allowed opacity-70"
-              >
-                Aguardando validação do pagamento
-              </button>
-
-              {/* Demo-only: this CTA will be removed once gateway validation is wired in. */}
-              <div className="mt-6 pt-5 border-t border-dashed border-border/60">
-                <p className="text-[10px] tracking-[0.3em] uppercase text-muted-foreground mb-3">
-                  Demo · substituído por validação automática do gateway
-                </p>
-                <button
-                  type="button"
-                  onClick={handleSimulatePayment}
-                  className="px-5 py-3 border border-gold/40 text-gold text-[10px] tracking-widest uppercase hover:bg-gold/10 transition"
-                >
-                  Simular pagamento confirmado
-                </button>
-              </div>
-            </>
+            <button
+              type="button"
+              disabled
+              aria-busy="true"
+              className="mt-5 inline-flex items-center gap-3 px-6 py-3 border border-border/60 text-muted-foreground tracking-widest text-xs uppercase cursor-not-allowed opacity-70"
+            >
+              <span className="block w-3 h-3 border-2 border-muted-foreground border-t-transparent rounded-full animate-spin" aria-hidden="true" />
+              Aguardando confirmação
+            </button>
           )}
         </div>
+
 
         {/* Payment instructions */}
         <div className="border border-border/40 bg-card/40 p-8 md:p-10 mb-8">
@@ -270,7 +266,7 @@ function Confirmacao() {
           <div className="flex justify-between">
             <span className="text-muted-foreground">Estado</span>
             <span className="text-gold uppercase tracking-widest text-xs">
-              {isConfirmed ? "pagamento confirmado" : "pagamento pendente"}
+              {isConfirmed ? "pagamento confirmado" : "a processar pagamento"}
             </span>
           </div>
         </div>
