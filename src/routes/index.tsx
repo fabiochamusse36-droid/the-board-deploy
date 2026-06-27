@@ -481,7 +481,7 @@ function Landing() {
             THE <span className="text-gold">BOARD</span> · BIG PLAYERS FORUM
           </p>
           <nav className="flex flex-wrap gap-x-6 gap-y-2 justify-center tracking-widest uppercase text-[10px]">
-            <Link to="/admissao" className="hover:text-gold transition">Admissão</Link>
+            <a href="#bilhetes" className="hover:text-gold transition">Processo</a>
             <Link to="/comprar" search={{ ticket: "early-investors" as const }} className="hover:text-gold transition">Bilhetes</Link>
             <Link to="/patrocinios" className="hover:text-gold transition">Patrocínios</Link>
             <a href="mailto:reservas@theboard-forum.com" className="hover:text-gold transition">Contacto</a>
