@@ -76,11 +76,12 @@ function Landing() {
             {navLinks.map((l) => (
               <a key={l.href} href={l.href} className="hover:text-gold transition">{l.label}</a>
             ))}
-            <Link to="/admissao" className="hover:text-gold transition">Admissão</Link>
+            <a href="#bilhetes" className="hover:text-gold transition">Processo</a>
           </div>
           <div className="flex items-center gap-3">
             <Link
-              to="/admissao"
+              to="/comprar"
+              search={{ ticket: "early-investors" as const }}
               className="hidden sm:inline-flex text-xs tracking-widest uppercase px-5 py-2.5 border border-gold text-gold hover:bg-gold hover:text-primary-foreground transition"
             >
               Candidatar-me
@@ -113,11 +114,12 @@ function Landing() {
                 </a>
               ))}
               <Link
-                to="/admissao"
+                to="/comprar"
+                search={{ ticket: "early-investors" as const }}
                 onClick={() => setMobileOpen(false)}
                 className="text-center py-3 border border-gold/60 text-gold text-xs uppercase tracking-widest"
               >
-                Admissão
+                Candidatar-me
               </Link>
               <Link
                 to="/comprar"
@@ -459,7 +461,7 @@ function Landing() {
             Inicie a sua candidatura ou solicite o dossier de patrocínio.
           </p>
           <div className="mt-12 flex flex-col sm:flex-row gap-4 justify-center">
-            <Link to="/admissao" className="px-10 py-5 bg-gradient-gold text-primary-foreground font-medium tracking-widest text-xs uppercase shadow-gold hover:opacity-90 transition">
+            <Link to="/comprar" search={{ ticket: "early-investors" as const }} className="px-10 py-5 bg-gradient-gold text-primary-foreground font-medium tracking-widest text-xs uppercase shadow-gold hover:opacity-90 transition">
               Candidatar-me
             </Link>
             <Link to="/patrocinios" className="px-10 py-5 border border-gold/60 text-gold font-medium tracking-widest text-xs uppercase hover:bg-gold/10 transition">
@@ -479,7 +481,7 @@ function Landing() {
             THE <span className="text-gold">BOARD</span> · BIG PLAYERS FORUM
           </p>
           <nav className="flex flex-wrap gap-x-6 gap-y-2 justify-center tracking-widest uppercase text-[10px]">
-            <Link to="/admissao" className="hover:text-gold transition">Admissão</Link>
+            <a href="#bilhetes" className="hover:text-gold transition">Processo</a>
             <Link to="/comprar" search={{ ticket: "early-investors" as const }} className="hover:text-gold transition">Bilhetes</Link>
             <Link to="/patrocinios" className="hover:text-gold transition">Patrocínios</Link>
             <a href="mailto:reservas@theboard-forum.com" className="hover:text-gold transition">Contacto</a>

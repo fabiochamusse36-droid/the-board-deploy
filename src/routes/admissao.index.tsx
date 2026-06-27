@@ -1,6 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { z } from "zod";
+import { getReservation, type MockReservation } from "@/lib/reservations.mock";
 
 const searchSchema = z.object({
   reference: z.string().trim().min(4).max(40).optional(),
@@ -87,6 +88,19 @@ const seatOptions = [
 function AdmissaoPage() {
   const navigate = useNavigate();
   const { reference } = Route.useSearch();
+  const [reservation, setReservation] = useState<MockReservation | null>(null);
+  const [gateChecked, setGateChecked] = useState(false);
+
+  useEffect(() => {
+    if (!reference) {
+      setGateChecked(true);
+      return;
+    }
+    const { data } = getReservation(reference);
+    setReservation(data);
+    setGateChecked(true);
+  }, [reference]);
+
   const [form, setForm] = useState<FormState>({
     name: "",
     email: "",
@@ -133,6 +147,21 @@ function AdmissaoPage() {
     } finally {
       setLoading(false);
     }
+  }
+
+  // Gate: no reference → block; reference but unpaid → block.
+  if (gateChecked && !reference) {
+    return <AdmissionGate variant="no-reference" />;
+  }
+  if (gateChecked && reference && (!reservation || reservation.paymentStatus !== "payment_confirmed")) {
+    return <AdmissionGate variant="unpaid" reference={reference} />;
+  }
+  if (!gateChecked) {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-muted-foreground text-xs tracking-widest uppercase">
+        A validar acesso…
+      </div>
+    );
   }
 
   return (
@@ -385,5 +414,63 @@ function Select({
         </option>
       ))}
     </select>
+  );
+}
+
+function AdmissionGate({
+  variant,
+  reference,
+}: {
+  variant: "no-reference" | "unpaid";
+  reference?: string;
+}) {
+  const isUnpaid = variant === "unpaid";
+  return (
+    <div className="min-h-screen bg-background text-foreground flex items-center justify-center px-6 py-24">
+      <div className="max-w-lg w-full text-center border border-gold/40 bg-gradient-to-b from-card/60 to-background p-10 md:p-12 shadow-gold">
+        <p className="text-[10px] tracking-[0.4em] uppercase text-gold mb-4">
+          {isUnpaid ? "Pagamento em validação" : "Reserva necessária"}
+        </p>
+        <h1 className="font-display text-3xl md:text-4xl leading-tight">
+          {isUnpaid ? "Pagamento em validação" : "Reserva necessária para continuar"}
+        </h1>
+        <div className="hairline-gold mx-auto my-6 max-w-[80px]" />
+        <p className="text-sm text-muted-foreground leading-relaxed">
+          {isUnpaid
+            ? "A sua reserva foi localizada, mas o Formulário de Admissão será liberado apenas após confirmação do pagamento."
+            : "O Formulário de Admissão Executiva é liberado apenas após criação de reserva e confirmação de pagamento."}
+        </p>
+        {isUnpaid && reference ? (
+          <p className="mt-4 text-[10px] tracking-[0.3em] uppercase text-muted-foreground">
+            Referência: <span className="text-foreground font-display">{reference}</span>
+          </p>
+        ) : null}
+        <div className="mt-8 flex flex-col sm:flex-row gap-3 justify-center">
+          {isUnpaid && reference ? (
+            <Link
+              to="/confirmacao/$reference"
+              params={{ reference }}
+              className="px-8 py-4 bg-gradient-gold text-primary-foreground text-xs tracking-widest uppercase shadow-gold hover:opacity-90 transition"
+            >
+              Ver estado da reserva
+            </Link>
+          ) : (
+            <Link
+              to="/comprar"
+              search={{ ticket: "early-investors" as const }}
+              className="px-8 py-4 bg-gradient-gold text-primary-foreground text-xs tracking-widest uppercase shadow-gold hover:opacity-90 transition"
+            >
+              Criar Reserva
+            </Link>
+          )}
+          <Link
+            to="/"
+            className="px-8 py-4 border border-gold/40 text-gold text-xs tracking-widest uppercase hover:bg-gold/10 transition"
+          >
+            ← Voltar ao início
+          </Link>
+        </div>
+      </div>
+    </div>
   );
 }
