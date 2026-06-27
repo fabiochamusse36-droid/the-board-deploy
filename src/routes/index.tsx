@@ -114,11 +114,12 @@ function Landing() {
                 </a>
               ))}
               <Link
-                to="/admissao"
+                to="/comprar"
+                search={{ ticket: "early-investors" as const }}
                 onClick={() => setMobileOpen(false)}
                 className="text-center py-3 border border-gold/60 text-gold text-xs uppercase tracking-widest"
               >
-                Admissão
+                Candidatar-me
               </Link>
               <Link
                 to="/comprar"
