@@ -155,11 +155,6 @@ function Confirmacao() {
           </p>
         </div>
 
-        {/* Admission gate */}
-        <div className={`border p-6 md:p-8 mb-8 ${isConfirmed ? "border-gold/60 bg-gradient-to-b from-gold/10 to-transparent" : "border-border/60 bg-card/40"}`}>
-          <p className="text-[10px] tracking-[0.4em] uppercase text-gold mb-3">
-            {isConfirmed ? "Formulário de Admissão liberado" : "Formulário de Admissão bloqueado"}
-          </p>
         {/* Admission gate — automatic transition, no manual continue button */}
         <div className={`border p-6 md:p-8 mb-8 ${isConfirmed ? "border-gold/60 bg-gradient-to-b from-gold/10 to-transparent" : "border-border/60 bg-card/40"}`}>
           <p className="text-[10px] tracking-[0.4em] uppercase text-gold mb-3">
