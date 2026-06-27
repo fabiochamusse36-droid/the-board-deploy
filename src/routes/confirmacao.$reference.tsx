@@ -35,6 +35,7 @@ export const Route = createFileRoute("/confirmacao/$reference")({
 
 function Confirmacao() {
   const { reference } = Route.useParams();
+  const navigate = useNavigate();
   const [order, setOrder] = useState<Order | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
@@ -51,7 +52,7 @@ function Confirmacao() {
   }, [reference]);
 
   // Automatic deterministic payment validation: processing → confirmed
-  // after ~2.5s. Internal mock; swapped for gateway webhook later.
+  // after ~2.5s, then auto-redirect to admission form after ~1.8s.
   useEffect(() => {
     if (!order) return;
     if (reservation?.paymentStatus === "payment_confirmed") return;
@@ -61,6 +62,14 @@ function Confirmacao() {
     }, 2500);
     return () => window.clearTimeout(t);
   }, [order, reservation?.paymentStatus, reference]);
+
+  useEffect(() => {
+    if (reservation?.paymentStatus !== "payment_confirmed") return;
+    const t = window.setTimeout(() => {
+      navigate({ to: "/admissao", search: { reference } });
+    }, 1800);
+    return () => window.clearTimeout(t);
+  }, [reservation?.paymentStatus, reference, navigate]);
 
   async function copyReference() {
     try {
