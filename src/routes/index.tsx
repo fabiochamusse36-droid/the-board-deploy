@@ -76,11 +76,12 @@ function Landing() {
             {navLinks.map((l) => (
               <a key={l.href} href={l.href} className="hover:text-gold transition">{l.label}</a>
             ))}
-            <Link to="/admissao" className="hover:text-gold transition">Admissão</Link>
+            <a href="#bilhetes" className="hover:text-gold transition">Processo</a>
           </div>
           <div className="flex items-center gap-3">
             <Link
-              to="/admissao"
+              to="/comprar"
+              search={{ ticket: "early-investors" as const }}
               className="hidden sm:inline-flex text-xs tracking-widest uppercase px-5 py-2.5 border border-gold text-gold hover:bg-gold hover:text-primary-foreground transition"
             >
               Candidatar-me
