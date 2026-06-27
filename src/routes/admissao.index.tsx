@@ -88,6 +88,19 @@ const seatOptions = [
 function AdmissaoPage() {
   const navigate = useNavigate();
   const { reference } = Route.useSearch();
+  const [reservation, setReservation] = useState<MockReservation | null>(null);
+  const [gateChecked, setGateChecked] = useState(false);
+
+  useEffect(() => {
+    if (!reference) {
+      setGateChecked(true);
+      return;
+    }
+    const { data } = getReservation(reference);
+    setReservation(data);
+    setGateChecked(true);
+  }, [reference]);
+
   const [form, setForm] = useState<FormState>({
     name: "",
     email: "",
