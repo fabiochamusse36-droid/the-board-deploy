@@ -149,6 +149,21 @@ function AdmissaoPage() {
     }
   }
 
+  // Gate: no reference → block; reference but unpaid → block.
+  if (gateChecked && !reference) {
+    return <AdmissionGate variant="no-reference" />;
+  }
+  if (gateChecked && reference && (!reservation || reservation.paymentStatus !== "payment_confirmed")) {
+    return <AdmissionGate variant="unpaid" reference={reference} />;
+  }
+  if (!gateChecked) {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-muted-foreground text-xs tracking-widest uppercase">
+        A validar acesso…
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-background text-foreground overflow-x-hidden">
       {/* HEADER */}
