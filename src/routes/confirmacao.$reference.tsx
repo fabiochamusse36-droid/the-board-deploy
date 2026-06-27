@@ -160,32 +160,34 @@ function Confirmacao() {
           <p className="text-[10px] tracking-[0.4em] uppercase text-gold mb-3">
             {isConfirmed ? "Formulário de Admissão liberado" : "Formulário de Admissão bloqueado"}
           </p>
+        {/* Admission gate — automatic transition, no manual continue button */}
+        <div className={`border p-6 md:p-8 mb-8 ${isConfirmed ? "border-gold/60 bg-gradient-to-b from-gold/10 to-transparent" : "border-border/60 bg-card/40"}`}>
+          <p className="text-[10px] tracking-[0.4em] uppercase text-gold mb-3">
+            {isConfirmed ? "Formulário de Admissão liberado" : "Formulário de Admissão bloqueado"}
+          </p>
           <h2 className="font-display text-2xl">Formulário de Admissão Executiva</h2>
           <p className="mt-3 text-sm text-muted-foreground leading-relaxed">
             {isConfirmed
-              ? "O pagamento foi validado. Preencha agora o Formulário de Admissão Executiva para concluir a validação do perfil."
+              ? "A abrir Formulário de Admissão…"
               : "O Formulário de Admissão Executiva será liberado assim que a confirmação do pagamento for recebida. A credencial final será emitida apenas após validação do perfil pela Direção Executiva."}
           </p>
 
-          {isConfirmed ? (
-            <Link
-              to="/admissao"
-              search={{ reference: order.reference }}
-              className="mt-5 inline-block px-6 py-3 bg-gradient-gold text-primary-foreground tracking-widest text-xs uppercase shadow-gold hover:opacity-90 transition"
-            >
-              Preencher Formulário de Admissão
-            </Link>
-          ) : (
-            <button
-              type="button"
-              disabled
-              aria-busy="true"
-              className="mt-5 inline-flex items-center gap-3 px-6 py-3 border border-border/60 text-muted-foreground tracking-widest text-xs uppercase cursor-not-allowed opacity-70"
-            >
-              <span className="block w-3 h-3 border-2 border-muted-foreground border-t-transparent rounded-full animate-spin" aria-hidden="true" />
-              Aguardando confirmação
-            </button>
-          )}
+          <div
+            aria-live="polite"
+            className={`mt-5 inline-flex items-center gap-3 px-6 py-3 border tracking-widest text-xs uppercase ${
+              isConfirmed
+                ? "border-gold/60 text-gold bg-gold/5"
+                : "border-border/60 text-muted-foreground opacity-70"
+            }`}
+          >
+            <span
+              className={`block w-3 h-3 rounded-full border-2 border-t-transparent animate-spin ${
+                isConfirmed ? "border-gold" : "border-muted-foreground"
+              }`}
+              aria-hidden="true"
+            />
+            {isConfirmed ? "A abrir Formulário de Admissão…" : "Aguardando confirmação"}
+          </div>
         </div>
 
 
