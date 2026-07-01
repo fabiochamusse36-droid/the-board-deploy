@@ -117,17 +117,9 @@ function Landing() {
                 to="/comprar"
                 search={{ ticket: "early-investors" as const }}
                 onClick={() => setMobileOpen(false)}
-                className="text-center py-3 border border-gold/60 text-gold text-xs uppercase tracking-widest"
-              >
-                Candidatar-me
-              </Link>
-              <Link
-                to="/comprar"
-                search={{ ticket: "early-investors" as const }}
-                onClick={() => setMobileOpen(false)}
                 className="mt-2 text-center py-3 bg-gradient-gold text-primary-foreground text-xs uppercase tracking-widest shadow-gold"
               >
-                Comprar bilhete
+                Garantir Lugar
               </Link>
               <Link
                 to="/patrocinios"
