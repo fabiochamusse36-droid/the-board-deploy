@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as PatrociniosRouteImport } from './routes/patrocinios'
 import { Route as ComprarRouteImport } from './routes/comprar'
+import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdmissaoIndexRouteImport } from './routes/admissao.index'
 import { Route as ConfirmacaoReferenceRouteImport } from './routes/confirmacao.$reference'
@@ -24,6 +25,11 @@ const PatrociniosRoute = PatrociniosRouteImport.update({
 const ComprarRoute = ComprarRouteImport.update({
   id: '/comprar',
   path: '/comprar',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -49,6 +55,7 @@ const AdmissaoObrigadoRoute = AdmissaoObrigadoRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
   '/comprar': typeof ComprarRoute
   '/patrocinios': typeof PatrociniosRoute
   '/admissao/obrigado': typeof AdmissaoObrigadoRoute
@@ -57,6 +64,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
   '/comprar': typeof ComprarRoute
   '/patrocinios': typeof PatrociniosRoute
   '/admissao/obrigado': typeof AdmissaoObrigadoRoute
@@ -66,6 +74,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
   '/comprar': typeof ComprarRoute
   '/patrocinios': typeof PatrociniosRoute
   '/admissao/obrigado': typeof AdmissaoObrigadoRoute
@@ -76,6 +85,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/admin'
     | '/comprar'
     | '/patrocinios'
     | '/admissao/obrigado'
@@ -84,6 +94,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/admin'
     | '/comprar'
     | '/patrocinios'
     | '/admissao/obrigado'
@@ -92,6 +103,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/admin'
     | '/comprar'
     | '/patrocinios'
     | '/admissao/obrigado'
@@ -101,6 +113,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AdminRoute: typeof AdminRoute
   ComprarRoute: typeof ComprarRoute
   PatrociniosRoute: typeof PatrociniosRoute
   AdmissaoObrigadoRoute: typeof AdmissaoObrigadoRoute
@@ -122,6 +135,13 @@ declare module '@tanstack/react-router' {
       path: '/comprar'
       fullPath: '/comprar'
       preLoaderRoute: typeof ComprarRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -157,6 +177,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AdminRoute: AdminRoute,
   ComprarRoute: ComprarRoute,
   PatrociniosRoute: PatrociniosRoute,
   AdmissaoObrigadoRoute: AdmissaoObrigadoRoute,
