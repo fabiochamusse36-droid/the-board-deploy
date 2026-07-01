@@ -84,7 +84,7 @@ function Landing() {
               search={{ ticket: "early-investors" as const }}
               className="hidden sm:inline-flex text-xs tracking-widest uppercase px-5 py-2.5 border border-gold text-gold hover:bg-gold hover:text-primary-foreground transition"
             >
-              Candidatar-me
+              Garantir Lugar
             </Link>
             <button
               type="button"
@@ -117,17 +117,9 @@ function Landing() {
                 to="/comprar"
                 search={{ ticket: "early-investors" as const }}
                 onClick={() => setMobileOpen(false)}
-                className="text-center py-3 border border-gold/60 text-gold text-xs uppercase tracking-widest"
-              >
-                Candidatar-me
-              </Link>
-              <Link
-                to="/comprar"
-                search={{ ticket: "early-investors" as const }}
-                onClick={() => setMobileOpen(false)}
                 className="mt-2 text-center py-3 bg-gradient-gold text-primary-foreground text-xs uppercase tracking-widest shadow-gold"
               >
-                Comprar bilhete
+                Garantir Lugar
               </Link>
               <Link
                 to="/patrocinios"
@@ -458,11 +450,11 @@ function Landing() {
           </h2>
           <p className="mt-6 text-muted-foreground text-lg">
             Os lugares são limitados e atribuídos por critério de elegibilidade.
-            Inicie a sua candidatura ou solicite o dossier de patrocínio.
+            Garanta a sua reserva ou solicite o dossier de patrocínio.
           </p>
           <div className="mt-12 flex flex-col sm:flex-row gap-4 justify-center">
             <Link to="/comprar" search={{ ticket: "early-investors" as const }} className="px-10 py-5 bg-gradient-gold text-primary-foreground font-medium tracking-widest text-xs uppercase shadow-gold hover:opacity-90 transition">
-              Candidatar-me
+              Garantir Lugar
             </Link>
             <Link to="/patrocinios" className="px-10 py-5 border border-gold/60 text-gold font-medium tracking-widest text-xs uppercase hover:bg-gold/10 transition">
               Dossier de Patrocínio

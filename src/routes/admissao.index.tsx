@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { z } from "zod";
-import { getReservation, type MockReservation } from "@/lib/reservations.mock";
+
 
 const searchSchema = z.object({
   reference: z.string().trim().min(4).max(40).optional(),
@@ -88,18 +88,12 @@ const seatOptions = [
 function AdmissaoPage() {
   const navigate = useNavigate();
   const { reference } = Route.useSearch();
-  const [reservation, setReservation] = useState<MockReservation | null>(null);
   const [gateChecked, setGateChecked] = useState(false);
 
   useEffect(() => {
-    if (!reference) {
-      setGateChecked(true);
-      return;
-    }
-    const { data } = getReservation(reference);
-    setReservation(data);
     setGateChecked(true);
   }, [reference]);
+
 
   const [form, setForm] = useState<FormState>({
     name: "",
@@ -149,13 +143,6 @@ function AdmissaoPage() {
     }
   }
 
-  // Gate: no reference → block; reference but unpaid → block.
-  if (gateChecked && !reference) {
-    return <AdmissionGate variant="no-reference" />;
-  }
-  if (gateChecked && reference && (!reservation || reservation.paymentStatus !== "payment_confirmed")) {
-    return <AdmissionGate variant="unpaid" reference={reference} />;
-  }
   if (!gateChecked) {
     return (
       <div className="min-h-screen flex items-center justify-center text-muted-foreground text-xs tracking-widest uppercase">
