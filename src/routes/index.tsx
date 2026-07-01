@@ -450,11 +450,11 @@ function Landing() {
           </h2>
           <p className="mt-6 text-muted-foreground text-lg">
             Os lugares são limitados e atribuídos por critério de elegibilidade.
-            Inicie a sua candidatura ou solicite o dossier de patrocínio.
+            Garanta a sua reserva ou solicite o dossier de patrocínio.
           </p>
           <div className="mt-12 flex flex-col sm:flex-row gap-4 justify-center">
             <Link to="/comprar" search={{ ticket: "early-investors" as const }} className="px-10 py-5 bg-gradient-gold text-primary-foreground font-medium tracking-widest text-xs uppercase shadow-gold hover:opacity-90 transition">
-              Candidatar-me
+              Garantir Lugar
             </Link>
             <Link to="/patrocinios" className="px-10 py-5 border border-gold/60 text-gold font-medium tracking-widest text-xs uppercase hover:bg-gold/10 transition">
               Dossier de Patrocínio
