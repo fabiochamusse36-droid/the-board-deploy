@@ -218,7 +218,7 @@ function Comprar() {
 
           <button type="submit" disabled={loading}
             className="w-full py-4 bg-gradient-gold text-primary-foreground tracking-widest text-xs uppercase shadow-gold hover:opacity-90 transition disabled:opacity-50">
-            {loading ? "A processar…" : "Criar Reserva"}
+            {loading ? "A processar…" : "Criar Reserva e Continuar"}
           </button>
           <p className="text-xs text-muted-foreground text-center">
             Receberá a referência de pagamento na próxima página. A credencial é emitida após validação
