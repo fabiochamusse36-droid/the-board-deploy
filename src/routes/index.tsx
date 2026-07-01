@@ -84,7 +84,7 @@ function Landing() {
               search={{ ticket: "early-investors" as const }}
               className="hidden sm:inline-flex text-xs tracking-widest uppercase px-5 py-2.5 border border-gold text-gold hover:bg-gold hover:text-primary-foreground transition"
             >
-              Candidatar-me
+              Garantir Lugar
             </Link>
             <button
               type="button"
