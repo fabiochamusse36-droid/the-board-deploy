@@ -203,6 +203,11 @@ function Comprar() {
                 </button>
               ))}
             </div>
+            {(form.payment_method === "mpesa" || form.payment_method === "emola") && (
+              <p className="mt-3 text-[11px] text-muted-foreground leading-relaxed">
+                O número informado será usado para associar a validação do pagamento.
+              </p>
+            )}
           </div>
 
           <div className="flex justify-between items-baseline border-t border-border/40 pt-5">
