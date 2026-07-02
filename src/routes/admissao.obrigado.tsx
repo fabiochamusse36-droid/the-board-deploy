@@ -27,12 +27,12 @@ const phases = [
   },
   {
     k: "Fase 2",
-    t: "Análise de Perfil",
-    d: "A comissão avalia a adequação do perfil, categoria pretendida e enquadramento com a experiência do evento.",
+    t: "Análise de perfil",
+    d: "A comissão avalia o perfil, categoria pretendida e enquadramento com a experiência do evento.",
   },
   {
     k: "Fase 3",
-    t: "Confirmação ou Reembolso",
+    t: "Credencial ou reembolso",
     d: "Caso aprovado, a credencial oficial será emitida. Caso o perfil não seja elegível, o valor será reembolsado conforme a política do evento.",
   },
 ];
