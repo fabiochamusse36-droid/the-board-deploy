@@ -189,18 +189,19 @@ function AdmissaoPage() {
               <p className="text-[10px] tracking-[0.3em] uppercase text-gold mb-2">Referência da reserva</p>
               <p className="font-display text-xl tracking-widest break-all">{reference}</p>
               <p className="mt-3 text-xs text-muted-foreground leading-relaxed">
-                Esta candidatura está associada à sua reserva provisória. A submissão do formulário é
-                necessária para validação final da admissão.
+                Esta candidatura está associada à sua reserva confirmada. A submissão do formulário
+                conclui a etapa de validação de perfil.
               </p>
             </div>
           ) : (
-            <div className="border border-border/60 bg-card/40 p-5 md:p-6 mb-8 flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
+            <div className="border border-gold/40 bg-card/40 p-5 md:p-6 mb-8 flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
               <p className="text-xs text-muted-foreground leading-relaxed">
-                Para garantir prioridade de vaga, recomendamos criar uma reserva antes de submeter o
-                formulário.
+                Para garantir prioridade de vaga, crie uma reserva antes de preencher o Formulário
+                de Admissão.
               </p>
               <Link
                 to="/comprar"
+                search={{ ticket: "early-investors" as const }}
                 className="shrink-0 px-5 py-3 border border-gold text-gold text-[10px] tracking-widest uppercase hover:bg-gold/10 transition"
               >
                 Criar Reserva
@@ -331,7 +332,7 @@ function AdmissaoPage() {
                 disabled={loading}
                 className="flex-1 px-8 py-4 bg-gradient-gold text-primary-foreground font-medium tracking-widest text-xs uppercase shadow-gold hover:opacity-90 transition disabled:opacity-60 disabled:cursor-not-allowed"
               >
-                {loading ? "A submeter…" : "Submeter Candidatura à Mesa"}
+                {loading ? "Submetendo candidatura…" : "Submeter Candidatura à Mesa"}
               </button>
               <Link
                 to="/"
@@ -401,63 +402,5 @@ function Select({
         </option>
       ))}
     </select>
-  );
-}
-
-function AdmissionGate({
-  variant,
-  reference,
-}: {
-  variant: "no-reference" | "unpaid";
-  reference?: string;
-}) {
-  const isUnpaid = variant === "unpaid";
-  return (
-    <div className="min-h-screen bg-background text-foreground flex items-center justify-center px-6 py-24">
-      <div className="max-w-lg w-full text-center border border-gold/40 bg-gradient-to-b from-card/60 to-background p-10 md:p-12 shadow-gold">
-        <p className="text-[10px] tracking-[0.4em] uppercase text-gold mb-4">
-          {isUnpaid ? "Pagamento em validação" : "Reserva necessária"}
-        </p>
-        <h1 className="font-display text-3xl md:text-4xl leading-tight">
-          {isUnpaid ? "Pagamento em validação" : "Reserva necessária para continuar"}
-        </h1>
-        <div className="hairline-gold mx-auto my-6 max-w-[80px]" />
-        <p className="text-sm text-muted-foreground leading-relaxed">
-          {isUnpaid
-            ? "A sua reserva foi localizada, mas o Formulário de Admissão será liberado apenas após confirmação do pagamento."
-            : "O Formulário de Admissão Executiva é liberado apenas após criação de reserva e confirmação de pagamento."}
-        </p>
-        {isUnpaid && reference ? (
-          <p className="mt-4 text-[10px] tracking-[0.3em] uppercase text-muted-foreground">
-            Referência: <span className="text-foreground font-display">{reference}</span>
-          </p>
-        ) : null}
-        <div className="mt-8 flex flex-col sm:flex-row gap-3 justify-center">
-          {isUnpaid && reference ? (
-            <Link
-              to="/confirmacao/$reference"
-              params={{ reference }}
-              className="px-8 py-4 bg-gradient-gold text-primary-foreground text-xs tracking-widest uppercase shadow-gold hover:opacity-90 transition"
-            >
-              Ver estado da reserva
-            </Link>
-          ) : (
-            <Link
-              to="/comprar"
-              search={{ ticket: "early-investors" as const }}
-              className="px-8 py-4 bg-gradient-gold text-primary-foreground text-xs tracking-widest uppercase shadow-gold hover:opacity-90 transition"
-            >
-              Criar Reserva
-            </Link>
-          )}
-          <Link
-            to="/"
-            className="px-8 py-4 border border-gold/40 text-gold text-xs tracking-widest uppercase hover:bg-gold/10 transition"
-          >
-            ← Voltar ao início
-          </Link>
-        </div>
-      </div>
-    </div>
   );
 }

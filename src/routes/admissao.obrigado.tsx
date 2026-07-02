@@ -22,17 +22,17 @@ export const Route = createFileRoute("/admissao/obrigado")({
 const phases = [
   {
     k: "Fase 1",
-    t: "Validação de Pagamento",
+    t: "Validação de pagamento",
     d: "A equipa confirma a referência de pagamento associada à sua reserva.",
   },
   {
     k: "Fase 2",
-    t: "Análise de Perfil",
-    d: "A comissão avalia a adequação do perfil, categoria pretendida e enquadramento com a experiência do evento.",
+    t: "Análise de perfil",
+    d: "A comissão avalia o perfil, categoria pretendida e enquadramento com a experiência do evento.",
   },
   {
     k: "Fase 3",
-    t: "Confirmação ou Reembolso",
+    t: "Credencial ou reembolso",
     d: "Caso aprovado, a credencial oficial será emitida. Caso o perfil não seja elegível, o valor será reembolsado conforme a política do evento.",
   },
 ];
@@ -61,16 +61,17 @@ function ObrigadoPage() {
             Candidatura Registada
           </span>
           <h1 className="font-display text-4xl md:text-6xl mt-8 leading-tight">
-            Candidatura recebida com{" "}
-            <span className="text-gradient-gold">sucesso</span>.
+            Candidatura recebida com <span className="text-gradient-gold">sucesso</span>.
           </h1>
 
           <div className="mx-auto mt-10 max-w-xs hairline-gold" />
 
           <p className="mt-10 text-base md:text-lg text-muted-foreground leading-relaxed">
-            Os seus dados foram enviados para análise da Direção Executiva do THE BOARD. A sua reserva
-            permanece provisória até validação final do perfil.
+            Os seus dados foram enviados para análise da Direção Executiva do THE BOARD. A sua
+            reserva permanece sujeita à validação final do perfil.
           </p>
+
+
 
           <div className="mt-12 grid sm:grid-cols-3 gap-4 text-left">
             {phases.map((p) => (

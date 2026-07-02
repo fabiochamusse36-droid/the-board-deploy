@@ -121,11 +121,19 @@ function Comprar() {
         <Link to="/" className="text-xs tracking-[0.3em] uppercase text-muted-foreground hover:text-gold">← Voltar</Link>
 
         <div className="mt-10 mb-10 text-center">
-          <p className="text-[10px] tracking-[0.4em] uppercase text-gold mb-4">{ticket.tag}</p>
-          <h1 className="font-display text-4xl md:text-5xl">{ticket.name}</h1>
-          <p className="mt-3 text-muted-foreground">{ticket.description}</p>
+          <p className="text-[10px] tracking-[0.4em] uppercase text-gold mb-4">Criar Reserva</p>
+          <h1 className="font-display text-4xl md:text-5xl">Criar Reserva</h1>
+          <p className="mt-4 text-muted-foreground max-w-md mx-auto">
+            Registe os seus dados para gerar uma referência de pagamento e reservar prioridade de vaga.
+          </p>
+        </div>
+
+        <div className="border border-gold/40 bg-gradient-to-b from-card to-background p-6 md:p-8 mb-8 text-center">
+          <p className="text-[10px] tracking-[0.3em] uppercase text-gold/80">{ticket.tag}</p>
+          <h2 className="font-display text-2xl md:text-3xl mt-2">{ticket.name}</h2>
+          <p className="mt-2 text-sm text-muted-foreground">{ticket.description}</p>
           <p className="mt-2 text-[10px] tracking-[0.3em] uppercase text-muted-foreground">{ticket.category}</p>
-          <p className="font-display text-5xl text-gradient-gold mt-6">
+          <p className="font-display text-4xl text-gradient-gold mt-5">
             {ticket.price.toLocaleString("pt-PT")} <span className="text-base text-muted-foreground">MT</span>
           </p>
         </div>
@@ -195,6 +203,11 @@ function Comprar() {
                 </button>
               ))}
             </div>
+            {(form.payment_method === "mpesa" || form.payment_method === "emola") && (
+              <p className="mt-3 text-[11px] text-muted-foreground leading-relaxed">
+                O número informado será usado para associar a validação do pagamento.
+              </p>
+            )}
           </div>
 
           <div className="flex justify-between items-baseline border-t border-border/40 pt-5">
@@ -214,15 +227,20 @@ function Comprar() {
             </span>
           </label>
 
+          <p className="text-xs text-muted-foreground leading-relaxed border-l-2 border-gold/40 pl-4">
+            A admissão final está sujeita à validação executiva. Caso o perfil não seja elegível para
+            a categoria solicitada, o valor será reembolsado conforme a política do evento.
+          </p>
+
           {error && <p className="text-sm text-destructive">{error}</p>}
+
 
           <button type="submit" disabled={loading}
             className="w-full py-4 bg-gradient-gold text-primary-foreground tracking-widest text-xs uppercase shadow-gold hover:opacity-90 transition disabled:opacity-50">
-            {loading ? "A processar…" : "Criar Reserva e Continuar"}
+            {loading ? "Criando reserva…" : "Criar Reserva e Continuar"}
           </button>
           <p className="text-xs text-muted-foreground text-center">
-            Receberá a referência de pagamento na próxima página. A credencial é emitida após validação
-            do perfil pela Direção Executiva.
+            Receberá a referência de pagamento na próxima página.
           </p>
         </form>
       </div>
