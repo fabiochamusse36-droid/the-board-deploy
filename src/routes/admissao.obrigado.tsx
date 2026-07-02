@@ -61,9 +61,15 @@ function ObrigadoPage() {
             Candidatura Registada
           </span>
           <h1 className="font-display text-4xl md:text-6xl mt-8 leading-tight">
-            Candidatura recebida com{" "}
-            <span className="text-gradient-gold">sucesso</span>.
+            Candidatura recebida com <span className="text-gradient-gold">sucesso</span>.
           </h1>
+
+          <div className="mx-auto mt-10 max-w-xs hairline-gold" />
+
+          <p className="mt-10 text-base md:text-lg text-muted-foreground leading-relaxed">
+            Os seus dados foram enviados para análise da Direção Executiva do THE BOARD. A sua
+            reserva permanece sujeita à validação final do perfil.
+          </p>
 
           <div className="mx-auto mt-10 max-w-xs hairline-gold" />
 
