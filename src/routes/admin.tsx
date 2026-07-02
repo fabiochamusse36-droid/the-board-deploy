@@ -58,8 +58,8 @@ function AdminPage() {
           </div>
 
           <div className="mt-12 border border-border/40 bg-card/40 p-6 text-xs text-muted-foreground leading-relaxed">
-            Placeholder operacional. A ligação a dados reais (reservas, pagamentos, admissões,
-            patrocínios) será activada em fase posterior, com controlo de acesso executivo.
+            Área futura para gestão interna da organização. Será integrada ao backend, gateway,
+            pagamentos, admissões e credenciais.
           </div>
         </div>
       </section>
