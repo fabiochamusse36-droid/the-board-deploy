@@ -116,29 +116,25 @@ function Confirmacao() {
             )}
           </div>
           <p className="text-[10px] tracking-[0.4em] uppercase text-gold mb-3">
-            {isConfirmed ? "Pagamento confirmado" : "Validação em curso"}
+            {isConfirmed ? "Pagamento confirmado" : "Reserva provisória criada"}
           </p>
           <h1 className="font-display text-3xl md:text-4xl">
-            {isConfirmed
-              ? "Pagamento validado"
-              : "A confirmar pagamento"}
+            {isConfirmed ? "Pagamento validado" : "Validando pagamento"}
           </h1>
           <p className="mt-4 text-muted-foreground">
             {isConfirmed
               ? "Pagamento validado. A encaminhar para o Formulário de Admissão Executiva."
               : "Estamos a confirmar o pagamento associado à sua reserva."}
           </p>
-          {isConfirmed && (
-            <p className="mt-3 text-xs">
-              <Link
-                to="/admissao"
-                search={{ reference }}
-                className="text-muted-foreground hover:text-gold underline underline-offset-4"
-              >
-                Continuar manualmente
-              </Link>
-            </p>
-          )}
+          <p className="mt-4 text-xs">
+            <Link
+              to="/admissao"
+              search={{ reference }}
+              className="text-muted-foreground hover:text-gold underline underline-offset-4 tracking-widest uppercase"
+            >
+              Continuar manualmente
+            </Link>
+          </p>
         </div>
 
         {/* Reference card */}
