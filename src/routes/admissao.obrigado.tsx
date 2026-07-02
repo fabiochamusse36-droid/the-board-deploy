@@ -71,12 +71,7 @@ function ObrigadoPage() {
             reserva permanece sujeita à validação final do perfil.
           </p>
 
-          <div className="mx-auto mt-10 max-w-xs hairline-gold" />
 
-          <p className="mt-10 text-base md:text-lg text-muted-foreground leading-relaxed">
-            Os seus dados foram enviados para análise da Direção Executiva do THE BOARD. A sua reserva
-            permanece provisória até validação final do perfil.
-          </p>
 
           <div className="mt-12 grid sm:grid-cols-3 gap-4 text-left">
             {phases.map((p) => (
