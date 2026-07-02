@@ -332,7 +332,7 @@ function AdmissaoPage() {
                 disabled={loading}
                 className="flex-1 px-8 py-4 bg-gradient-gold text-primary-foreground font-medium tracking-widest text-xs uppercase shadow-gold hover:opacity-90 transition disabled:opacity-60 disabled:cursor-not-allowed"
               >
-                {loading ? "A submeter…" : "Submeter Candidatura à Mesa"}
+                {loading ? "Submetendo candidatura…" : "Submeter Candidatura à Mesa"}
               </button>
               <Link
                 to="/"
