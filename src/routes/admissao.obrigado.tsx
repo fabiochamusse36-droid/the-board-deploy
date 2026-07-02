@@ -22,7 +22,7 @@ export const Route = createFileRoute("/admissao/obrigado")({
 const phases = [
   {
     k: "Fase 1",
-    t: "Validação de Pagamento",
+    t: "Validação de pagamento",
     d: "A equipa confirma a referência de pagamento associada à sua reserva.",
   },
   {
