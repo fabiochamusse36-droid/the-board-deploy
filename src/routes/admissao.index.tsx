@@ -189,18 +189,19 @@ function AdmissaoPage() {
               <p className="text-[10px] tracking-[0.3em] uppercase text-gold mb-2">Referência da reserva</p>
               <p className="font-display text-xl tracking-widest break-all">{reference}</p>
               <p className="mt-3 text-xs text-muted-foreground leading-relaxed">
-                Esta candidatura está associada à sua reserva provisória. A submissão do formulário é
-                necessária para validação final da admissão.
+                Esta candidatura está associada à sua reserva confirmada. A submissão do formulário
+                conclui a etapa de validação de perfil.
               </p>
             </div>
           ) : (
-            <div className="border border-border/60 bg-card/40 p-5 md:p-6 mb-8 flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
+            <div className="border border-gold/40 bg-card/40 p-5 md:p-6 mb-8 flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
               <p className="text-xs text-muted-foreground leading-relaxed">
-                Para garantir prioridade de vaga, recomendamos criar uma reserva antes de submeter o
-                formulário.
+                Para garantir prioridade de vaga, crie uma reserva antes de preencher o Formulário
+                de Admissão.
               </p>
               <Link
                 to="/comprar"
+                search={{ ticket: "early-investors" as const }}
                 className="shrink-0 px-5 py-3 border border-gold text-gold text-[10px] tracking-widest uppercase hover:bg-gold/10 transition"
               >
                 Criar Reserva
