@@ -227,8 +227,13 @@ function Comprar() {
             </span>
           </label>
 
+          <p className="text-xs text-muted-foreground leading-relaxed border-l-2 border-gold/40 pl-4">
+            A admissão final está sujeita à validação executiva. Caso o perfil não seja elegível para
+            a categoria solicitada, o valor será reembolsado conforme a política do evento.
+          </p>
 
           {error && <p className="text-sm text-destructive">{error}</p>}
+
 
           <button type="submit" disabled={loading}
             className="w-full py-4 bg-gradient-gold text-primary-foreground tracking-widest text-xs uppercase shadow-gold hover:opacity-90 transition disabled:opacity-50">
