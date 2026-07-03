@@ -1,6 +1,8 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { z } from "zod";
+import { getReservation, type MockReservation } from "@/lib/reservations.mock";
+
 
 
 const searchSchema = z.object({
