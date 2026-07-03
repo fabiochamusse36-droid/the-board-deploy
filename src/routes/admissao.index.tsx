@@ -408,3 +408,79 @@ function Select({
     </select>
   );
 }
+
+function AccessGate({
+  variant,
+  reference,
+}: {
+  variant: "no-reference" | "pending-payment";
+  reference?: string;
+}) {
+  const isPending = variant === "pending-payment";
+  return (
+    <div className="min-h-screen bg-background text-foreground overflow-x-hidden">
+      <header className="fixed top-0 inset-x-0 z-50 backdrop-blur-md bg-background/70 border-b border-border/40">
+        <nav className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+          <Link to="/" className="font-display text-lg tracking-[0.25em] text-foreground">
+            THE <span className="text-gold">BOARD</span>
+          </Link>
+          <Link
+            to="/"
+            className="text-[10px] tracking-[0.3em] uppercase text-muted-foreground hover:text-gold transition"
+          >
+            ← Voltar
+          </Link>
+        </nav>
+      </header>
+
+      <section className="relative min-h-screen flex items-center pt-24 pb-20">
+        <div className="absolute inset-0 bg-gradient-dark opacity-80 pointer-events-none" />
+        <div className="relative max-w-xl mx-auto px-6 text-center">
+          <span className="inline-block px-4 py-1.5 border border-gold/60 text-gold text-[10px] tracking-[0.35em] uppercase">
+            {isPending ? "Pagamento em validação" : "Acesso restrito"}
+          </span>
+          <h1 className="font-display text-3xl md:text-5xl mt-8 leading-tight">
+            {isPending ? (
+              <>Aguardando <span className="text-gradient-gold">confirmação</span></>
+            ) : (
+              <>Reserva necessária para <span className="text-gradient-gold">continuar</span></>
+            )}
+          </h1>
+          <div className="mx-auto mt-8 max-w-[80px] hairline-gold" />
+          <p className="mt-8 text-sm md:text-base text-muted-foreground leading-relaxed">
+            {isPending
+              ? "O Formulário de Admissão Executiva será liberado assim que a validação do pagamento associado à sua reserva estiver concluída."
+              : "O Formulário de Admissão Executiva é liberado após a criação da reserva e validação do pagamento."}
+          </p>
+
+          <div className="mt-10 flex flex-col sm:flex-row gap-4 justify-center">
+            {isPending && reference ? (
+              <Link
+                to="/confirmacao/$reference"
+                params={{ reference }}
+                className="px-8 py-4 bg-gradient-gold text-primary-foreground font-medium tracking-widest text-xs uppercase shadow-gold hover:opacity-90 transition"
+              >
+                Ver estado da reserva
+              </Link>
+            ) : (
+              <Link
+                to="/comprar"
+                search={{ ticket: "early-investors" as const }}
+                className="px-8 py-4 bg-gradient-gold text-primary-foreground font-medium tracking-widest text-xs uppercase shadow-gold hover:opacity-90 transition"
+              >
+                Criar Reserva
+              </Link>
+            )}
+            <Link
+              to="/"
+              className="px-8 py-4 border border-gold/40 text-gold text-xs tracking-widest uppercase hover:bg-gold/10 transition"
+            >
+              Voltar ao início
+            </Link>
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+}
+
