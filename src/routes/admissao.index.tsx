@@ -203,30 +203,15 @@ function AdmissaoPage() {
             <div className="mx-auto mt-8 max-w-xs hairline-gold" />
           </div>
 
-          {reference ? (
-            <div className="border border-gold/40 bg-gold/5 p-5 md:p-6 mb-8 text-center">
-              <p className="text-[10px] tracking-[0.3em] uppercase text-gold mb-2">Referência da reserva</p>
-              <p className="font-display text-xl tracking-widest break-all">{reference}</p>
-              <p className="mt-3 text-xs text-muted-foreground leading-relaxed">
-                Esta candidatura está associada à sua reserva confirmada. A submissão do formulário
-                conclui a etapa de validação de perfil.
-              </p>
-            </div>
-          ) : (
-            <div className="border border-gold/40 bg-card/40 p-5 md:p-6 mb-8 flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-              <p className="text-xs text-muted-foreground leading-relaxed">
-                Para garantir prioridade de vaga, crie uma reserva antes de preencher o Formulário
-                de Admissão.
-              </p>
-              <Link
-                to="/comprar"
-                search={{ ticket: "early-investors" as const }}
-                className="shrink-0 px-5 py-3 border border-gold text-gold text-[10px] tracking-widest uppercase hover:bg-gold/10 transition"
-              >
-                Criar Reserva
-              </Link>
-            </div>
-          )}
+          <div className="border border-gold/40 bg-gold/5 p-5 md:p-6 mb-8 text-center">
+            <p className="text-[10px] tracking-[0.3em] uppercase text-gold mb-2">Referência da reserva</p>
+            <p className="font-display text-xl tracking-widest break-all">{reference}</p>
+            <p className="mt-3 text-xs text-muted-foreground leading-relaxed">
+              Esta candidatura está associada à sua reserva confirmada. A submissão do formulário
+              conclui a etapa de validação de perfil.
+            </p>
+          </div>
+
 
 
           <div className="border border-gold/30 bg-card/40 backdrop-blur-sm p-6 md:p-8 mb-10">
