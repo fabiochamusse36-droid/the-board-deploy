@@ -91,10 +91,18 @@ function AdmissaoPage() {
   const navigate = useNavigate();
   const { reference } = Route.useSearch();
   const [gateChecked, setGateChecked] = useState(false);
+  const [reservation, setReservation] = useState<MockReservation | null>(null);
 
   useEffect(() => {
+    if (reference) {
+      const { data } = getReservation(reference);
+      setReservation(data);
+    } else {
+      setReservation(null);
+    }
     setGateChecked(true);
   }, [reference]);
+
 
 
   const [form, setForm] = useState<FormState>({
