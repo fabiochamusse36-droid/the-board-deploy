@@ -124,7 +124,7 @@ function Confirmacao() {
           <p className="mt-4 text-muted-foreground">
             {isConfirmed
               ? "Pagamento validado. A encaminhar para o Formulário de Admissão Executiva."
-              : "Estamos a confirmar o pagamento associado à sua reserva."}
+              : "Será encaminhado para o ambiente seguro de pagamento e regressará automaticamente após a confirmação."}
           </p>
           <p className="mt-4 text-xs">
             <Link
