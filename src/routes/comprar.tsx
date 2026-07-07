@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { z } from "zod";
 import { createOrder } from "@/lib/orders.functions";
 import { saveReservation, type PaymentMethod } from "@/lib/reservations.mock";
@@ -13,6 +13,7 @@ const TICKETS = {
     price: 2500,
     category: "Participante presencial",
     description: "Acesso geral antecipado ao Big Players Forum.",
+    maxQuantity: 5,
   },
   "vip-board": {
     id: "vip-board" as const,
@@ -21,6 +22,7 @@ const TICKETS = {
     price: 7500,
     category: "VIP sujeita a validação executiva",
     description: "Lounge exclusivo, jantar executivo e mesa restrita.",
+    maxQuantity: 2,
   },
 } as const;
 
@@ -68,16 +70,42 @@ function Comprar() {
     city: "",
     quantity: 1,
     payment_method: "mpesa" as PaymentMethod,
+    payment_phone: "",
+    same_as_whatsapp: true,
     consent: false,
   });
 
   const total = useMemo(() => ticket.price * form.quantity, [ticket.price, form.quantity]);
+  const requiresPhone = form.payment_method === "mpesa" || form.payment_method === "emola";
+
+  // Clamp quantity if ticket max changes
+  useEffect(() => {
+    setForm((f) => ({ ...f, quantity: Math.min(f.quantity, ticket.maxQuantity) }));
+  }, [ticket.maxQuantity]);
+
+  // Auto-sync payment phone with WhatsApp when checkbox is active
+  useEffect(() => {
+    if (form.same_as_whatsapp && requiresPhone) {
+      setForm((f) => (f.payment_phone === f.phone ? f : { ...f, payment_phone: f.phone }));
+    }
+  }, [form.phone, form.same_as_whatsapp, requiresPhone]);
+
+  function decQty() {
+    setForm((f) => ({ ...f, quantity: Math.max(1, f.quantity - 1) }));
+  }
+  function incQty() {
+    setForm((f) => ({ ...f, quantity: Math.min(ticket.maxQuantity, f.quantity + 1) }));
+  }
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
     if (!form.consent) {
       setError("Confirme a declaração de reserva provisória para continuar.");
+      return;
+    }
+    if (requiresPhone && form.payment_phone.trim().length < 6) {
+      setError("Indique o número para pagamento.");
       return;
     }
     setLoading(true);
@@ -94,7 +122,9 @@ function Comprar() {
           payment_method: form.payment_method,
         },
       });
-      // Persist mock client-side reservation state for the demo funnel.
+      // Persist client-side reservation state.
+      // NOTE (internal): In production, this step will call THE BOARD backend, which
+      // will create a payment session with Gateway RW and return a checkoutUrl.
       saveReservation({
         reference: res.reference,
         ticketId: ticket.id,
@@ -107,6 +137,9 @@ function Comprar() {
         country: form.country,
         city: form.city,
         paymentMethod: form.payment_method,
+        paymentPhone: requiresPhone ? form.payment_phone.trim() : null,
+        paymentStatus: "payment_processing",
+        admissionStatus: "admission_form_locked",
       });
       navigate({ to: "/confirmacao/$reference", params: { reference: res.reference } });
     } catch (err) {
@@ -124,10 +157,12 @@ function Comprar() {
           <p className="text-[10px] tracking-[0.4em] uppercase text-gold mb-4">Criar Reserva</p>
           <h1 className="font-display text-4xl md:text-5xl">Criar Reserva</h1>
           <p className="mt-4 text-muted-foreground max-w-md mx-auto">
-            Registe os seus dados para gerar uma referência de pagamento e reservar prioridade de vaga.
+            Registe os seus dados para gerar uma referência de reserva e prosseguir para o
+            ambiente seguro de pagamento.
           </p>
         </div>
 
+        {/* A. Access Summary */}
         <div className="border border-gold/40 bg-gradient-to-b from-card to-background p-6 md:p-8 mb-8 text-center">
           <p className="text-[10px] tracking-[0.3em] uppercase text-gold/80">{ticket.tag}</p>
           <h2 className="font-display text-2xl md:text-3xl mt-2">{ticket.name}</h2>
@@ -136,6 +171,7 @@ function Comprar() {
           <p className="font-display text-4xl text-gradient-gold mt-5">
             {ticket.price.toLocaleString("pt-PT")} <span className="text-base text-muted-foreground">MT</span>
           </p>
+          <p className="mt-2 text-[10px] tracking-[0.3em] uppercase text-muted-foreground">Preço unitário</p>
         </div>
 
         <div className="mb-8 flex gap-3 text-[10px] tracking-widest uppercase justify-center">
@@ -159,37 +195,71 @@ function Comprar() {
           o valor será reembolsado conforme a política do evento.
         </div>
 
-        <form onSubmit={onSubmit} className="space-y-6 border border-border/40 bg-card/40 p-8 md:p-10">
-          <div className="grid sm:grid-cols-2 gap-4">
-            <Field label="Nome completo">
-              <input required minLength={2} maxLength={120} value={form.name}
-                onChange={(e) => setForm({ ...form, name: e.target.value })} className={inputCls} />
-            </Field>
-            <Field label="Email">
-              <input type="email" required maxLength={255} value={form.email}
-                onChange={(e) => setForm({ ...form, email: e.target.value })} className={inputCls} />
-            </Field>
-            <Field label="WhatsApp (com indicativo)">
-              <input type="tel" required minLength={6} maxLength={30} placeholder="+258 84 000 0000"
-                value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} className={inputCls} />
-            </Field>
-            <Field label="País">
-              <input required maxLength={80} value={form.country}
-                onChange={(e) => setForm({ ...form, country: e.target.value })} className={inputCls} />
-            </Field>
-            <Field label="Cidade">
-              <input required maxLength={80} value={form.city}
-                onChange={(e) => setForm({ ...form, city: e.target.value })} className={inputCls} />
-            </Field>
-            <Field label="Quantidade">
-              <input type="number" min={1} max={10} value={form.quantity}
-                onChange={(e) => setForm({ ...form, quantity: Math.max(1, Math.min(10, Number(e.target.value) || 1)) })}
-                className={inputCls} />
-            </Field>
+        <form onSubmit={onSubmit} className="space-y-8 border border-border/40 bg-card/40 p-6 md:p-10">
+          {/* B. Participant Details */}
+          <div>
+            <p className="text-[10px] tracking-[0.4em] uppercase text-gold mb-4">01 — Participante</p>
+            <div className="grid sm:grid-cols-2 gap-4">
+              <Field label="Nome completo">
+                <input required minLength={2} maxLength={120} value={form.name}
+                  onChange={(e) => setForm({ ...form, name: e.target.value })} className={inputCls} />
+              </Field>
+              <Field label="Email">
+                <input type="email" required maxLength={255} value={form.email}
+                  onChange={(e) => setForm({ ...form, email: e.target.value })} className={inputCls} />
+              </Field>
+              <Field label="WhatsApp de contacto">
+                <input type="tel" required minLength={6} maxLength={30} placeholder="+258 84 000 0000"
+                  value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} className={inputCls} />
+              </Field>
+              <Field label="País">
+                <input required maxLength={80} value={form.country}
+                  onChange={(e) => setForm({ ...form, country: e.target.value })} className={inputCls} />
+              </Field>
+              <Field label="Cidade">
+                <input required maxLength={80} value={form.city}
+                  onChange={(e) => setForm({ ...form, city: e.target.value })} className={inputCls} />
+              </Field>
+            </div>
           </div>
 
+          {/* C. Quantity stepper */}
           <div>
-            <p className="text-[10px] tracking-[0.3em] uppercase text-muted-foreground mb-3">Método de pagamento</p>
+            <p className="text-[10px] tracking-[0.4em] uppercase text-gold mb-4">02 — Quantidade</p>
+            <div className="flex items-center gap-4">
+              <button
+                type="button"
+                onClick={decQty}
+                disabled={form.quantity <= 1}
+                aria-label="Diminuir quantidade"
+                className="w-11 h-11 border border-border/60 text-gold text-lg flex items-center justify-center hover:border-gold/60 hover:bg-gold/10 transition disabled:opacity-30 disabled:cursor-not-allowed"
+              >
+                −
+              </button>
+              <div
+                aria-live="polite"
+                className="min-w-[3rem] text-center font-display text-2xl tabular-nums"
+              >
+                {form.quantity}
+              </div>
+              <button
+                type="button"
+                onClick={incQty}
+                disabled={form.quantity >= ticket.maxQuantity}
+                aria-label="Aumentar quantidade"
+                className="w-11 h-11 border border-border/60 text-gold text-lg flex items-center justify-center hover:border-gold/60 hover:bg-gold/10 transition disabled:opacity-30 disabled:cursor-not-allowed"
+              >
+                +
+              </button>
+              <span className="ml-2 text-[10px] tracking-[0.2em] uppercase text-muted-foreground">
+                Máx. {ticket.maxQuantity} por reserva
+              </span>
+            </div>
+          </div>
+
+          {/* D. Payment Preparation */}
+          <div>
+            <p className="text-[10px] tracking-[0.4em] uppercase text-gold mb-4">03 — Canal de pagamento preferido</p>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
               {(["mpesa", "emola", "bank", "manual"] as const).map((m) => (
                 <button key={m} type="button"
@@ -203,9 +273,54 @@ function Comprar() {
                 </button>
               ))}
             </div>
-            {(form.payment_method === "mpesa" || form.payment_method === "emola") && (
-              <p className="mt-3 text-[11px] text-muted-foreground leading-relaxed">
-                O número informado será usado para associar a validação do pagamento.
+
+            {requiresPhone && (
+              <div className="mt-5 space-y-3">
+                <Field label="Número para pagamento">
+                  <input
+                    type="tel"
+                    required
+                    minLength={6}
+                    maxLength={30}
+                    placeholder="+258 84 000 0000"
+                    value={form.payment_phone}
+                    disabled={form.same_as_whatsapp}
+                    onChange={(e) => setForm({ ...form, payment_phone: e.target.value })}
+                    className={`${inputCls} disabled:opacity-70`}
+                  />
+                </Field>
+                <label className="flex items-start gap-3 cursor-pointer select-none">
+                  <input
+                    type="checkbox"
+                    checked={form.same_as_whatsapp}
+                    onChange={(e) =>
+                      setForm({
+                        ...form,
+                        same_as_whatsapp: e.target.checked,
+                        payment_phone: e.target.checked ? form.phone : form.payment_phone,
+                      })
+                    }
+                    className="mt-1 accent-[color:var(--color-gold,#c9a449)]"
+                  />
+                  <span className="text-xs text-muted-foreground">
+                    Usar o mesmo número do WhatsApp
+                  </span>
+                </label>
+                <p className="text-[11px] text-muted-foreground leading-relaxed">
+                  O número informado será usado para iniciar a confirmação de pagamento no canal
+                  selecionado.
+                </p>
+              </div>
+            )}
+
+            {form.payment_method === "bank" && (
+              <p className="mt-5 text-[11px] text-muted-foreground leading-relaxed">
+                A referência será gerada e a validação poderá ser feita manualmente pela equipa.
+              </p>
+            )}
+            {form.payment_method === "manual" && (
+              <p className="mt-5 text-[11px] text-muted-foreground leading-relaxed">
+                A equipa executiva entrará em contacto para confirmar a reserva.
               </p>
             )}
           </div>
@@ -234,13 +349,12 @@ function Comprar() {
 
           {error && <p className="text-sm text-destructive">{error}</p>}
 
-
           <button type="submit" disabled={loading}
             className="w-full py-4 bg-gradient-gold text-primary-foreground tracking-widest text-xs uppercase shadow-gold hover:opacity-90 transition disabled:opacity-50">
             {loading ? "Criando reserva…" : "Criar Reserva e Continuar"}
           </button>
           <p className="text-xs text-muted-foreground text-center">
-            Receberá a referência de pagamento na próxima página.
+            Após criar a reserva, será encaminhado para o ambiente seguro de pagamento.
           </p>
         </form>
       </div>
