@@ -108,6 +108,7 @@ export function confirmPaymentMock(reference: string): Result<MockReservation> {
       country: "",
       city: "",
       paymentMethod: "manual",
+      paymentPhone: null,
       paymentStatus: "payment_confirmed",
       admissionStatus: "admission_form_available",
       createdAt: new Date().toISOString(),
