@@ -35,6 +35,7 @@ export type MockReservation = {
   country: string;
   city: string;
   paymentMethod: PaymentMethod;
+  paymentPhone: string | null;
   paymentStatus: PaymentStatus;
   admissionStatus: AdmissionStatus;
   createdAt: string;
