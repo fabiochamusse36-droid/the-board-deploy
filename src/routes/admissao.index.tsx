@@ -161,13 +161,10 @@ function AdmissaoPage() {
     );
   }
 
-  if (!reference) {
-    return <AccessGate variant="no-reference" />;
-  }
-
-  if (reservation?.paymentStatus !== "payment_confirmed") {
+  if (reference && reservation?.paymentStatus !== "payment_confirmed") {
     return <AccessGate variant="pending-payment" reference={reference} />;
   }
+
 
 
   return (
