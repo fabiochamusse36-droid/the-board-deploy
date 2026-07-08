@@ -254,7 +254,7 @@ function Comprar() {
             </div>
           </div>
 
-          {/* D. Payment Preparation */}
+          {/* STEP 3 — Preparação do Pagamento */}
           <div>
             <p className="text-[10px] tracking-[0.4em] uppercase text-gold mb-4">03 — Canal de pagamento preferido</p>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
@@ -303,30 +303,28 @@ function Comprar() {
                     Usar o mesmo número do WhatsApp
                   </span>
                 </label>
-                <p className="text-[11px] text-muted-foreground leading-relaxed">
-                  O número informado será usado para iniciar a confirmação de pagamento no canal
-                  selecionado.
-                </p>
               </div>
             )}
 
             {form.payment_method === "bank" && (
               <p className="mt-5 text-[11px] text-muted-foreground leading-relaxed">
-                A referência será gerada e a validação poderá ser feita manualmente pela equipa.
+                Os dados de pagamento serão apresentados no ambiente de pagamento seguro.
               </p>
             )}
             {form.payment_method === "manual" && (
               <p className="mt-5 text-[11px] text-muted-foreground leading-relaxed">
-                A equipa executiva entrará em contacto para confirmar a reserva.
+                A equipa executiva poderá entrar em contacto para coordenar a validação da reserva.
               </p>
             )}
           </div>
 
-          <div className="flex justify-between items-baseline border-t border-border/40 pt-5">
-            <span className="text-[10px] tracking-[0.3em] uppercase text-muted-foreground">Total</span>
-            <span className="font-display text-3xl text-gradient-gold">
-              {total.toLocaleString("pt-PT")} <span className="text-sm text-muted-foreground">MT</span>
-            </span>
+          {/* STEP 4 — Política */}
+          <div>
+            <p className="text-[10px] tracking-[0.4em] uppercase text-gold mb-4">04 — Política</p>
+            <p className="text-xs text-muted-foreground leading-relaxed border-l-2 border-gold/40 pl-4">
+              A admissão final está sujeita à validação executiva. Caso o perfil não seja elegível para
+              a categoria solicitada, o valor será reembolsado conforme a política do evento.
+            </p>
           </div>
 
           <label className="flex items-start gap-3 cursor-pointer select-none">
@@ -338,11 +336,6 @@ function Comprar() {
               está sujeita à validação da Direção Executiva.
             </span>
           </label>
-
-          <p className="text-xs text-muted-foreground leading-relaxed border-l-2 border-gold/40 pl-4">
-            A admissão final está sujeita à validação executiva. Caso o perfil não seja elegível para
-            a categoria solicitada, o valor será reembolsado conforme a política do evento.
-          </p>
 
           {error && <p className="text-sm text-destructive">{error}</p>}
 
