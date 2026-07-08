@@ -162,16 +162,53 @@ function Comprar() {
           </p>
         </div>
 
-        {/* A. Access Summary */}
-        <div className="border border-gold/40 bg-gradient-to-b from-card to-background p-6 md:p-8 mb-8 text-center">
-          <p className="text-[10px] tracking-[0.3em] uppercase text-gold/80">{ticket.tag}</p>
-          <h2 className="font-display text-2xl md:text-3xl mt-2">{ticket.name}</h2>
-          <p className="mt-2 text-sm text-muted-foreground">{ticket.description}</p>
-          <p className="mt-2 text-[10px] tracking-[0.3em] uppercase text-muted-foreground">{ticket.category}</p>
-          <p className="font-display text-4xl text-gradient-gold mt-5">
-            {ticket.price.toLocaleString("pt-PT")} <span className="text-base text-muted-foreground">MT</span>
+        {/* STEP 1 — Escolha confirmada (access summary + quantity + total) */}
+        <div className="border border-gold/40 bg-gradient-to-b from-card to-background p-6 md:p-8 mb-8">
+          <p className="text-[10px] tracking-[0.4em] uppercase text-gold mb-4 text-center">01 — Escolha confirmada</p>
+          <div className="text-center">
+            <p className="text-[10px] tracking-[0.3em] uppercase text-gold/80">{ticket.tag}</p>
+            <h2 className="font-display text-2xl md:text-3xl mt-2">{ticket.name}</h2>
+            <p className="mt-2 text-sm text-muted-foreground">{ticket.description}</p>
+            <p className="mt-2 text-[10px] tracking-[0.3em] uppercase text-muted-foreground">{ticket.category}</p>
+            <p className="font-display text-4xl text-gradient-gold mt-5">
+              {ticket.price.toLocaleString("pt-PT")} <span className="text-base text-muted-foreground">MT</span>
+            </p>
+            <p className="mt-2 text-[10px] tracking-[0.3em] uppercase text-muted-foreground">Preço unitário</p>
+          </div>
+
+          <div className="mt-6 flex items-center justify-center gap-4">
+            <button
+              type="button"
+              onClick={decQty}
+              disabled={form.quantity <= 1}
+              aria-label="Diminuir quantidade"
+              className="w-11 h-11 border border-border/60 text-gold text-lg flex items-center justify-center hover:border-gold/60 hover:bg-gold/10 transition disabled:opacity-30 disabled:cursor-not-allowed"
+            >
+              −
+            </button>
+            <div aria-live="polite" className="min-w-[3rem] text-center font-display text-2xl tabular-nums">
+              {form.quantity}
+            </div>
+            <button
+              type="button"
+              onClick={incQty}
+              disabled={form.quantity >= ticket.maxQuantity}
+              aria-label="Aumentar quantidade"
+              className="w-11 h-11 border border-border/60 text-gold text-lg flex items-center justify-center hover:border-gold/60 hover:bg-gold/10 transition disabled:opacity-30 disabled:cursor-not-allowed"
+            >
+              +
+            </button>
+          </div>
+          <p className="mt-2 text-center text-[10px] tracking-[0.2em] uppercase text-muted-foreground">
+            Máx. {ticket.maxQuantity} por reserva
           </p>
-          <p className="mt-2 text-[10px] tracking-[0.3em] uppercase text-muted-foreground">Preço unitário</p>
+
+          <div className="mt-6 pt-4 border-t border-border/40 flex justify-between items-baseline">
+            <span className="text-[10px] tracking-[0.3em] uppercase text-muted-foreground">Total</span>
+            <span className="font-display text-3xl text-gradient-gold">
+              {total.toLocaleString("pt-PT")} <span className="text-sm text-muted-foreground">MT</span>
+            </span>
+          </div>
         </div>
 
         <div className="mb-8 flex gap-3 text-[10px] tracking-widest uppercase justify-center">
@@ -189,16 +226,10 @@ function Comprar() {
           ))}
         </div>
 
-        <div className="border border-gold/30 bg-card/40 p-5 mb-6 text-xs text-muted-foreground leading-relaxed">
-          A reserva garante prioridade de vaga, mas a admissão final será confirmada após análise do
-          Formulário de Admissão Executiva. Caso o perfil não seja elegível para a categoria solicitada,
-          o valor será reembolsado conforme a política do evento.
-        </div>
-
         <form onSubmit={onSubmit} className="space-y-8 border border-border/40 bg-card/40 p-6 md:p-10">
-          {/* B. Participant Details */}
+          {/* STEP 2 — Dados do Participante */}
           <div>
-            <p className="text-[10px] tracking-[0.4em] uppercase text-gold mb-4">01 — Participante</p>
+            <p className="text-[10px] tracking-[0.4em] uppercase text-gold mb-4">02 — Dados do participante</p>
             <div className="grid sm:grid-cols-2 gap-4">
               <Field label="Nome completo">
                 <input required minLength={2} maxLength={120} value={form.name}
@@ -223,41 +254,7 @@ function Comprar() {
             </div>
           </div>
 
-          {/* C. Quantity stepper */}
-          <div>
-            <p className="text-[10px] tracking-[0.4em] uppercase text-gold mb-4">02 — Quantidade</p>
-            <div className="flex items-center gap-4">
-              <button
-                type="button"
-                onClick={decQty}
-                disabled={form.quantity <= 1}
-                aria-label="Diminuir quantidade"
-                className="w-11 h-11 border border-border/60 text-gold text-lg flex items-center justify-center hover:border-gold/60 hover:bg-gold/10 transition disabled:opacity-30 disabled:cursor-not-allowed"
-              >
-                −
-              </button>
-              <div
-                aria-live="polite"
-                className="min-w-[3rem] text-center font-display text-2xl tabular-nums"
-              >
-                {form.quantity}
-              </div>
-              <button
-                type="button"
-                onClick={incQty}
-                disabled={form.quantity >= ticket.maxQuantity}
-                aria-label="Aumentar quantidade"
-                className="w-11 h-11 border border-border/60 text-gold text-lg flex items-center justify-center hover:border-gold/60 hover:bg-gold/10 transition disabled:opacity-30 disabled:cursor-not-allowed"
-              >
-                +
-              </button>
-              <span className="ml-2 text-[10px] tracking-[0.2em] uppercase text-muted-foreground">
-                Máx. {ticket.maxQuantity} por reserva
-              </span>
-            </div>
-          </div>
-
-          {/* D. Payment Preparation */}
+          {/* STEP 3 — Preparação do Pagamento */}
           <div>
             <p className="text-[10px] tracking-[0.4em] uppercase text-gold mb-4">03 — Canal de pagamento preferido</p>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
@@ -306,30 +303,28 @@ function Comprar() {
                     Usar o mesmo número do WhatsApp
                   </span>
                 </label>
-                <p className="text-[11px] text-muted-foreground leading-relaxed">
-                  O número informado será usado para iniciar a confirmação de pagamento no canal
-                  selecionado.
-                </p>
               </div>
             )}
 
             {form.payment_method === "bank" && (
               <p className="mt-5 text-[11px] text-muted-foreground leading-relaxed">
-                A referência será gerada e a validação poderá ser feita manualmente pela equipa.
+                Os dados de pagamento serão apresentados no ambiente de pagamento seguro.
               </p>
             )}
             {form.payment_method === "manual" && (
               <p className="mt-5 text-[11px] text-muted-foreground leading-relaxed">
-                A equipa executiva entrará em contacto para confirmar a reserva.
+                A equipa executiva poderá entrar em contacto para coordenar a validação da reserva.
               </p>
             )}
           </div>
 
-          <div className="flex justify-between items-baseline border-t border-border/40 pt-5">
-            <span className="text-[10px] tracking-[0.3em] uppercase text-muted-foreground">Total</span>
-            <span className="font-display text-3xl text-gradient-gold">
-              {total.toLocaleString("pt-PT")} <span className="text-sm text-muted-foreground">MT</span>
-            </span>
+          {/* STEP 4 — Política */}
+          <div>
+            <p className="text-[10px] tracking-[0.4em] uppercase text-gold mb-4">04 — Política</p>
+            <p className="text-xs text-muted-foreground leading-relaxed border-l-2 border-gold/40 pl-4">
+              A admissão final está sujeita à validação executiva. Caso o perfil não seja elegível para
+              a categoria solicitada, o valor será reembolsado conforme a política do evento.
+            </p>
           </div>
 
           <label className="flex items-start gap-3 cursor-pointer select-none">
@@ -341,11 +336,6 @@ function Comprar() {
               está sujeita à validação da Direção Executiva.
             </span>
           </label>
-
-          <p className="text-xs text-muted-foreground leading-relaxed border-l-2 border-gold/40 pl-4">
-            A admissão final está sujeita à validação executiva. Caso o perfil não seja elegível para
-            a categoria solicitada, o valor será reembolsado conforme a política do evento.
-          </p>
 
           {error && <p className="text-sm text-destructive">{error}</p>}
 
