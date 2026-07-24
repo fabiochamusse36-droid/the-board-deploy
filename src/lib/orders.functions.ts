@@ -14,7 +14,6 @@ const createSchema = z.object({
   country: z.string().trim().max(80).optional().default(""),
   city: z.string().trim().max(80).optional().default(""),
   quantity: z.number().int().min(1).max(10).optional().default(1),
-  payment_method: z.enum(["mpesa", "emola", "bank", "manual"]),
 });
 
 function genReference() {
@@ -37,6 +36,7 @@ export const createOrder = createServerFn({ method: "POST" })
       country: data.country ?? "",
       city: data.city ?? "",
       quantity,
+      payment_owner: "external_gateway",
     });
 
     for (let i = 0; i < 5; i++) {
@@ -50,7 +50,9 @@ export const createOrder = createServerFn({ method: "POST" })
           buyer_phone: data.phone,
           ticket_type: ticket.name,
           amount_mt: amount,
-          payment_method: data.payment_method,
+          // Temporary compatibility with the existing orders table.
+          // The payment method is intentionally not collected in THE BOARD UI.
+          payment_method: "external_gateway",
           status: "reservation_created",
           notes,
         })
