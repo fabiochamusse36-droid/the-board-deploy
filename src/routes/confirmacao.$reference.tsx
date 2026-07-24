@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { getOrder } from "@/lib/orders.functions";
 import { confirmPaymentMock, getReservation, type MockReservation } from "@/lib/reservations.mock";
 
- type Order = Awaited<ReturnType<typeof getOrder>>;
+type Order = Awaited<ReturnType<typeof getOrder>>;
 
 export const Route = createFileRoute("/confirmacao/$reference")({
   head: () => ({
