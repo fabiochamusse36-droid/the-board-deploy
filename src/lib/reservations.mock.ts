@@ -1,8 +1,5 @@
-// Mock client-side reservation state.
-// This layer simulates the payment confirmation step before a real gateway
-// (e.g., Paysuite / M-Pesa / e-Mola) is integrated. It is intentionally
-// isolated so the UI consumes a single source of truth and the integration
-// swap-out (later) only replaces this file.
+// Client-side reservation state used by THE BOARD while the real backend contract is finalized.
+// Payment channel selection and transaction execution belong to the external gateway, not this UI.
 
 export type PaymentStatus =
   | "payment_pending"
@@ -21,8 +18,6 @@ export type AdmissionStatus =
   | "refund_pending"
   | "refunded";
 
-export type PaymentMethod = "mpesa" | "emola" | "bank" | "manual";
-
 export type MockReservation = {
   reference: string;
   ticketId: string;
@@ -34,8 +29,6 @@ export type MockReservation = {
   buyerPhone: string;
   country: string;
   city: string;
-  paymentMethod: PaymentMethod;
-  paymentPhone: string | null;
   paymentStatus: PaymentStatus;
   admissionStatus: AdmissionStatus;
   createdAt: string;
@@ -95,7 +88,6 @@ export function confirmPaymentMock(reference: string): Result<MockReservation> {
   const all = readAll();
   const record = all[reference];
   if (!record) {
-    // Allow confirming even without prior save (e.g., legacy reference) — create a stub.
     const stub: MockReservation = {
       reference,
       ticketId: "",
@@ -107,8 +99,6 @@ export function confirmPaymentMock(reference: string): Result<MockReservation> {
       buyerPhone: "",
       country: "",
       city: "",
-      paymentMethod: "manual",
-      paymentPhone: null,
       paymentStatus: "payment_confirmed",
       admissionStatus: "admission_form_available",
       createdAt: new Date().toISOString(),
