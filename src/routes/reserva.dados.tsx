@@ -69,26 +69,27 @@ function ReservaDados() {
   if (!draft) return <RecoveryState />;
 
   return (
-    <div className="min-h-screen bg-background text-foreground py-24 px-6">
-      <div className="max-w-2xl mx-auto">
-        <Link to="/comprar" search={{ ticket: "early-investors" }} className="text-xs tracking-[0.3em] uppercase text-muted-foreground hover:text-gold">
+    <div className="min-h-screen bg-background text-foreground py-20 md:py-24 px-5 md:px-6">
+      <div className="max-w-3xl mx-auto">
+        <Link to="/comprar" search={{ ticket: draft.ticketId }} className="text-xs tracking-[0.3em] uppercase text-muted-foreground hover:text-gold">
           ← Voltar
         </Link>
 
         <div className="mt-10 mb-10 text-center">
           <p className="text-[10px] tracking-[0.4em] uppercase text-gold mb-4">Criar Reserva</p>
-          <h1 className="font-display text-4xl md:text-5xl">Dados do Participante</h1>
-          <p className="mt-4 text-muted-foreground max-w-md mx-auto">
-            Identifique o participante associado à reserva selecionada.
+          <h1 className="font-display text-4xl md:text-6xl leading-tight">Dados do Participante</h1>
+          <p className="mt-4 text-muted-foreground max-w-lg mx-auto leading-relaxed">
+            Identifique o participante associado à reserva. Estes dados serão usados para contacto, validação e admissão executiva.
           </p>
         </div>
 
         <ReservationProgress active="dados" />
 
-        <div className="mt-10 mb-8 border border-gold/30 bg-gold/5 p-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <div className="mt-10 mb-8 border border-gold/30 bg-gold/5 p-5 md:p-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
             <p className="text-[10px] tracking-[0.3em] uppercase text-gold mb-1">Reserva em curso</p>
-            <p className="font-display text-xl">{draft.ticketName}</p>
+            <p className="font-display text-xl md:text-2xl">{draft.ticketName}</p>
+            <p className="mt-1 text-xs text-muted-foreground">{draft.ticketCategory}</p>
           </div>
           <div className="text-sm text-muted-foreground sm:text-right">
             <p>Quantidade: <span className="text-foreground">{draft.quantity}</span></p>
@@ -96,22 +97,26 @@ function ReservaDados() {
           </div>
         </div>
 
-        <form onSubmit={continueToSummary} className="border border-border/40 bg-card/40 p-6 md:p-10 space-y-6">
+        <form onSubmit={continueToSummary} className="border border-border/40 bg-card/40 p-6 md:p-10 space-y-7">
+          <div className="border-l border-gold/40 pl-4 text-xs text-muted-foreground leading-relaxed">
+            O participante informado aqui será o titular da reserva e receberá as comunicações oficiais do THE BOARD.
+          </div>
+
           <Field label="Nome completo">
-            <input required minLength={2} maxLength={120} value={form.buyerName} onChange={(e) => setForm({ ...form, buyerName: e.target.value })} className={inputCls} />
+            <input required minLength={2} maxLength={120} value={form.buyerName} onChange={(e) => setForm({ ...form, buyerName: e.target.value })} className={inputCls} autoComplete="name" />
           </Field>
           <div className="grid sm:grid-cols-2 gap-4">
             <Field label="Email">
-              <input type="email" required maxLength={255} value={form.buyerEmail} onChange={(e) => setForm({ ...form, buyerEmail: e.target.value })} className={inputCls} />
+              <input type="email" required maxLength={255} value={form.buyerEmail} onChange={(e) => setForm({ ...form, buyerEmail: e.target.value })} className={inputCls} autoComplete="email" />
             </Field>
             <Field label="WhatsApp de contacto">
-              <input type="tel" required minLength={6} maxLength={30} placeholder="+258 84 000 0000" value={form.buyerPhone} onChange={(e) => setForm({ ...form, buyerPhone: e.target.value })} className={inputCls} />
+              <input type="tel" required minLength={6} maxLength={30} placeholder="+258 84 000 0000" value={form.buyerPhone} onChange={(e) => setForm({ ...form, buyerPhone: e.target.value })} className={inputCls} autoComplete="tel" />
             </Field>
             <Field label="País">
-              <input required maxLength={80} value={form.country} onChange={(e) => setForm({ ...form, country: e.target.value })} className={inputCls} />
+              <input required maxLength={80} value={form.country} onChange={(e) => setForm({ ...form, country: e.target.value })} className={inputCls} autoComplete="country-name" />
             </Field>
             <Field label="Cidade">
-              <input required maxLength={80} value={form.city} onChange={(e) => setForm({ ...form, city: e.target.value })} className={inputCls} />
+              <input required maxLength={80} value={form.city} onChange={(e) => setForm({ ...form, city: e.target.value })} className={inputCls} autoComplete="address-level2" />
             </Field>
           </div>
 
@@ -126,7 +131,7 @@ function ReservaDados() {
               Voltar
             </Link>
             <button type="submit" className="py-4 bg-gradient-gold text-primary-foreground tracking-widest text-xs uppercase shadow-gold hover:opacity-90 transition">
-              Continuar
+              Continuar para resumo
             </button>
           </div>
         </form>
