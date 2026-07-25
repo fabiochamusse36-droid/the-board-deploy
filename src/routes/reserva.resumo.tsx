@@ -85,17 +85,17 @@ function ReservaResumo() {
   const hasParticipant = Boolean(draft.buyerName && draft.buyerEmail && draft.buyerPhone && draft.country && draft.city);
 
   return (
-    <div className="min-h-screen bg-background text-foreground py-24 px-6">
-      <div className="max-w-2xl mx-auto">
+    <div className="min-h-screen bg-background text-foreground py-20 md:py-24 px-5 md:px-6">
+      <div className="max-w-3xl mx-auto">
         <Link to="/reserva/dados" className="text-xs tracking-[0.3em] uppercase text-muted-foreground hover:text-gold">
           ← Voltar
         </Link>
 
         <div className="mt-10 mb-10 text-center">
           <p className="text-[10px] tracking-[0.4em] uppercase text-gold mb-4">Criar Reserva</p>
-          <h1 className="font-display text-4xl md:text-5xl">Confirmar Reserva</h1>
-          <p className="mt-4 text-muted-foreground max-w-md mx-auto">
-            Reveja o acesso, os dados do participante e a política antes de continuar para pagamento.
+          <h1 className="font-display text-4xl md:text-6xl leading-tight">Confirmar Reserva</h1>
+          <p className="mt-4 text-muted-foreground max-w-lg mx-auto leading-relaxed">
+            Reveja o acesso, os dados do participante e a política. Depois disto, será criada a referência oficial da reserva.
           </p>
         </div>
 
@@ -103,13 +103,21 @@ function ReservaResumo() {
 
         <form onSubmit={confirmReservation} className="mt-10 space-y-6">
           <section className="border border-gold/40 bg-gradient-to-b from-card to-background p-6 md:p-8">
-            <p className="text-[10px] tracking-[0.4em] uppercase text-gold mb-5">Acesso</p>
-            <ReviewRow label="Acesso" value={draft.ticketName} />
+            <div className="flex items-start justify-between gap-4 mb-6">
+              <div>
+                <p className="text-[10px] tracking-[0.4em] uppercase text-gold mb-2">Acesso</p>
+                <h2 className="font-display text-2xl">{draft.ticketName}</h2>
+                <p className="mt-1 text-xs text-muted-foreground">{draft.ticketCategory}</p>
+              </div>
+              <Link to="/comprar" search={{ ticket: draft.ticketId }} className="text-[10px] tracking-widest uppercase text-muted-foreground hover:text-gold shrink-0">
+                Alterar
+              </Link>
+            </div>
             <ReviewRow label="Preço unitário" value={formatMoney(draft.unitPrice)} />
             <ReviewRow label="Quantidade" value={String(draft.quantity)} />
             <div className="mt-5 pt-5 border-t border-border/40 flex justify-between items-baseline">
               <span className="text-[10px] tracking-[0.3em] uppercase text-muted-foreground">Total</span>
-              <span className="font-display text-3xl text-gradient-gold">{formatMoney(draft.totalAmount)}</span>
+              <span className="font-display text-3xl md:text-4xl text-gradient-gold">{formatMoney(draft.totalAmount)}</span>
             </div>
           </section>
 
@@ -131,6 +139,13 @@ function ReservaResumo() {
             ) : (
               <p className="text-sm text-muted-foreground">Complete os dados do participante antes de confirmar a reserva.</p>
             )}
+          </section>
+
+          <section className="border border-gold/30 bg-gold/5 p-6 md:p-8">
+            <p className="text-[10px] tracking-[0.4em] uppercase text-gold mb-4">Próxima etapa</p>
+            <p className="text-sm text-muted-foreground leading-relaxed">
+              Ao confirmar, o THE BOARD cria a referência da reserva. Em produção, esta reserva seguirá para o ambiente seguro de pagamento externo e regressará para confirmação antes da admissão.
+            </p>
           </section>
 
           <section className="border border-border/40 bg-background/60 p-6 md:p-8">
@@ -158,7 +173,7 @@ function ReservaResumo() {
               disabled={loading || !consent || !hasParticipant}
               className="py-4 bg-gradient-gold text-primary-foreground tracking-widest text-xs uppercase shadow-gold hover:opacity-90 transition disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {loading ? "Criando reserva…" : "Confirmar Reserva e Continuar para Pagamento"}
+              {loading ? "Criando reserva…" : "Confirmar Reserva e Continuar"}
             </button>
           </div>
         </form>
