@@ -53,7 +53,6 @@ function Landing() {
   const { schedule, error: scheduleError, isEmpty: scheduleEmpty } = useSchedule();
   const { tiers, error: tiersError, isEmpty: tiersEmpty } = useSponsorTiers();
   const { kpis } = useKpis();
-
   const [mobileOpen, setMobileOpen] = useState(false);
 
   useEffect(() => {
@@ -65,7 +64,7 @@ function Landing() {
 
   return (
     <div className="min-h-screen bg-background text-foreground overflow-x-hidden rw-motion-shell">
-      <header className="fixed top-0 inset-x-0 z-50 backdrop-blur-md bg-background/70 border-b border-border/40">
+      <header className="fixed top-0 inset-x-0 z-50 backdrop-blur-md bg-background/75 border-b border-border/40">
         <nav className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
           <a href="#top" className="font-display text-lg tracking-[0.25em] text-foreground">
             THE <span className="text-gold">BOARD</span>
@@ -96,7 +95,6 @@ function Landing() {
             </button>
           </div>
         </nav>
-
         {mobileOpen && (
           <div className="md:hidden border-t border-border/40 bg-background/95 backdrop-blur-md">
             <div className="px-6 py-6 flex flex-col gap-5 text-sm tracking-widest uppercase">
@@ -105,19 +103,10 @@ function Landing() {
                   {l.label}
                 </a>
               ))}
-              <Link
-                to="/comprar"
-                search={{ ticket: "early-investors" as const }}
-                onClick={() => setMobileOpen(false)}
-                className="mt-2 text-center py-3 bg-gradient-gold text-primary-foreground text-xs uppercase tracking-widest shadow-gold"
-              >
+              <Link to="/comprar" search={{ ticket: "early-investors" as const }} onClick={() => setMobileOpen(false)} className="mt-2 text-center py-3 bg-gradient-gold text-primary-foreground text-xs uppercase tracking-widest shadow-gold">
                 Garantir Lugar
               </Link>
-              <Link
-                to="/patrocinios"
-                onClick={() => setMobileOpen(false)}
-                className="text-center py-3 border border-gold/60 text-gold text-xs uppercase tracking-widest"
-              >
+              <Link to="/patrocinios" onClick={() => setMobileOpen(false)} className="text-center py-3 border border-gold/60 text-gold text-xs uppercase tracking-widest">
                 Tornar-se Parceiro
               </Link>
             </div>
@@ -126,47 +115,42 @@ function Landing() {
       </header>
 
       <section id="top" className="relative min-h-screen flex items-center overflow-hidden">
-        <img src={heroBg} alt="" className="absolute inset-0 w-full h-full object-cover opacity-40" width={1920} height={1080} />
-        <div className="absolute inset-0 bg-gradient-to-b from-background/50 via-background/38 to-background" />
-        <div className="absolute inset-0 bg-gradient-dark opacity-80" />
+        <img src={heroBg} alt="" className="absolute inset-0 w-full h-full object-cover opacity-32" width={1920} height={1080} />
+        <div className="absolute inset-0 bg-gradient-to-b from-background/40 via-background/34 to-background" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,oklch(0.08_0.005_60_/_0.2)_42%,oklch(0.08_0.005_60)_84%)]" />
         <div className="capital-grid" />
-        <div className="market-ribbon" />
-        <div className="market-sculpture" />
-        <div className="gold-orbit" />
+        <MarketSignal />
 
-        <div className="relative max-w-6xl mx-auto px-6 pt-32 pb-20 text-center">
-          <p className="reveal-premium text-[10px] md:text-xs tracking-[0.5em] text-gold uppercase mb-8">
-            Edição Especial · Moçambique &amp; Angola
-          </p>
+        <div className="relative z-10 max-w-6xl mx-auto px-6 pt-28 pb-20 text-center">
+          <div className="reveal-premium hero-edition-badge mx-auto mb-8">
+            <span>Edição Especial</span>
+            <strong>Moçambique &amp; Angola</strong>
+          </div>
           <h1 className="reveal-premium reveal-delay-1 font-display text-6xl md:text-8xl lg:text-9xl leading-[0.95] text-foreground drop-shadow-2xl">
             THE BOARD
           </h1>
           <p className="reveal-premium reveal-delay-2 mt-6 text-sm md:text-base tracking-[0.4em] text-gold uppercase">
             Big Players Forum
           </p>
-
           <div className="mx-auto mt-10 max-w-md hairline-gold reveal-premium reveal-delay-2" />
-
           <p className="reveal-premium reveal-delay-3 mt-10 max-w-2xl mx-auto text-base md:text-lg text-muted-foreground leading-relaxed">
             A plataforma premium de convergência entre os ecossistemas financeiros da África Austral.
             Onde investidores soberanos, traders profissionais e líderes corporativos originam transações reais.
           </p>
-
-          <div className="reveal-premium reveal-delay-3 mt-14 grid grid-cols-2 md:grid-cols-4 gap-6 max-w-3xl mx-auto text-left">
+          <div className="reveal-premium reveal-delay-3 mt-12 grid grid-cols-2 md:grid-cols-4 gap-4 max-w-3xl mx-auto text-left">
             {[
               { k: "Data", v: "08 Ago 2026" },
               { k: "Local", v: "Hotel ONOMO" },
               { k: "Cidade", v: "Maputo, MZ" },
               { k: "Acesso", v: "200 lugares" },
             ].map((i) => (
-              <div key={i.k} className="border-l border-gold/40 pl-4 premium-card">
+              <div key={i.k} className="hero-fact-card">
                 <p className="text-[10px] tracking-[0.3em] uppercase text-gold/70">{i.k}</p>
                 <p className="mt-1 font-display text-xl text-foreground">{i.v}</p>
               </div>
             ))}
           </div>
-
-          <div className="reveal-premium reveal-delay-3 mt-14 flex flex-col sm:flex-row gap-4 justify-center">
+          <div className="reveal-premium reveal-delay-3 mt-12 flex flex-col sm:flex-row gap-4 justify-center">
             <a href="#bilhetes" className="px-8 py-4 bg-gradient-gold text-primary-foreground font-medium tracking-widest text-xs uppercase shadow-gold hover:opacity-90 transition">
               Garantir Lugar
             </a>
@@ -177,7 +161,7 @@ function Landing() {
         </div>
       </section>
 
-      <section id="forum" className="py-32 relative scroll-mt-24 rw-section">
+      <section id="forum" className="py-28 relative scroll-mt-24 rw-section">
         <div className="max-w-6xl mx-auto px-6 grid md:grid-cols-12 gap-12 items-start">
           <div className="md:col-span-4 reveal-premium">
             <p className="text-[10px] tracking-[0.4em] uppercase text-gold mb-4">01 — Visão</p>
@@ -205,7 +189,7 @@ function Landing() {
         </div>
       </section>
 
-      <section className="py-24 bg-card/40 border-y border-border/40 rw-section">
+      <section className="py-24 bg-card/30 border-y border-border/40 rw-section">
         <div className="max-w-6xl mx-auto px-6">
           <SectionTitle eyebrow="02 — Audiência" title="Perfil dos participantes" />
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-px bg-border/30 reveal-premium reveal-delay-1">
@@ -220,7 +204,7 @@ function Landing() {
         </div>
       </section>
 
-      <section id="agenda" className="py-32 scroll-mt-24 rw-section">
+      <section id="agenda" className="py-28 scroll-mt-24 rw-section">
         <div className="max-w-5xl mx-auto px-6">
           <SectionTitle eyebrow="03 — Agenda" title="Cronograma executivo" description="08 de Agosto de 2026 · Hotel ONOMO Maputo" />
           {scheduleError ? (
@@ -249,7 +233,7 @@ function Landing() {
         </div>
       </section>
 
-      <section id="bilhetes" className="py-32 bg-card/40 border-y border-border/40 scroll-mt-24 rw-section">
+      <section id="bilhetes" className="py-28 bg-card/30 border-y border-border/40 scroll-mt-24 rw-section">
         <div className="max-w-7xl mx-auto px-6">
           <SectionTitle eyebrow="04 — Bilhética" title="Garanta o seu acesso" description="Capacidade rigorosamente limitada. Preços em meticais (MT)." />
           {ticketsError ? (
@@ -261,7 +245,7 @@ function Landing() {
               {tickets.map((t) => (
                 <div
                   key={t.id}
-                  className={`relative p-8 flex flex-col border premium-card ${
+                  className={`relative p-8 flex flex-col border premium-card ticket-card ${
                     t.featured
                       ? "border-gold bg-gradient-to-b from-card to-background shadow-gold"
                       : t.available
@@ -269,10 +253,12 @@ function Landing() {
                       : "border-border/40 bg-background hover:border-gold/40 transition"
                   }`}
                 >
-                  {t.featured && <span className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 bg-gold text-primary-foreground text-[10px] tracking-widest uppercase">Recomendado</span>}
-                  {t.available && !t.featured && <span className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 bg-background border border-gold text-gold text-[10px] tracking-widest uppercase">À venda</span>}
-                  <p className="text-[10px] tracking-[0.3em] uppercase text-gold/80">{t.tag}</p>
-                  <h3 className="font-display text-2xl mt-3">{t.name}</h3>
+                  <div className="flex items-start justify-between gap-3 mb-4">
+                    <p className="text-[10px] tracking-[0.3em] uppercase text-gold/80">{t.tag}</p>
+                    {t.featured && <span className="ticket-status bg-gold text-primary-foreground">Recomendado</span>}
+                    {t.available && !t.featured && <span className="ticket-status border border-gold/70 text-gold">À venda</span>}
+                  </div>
+                  <h3 className="font-display text-2xl">{t.name}</h3>
                   <p className="text-sm text-muted-foreground mt-2 min-h-[40px]">{t.description}</p>
                   <div className="mt-6 mb-6">
                     <p className="font-display text-4xl text-foreground">{t.priceLabel} <span className="text-base text-muted-foreground">{t.priceCurrency}</span></p>
@@ -296,7 +282,7 @@ function Landing() {
         </div>
       </section>
 
-      <section className="py-32 rw-section">
+      <section className="py-28 rw-section">
         <div className="max-w-6xl mx-auto px-6">
           <SectionTitle eyebrow="05 — Experiência" title="Premium agregada" />
           <div className="grid md:grid-cols-2 gap-px bg-border/30 reveal-premium reveal-delay-1">
@@ -315,7 +301,7 @@ function Landing() {
         </div>
       </section>
 
-      <section id="patrocinios" className="py-32 bg-card/40 border-y border-border/40 scroll-mt-24 rw-section">
+      <section id="patrocinios" className="py-28 bg-card/30 border-y border-border/40 scroll-mt-24 rw-section">
         <div className="max-w-6xl mx-auto px-6">
           <SectionTitle eyebrow="06 — Patrocínios" title="Cotas institucionais" description="Três níveis hierárquicos rígidos desenhados para máxima visibilidade setorial." />
           {tiersError ? (
@@ -345,7 +331,7 @@ function Landing() {
         </div>
       </section>
 
-      <section className="py-24 rw-section">
+      <section className="py-20 rw-section">
         <div className="max-w-6xl mx-auto px-6">
           <div className="grid grid-cols-2 md:grid-cols-5 gap-px bg-border/30 reveal-premium">
             {kpis.map((k) => (
@@ -358,9 +344,9 @@ function Landing() {
         </div>
       </section>
 
-      <section id="contacto" className="py-32 relative overflow-hidden">
+      <section id="contacto" className="py-28 relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-dark" />
-        <div className="capital-grid opacity-40" />
+        <div className="capital-grid opacity-25" />
         <div className="relative max-w-3xl mx-auto px-6 text-center reveal-premium">
           <p className="text-[10px] tracking-[0.4em] uppercase text-gold mb-6">Acesso confidencial</p>
           <h2 className="font-display text-4xl md:text-6xl leading-tight">
@@ -397,9 +383,22 @@ function Landing() {
   );
 }
 
+function MarketSignal() {
+  return (
+    <div className="market-signal" aria-hidden="true">
+      <div className="market-signal__line" />
+      <div className="market-signal__candles">
+        {Array.from({ length: 14 }).map((_, i) => (
+          <span key={i} style={{ "--i": i } as React.CSSProperties} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function SectionTitle({ eyebrow, title, description }: { eyebrow: string; title: string; description?: string }) {
   return (
-    <div className="text-center mb-16 reveal-premium">
+    <div className="text-center mb-14 reveal-premium">
       <p className="text-[10px] tracking-[0.4em] uppercase text-gold mb-4">{eyebrow}</p>
       <h2 className="font-display text-4xl md:text-5xl">{title}</h2>
       {description && <p className="mt-4 text-muted-foreground max-w-xl mx-auto">{description}</p>}
