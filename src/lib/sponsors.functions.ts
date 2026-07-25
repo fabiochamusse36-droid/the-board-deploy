@@ -10,19 +10,20 @@ const schema = z.object({
   message: z.string().trim().max(2000).optional().or(z.literal("")),
 });
 
+function genSponsorReference() {
+  const rand = Math.random().toString(36).slice(2, 8).toUpperCase();
+  const ts = Date.now().toString(36).slice(-4).toUpperCase();
+  return `SP-${ts}${rand}`;
+}
+
 export const createSponsorInquiry = createServerFn({ method: "POST" })
-  .inputValidator((input: unknown) => schema.parse(input))
+  .validator((input: unknown) => schema.parse(input))
   .handler(async ({ data }) => {
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { error } = await supabaseAdmin.from("sponsor_inquiries").insert({
+    // Temporary backend-ready response. When the real backend lands, replace this handler with an API call.
+    return {
+      ok: true,
+      inquiryReference: genSponsorReference(),
+      status: "sponsor_inquiry_received" as const,
       tier: data.tier,
-      company: data.company,
-      contact_name: data.contact_name,
-      email: data.email,
-      phone: data.phone || null,
-      message: data.message || null,
-      status: "new",
-    });
-    if (error) throw new Error(error.message);
-    return { ok: true };
+    };
   });
