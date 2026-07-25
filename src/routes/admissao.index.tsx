@@ -1,9 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { z } from "zod";
-import { getReservation, type MockReservation } from "@/lib/reservations.mock";
-
-
+import { getReservation, markAdmissionSubmitted, type MockReservation } from "@/lib/reservations.mock";
 
 const searchSchema = z.object({
   reference: z.string().trim().min(4).max(40).optional(),
@@ -13,17 +11,15 @@ export const Route = createFileRoute("/admissao/")({
   validateSearch: (s: Record<string, unknown>) => searchSchema.parse(s),
   head: () => ({
     meta: [
-      { title: "Admissão — THE BOARD Big Players Forum 2026" },
+      { title: "Admissão Executiva — THE BOARD Big Players Forum 2026" },
       {
         name: "description",
-        content:
-          "Formulário de Admissão Executiva — validação de perfil para o THE BOARD, Maputo 2026.",
+        content: "Formulário de Admissão Executiva — validação de perfil para o THE BOARD, Maputo 2026.",
       },
-      { property: "og:title", content: "Admissão — THE BOARD 2026" },
+      { property: "og:title", content: "Admissão Executiva — THE BOARD 2026" },
       {
         property: "og:description",
-        content:
-          "Trader Profile Assessment — admissão à mesa do Big Players Forum, Maputo 2026.",
+        content: "Validação executiva de perfil para participantes do THE BOARD Big Players Forum, Maputo 2026.",
       },
     ],
   }),
@@ -72,12 +68,15 @@ const styleOptions = [
   "Position / Long-term",
   "Algorítmico / Quant",
   "Multi-estratégia",
+  "Empresário / Investidor estratégico",
+  "Institucional / Advisory",
 ];
 const riskOptions = [
   "Conservador (< 1% por operação)",
   "Moderado (1–3% por operação)",
   "Agressivo (> 3% por operação)",
   "Gestão institucional / mandato",
+  "Não aplicável / perfil não operacional",
 ];
 const seatOptions = [
   "Early Investor",
@@ -92,19 +91,6 @@ function AdmissaoPage() {
   const { reference } = Route.useSearch();
   const [gateChecked, setGateChecked] = useState(false);
   const [reservation, setReservation] = useState<MockReservation | null>(null);
-
-  useEffect(() => {
-    if (reference) {
-      const { data } = getReservation(reference);
-      setReservation(data);
-    } else {
-      setReservation(null);
-    }
-    setGateChecked(true);
-  }, [reference]);
-
-
-
   const [form, setForm] = useState<FormState>({
     name: "",
     email: "",
@@ -120,6 +106,25 @@ function AdmissaoPage() {
   const [errors, setErrors] = useState<Partial<Record<keyof FormState, string>>>({});
   const [loading, setLoading] = useState(false);
 
+  useEffect(() => {
+    if (reference) {
+      const { data } = getReservation(reference);
+      setReservation(data);
+      if (data?.paymentStatus === "payment_confirmed") {
+        setForm((current) => ({
+          ...current,
+          name: current.name || data.buyerName || "",
+          email: current.email || data.buyerEmail || "",
+          phone: current.phone || data.buyerPhone || "",
+          seat: current.seat || inferSeat(data.ticketName),
+        }));
+      }
+    } else {
+      setReservation(null);
+    }
+    setGateChecked(true);
+  }, [reference]);
+
   function update<K extends keyof FormState>(key: K, value: FormState[K]) {
     setForm((f) => ({ ...f, [key]: value }));
     setErrors((e) => ({ ...e, [key]: undefined }));
@@ -129,10 +134,9 @@ function AdmissaoPage() {
     const next: Partial<Record<keyof FormState, string>> = {};
     if (!form.name.trim()) next.name = "Nome obrigatório";
     if (!form.email.trim()) next.email = "E-mail obrigatório";
-    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.trim()))
-      next.email = "E-mail inválido";
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.trim())) next.email = "E-mail inválido";
     if (!form.experience) next.experience = "Selecione a sua experiência";
-    if (!form.style) next.style = "Selecione um estilo operacional";
+    if (!form.style) next.style = "Selecione um perfil operacional";
     if (!form.risk) next.risk = "Selecione a sua gestão de risco";
     if (!form.seat) next.seat = "Selecione a categoria de assento";
     if (!form.declaration) next.declaration = "Confirme a declaração final";
@@ -145,8 +149,8 @@ function AdmissaoPage() {
     if (!validate()) return;
     setLoading(true);
     try {
-      // Simulated submission — replace with real backend when available.
       await new Promise((r) => setTimeout(r, 900));
+      if (reference) markAdmissionSubmitted(reference);
       navigate({ to: "/admissao/obrigado" });
     } finally {
       setLoading(false);
@@ -165,11 +169,8 @@ function AdmissaoPage() {
     return <AccessGate variant="pending-payment" reference={reference} />;
   }
 
-
-
   return (
     <div className="min-h-screen bg-background text-foreground overflow-x-hidden">
-      {/* HEADER */}
       <header className="fixed top-0 inset-x-0 z-50 backdrop-blur-md bg-background/70 border-b border-border/40">
         <nav className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
           <Link to="/" className="font-display text-lg tracking-[0.25em] text-foreground">
@@ -189,32 +190,35 @@ function AdmissaoPage() {
         <div className="relative max-w-3xl mx-auto px-6">
           <div className="text-center mb-12">
             <span className="inline-block px-4 py-1.5 border border-gold/60 text-gold text-[10px] tracking-[0.35em] uppercase">
-              Trader Profile Assessment
+              Admissão Executiva
             </span>
             <h1 className="font-display text-4xl md:text-6xl mt-8 leading-tight">
-              THE BOARD — <span className="text-gradient-gold">BIG PLAYERS FORUM</span>
+              Perfil para a <span className="text-gradient-gold">mesa certa</span>
             </h1>
-            <p className="mt-6 text-sm md:text-base text-muted-foreground tracking-wide">
-              Maputo 2026 • Questionário de Qualificação e Admissão de Operadores de Mercado
+            <p className="mt-6 text-sm md:text-base text-muted-foreground tracking-wide max-w-xl mx-auto">
+              Complete os dados de perfil para a comissão enquadrar a sua participação, categoria e experiência no THE BOARD.
             </p>
             <div className="mx-auto mt-8 max-w-xs hairline-gold" />
           </div>
 
-          {reference ? (
+          {reference && reservation ? (
             <div className="border border-gold/40 bg-gold/5 p-5 md:p-6 mb-8 text-center">
-              <p className="text-[10px] tracking-[0.3em] uppercase text-gold mb-2">Referência da reserva</p>
+              <p className="text-[10px] tracking-[0.3em] uppercase text-gold mb-2">Reserva confirmada</p>
               <p className="font-display text-xl tracking-widest break-all">{reference}</p>
-              <p className="mt-3 text-xs text-muted-foreground leading-relaxed">
-                Esta candidatura está associada à sua reserva confirmada. A submissão do formulário
-                conclui a etapa de validação de perfil.
+              <div className="mt-4 grid sm:grid-cols-3 gap-3 text-xs text-muted-foreground">
+                <p><span className="block text-[9px] tracking-[0.25em] uppercase text-gold/80 mb-1">Acesso</span>{reservation.ticketName}</p>
+                <p><span className="block text-[9px] tracking-[0.25em] uppercase text-gold/80 mb-1">Quantidade</span>{reservation.quantity}</p>
+                <p><span className="block text-[9px] tracking-[0.25em] uppercase text-gold/80 mb-1">Total</span>{reservation.amount.toLocaleString("pt-PT")} MT</p>
+              </div>
+              <p className="mt-4 text-xs text-muted-foreground leading-relaxed">
+                Esta candidatura está associada à sua reserva confirmada. A submissão do formulário conclui a etapa de validação de perfil.
               </p>
             </div>
           ) : (
             <div className="border border-gold/40 bg-gold/5 p-5 md:p-6 mb-8 text-center">
               <p className="text-[10px] tracking-[0.3em] uppercase text-gold mb-2">Reserva recomendada</p>
               <p className="text-xs text-muted-foreground leading-relaxed">
-                Para garantir prioridade de vaga, crie uma reserva antes de preencher o Formulário
-                de Admissão.
+                Para garantir prioridade de vaga, crie uma reserva antes de preencher o Formulário de Admissão.
               </p>
               <Link
                 to="/comprar"
@@ -226,16 +230,12 @@ function AdmissaoPage() {
             </div>
           )}
 
-
-
           <div className="border border-gold/30 bg-card/40 backdrop-blur-sm p-6 md:p-8 mb-10">
             <p className="text-[10px] tracking-[0.3em] uppercase text-gold mb-3">
-              Política de Privacidade & Data Protection
+              Privacidade & curadoria
             </p>
             <p className="text-sm text-muted-foreground leading-relaxed">
-              Os dados operacionais fornecidos abaixo destinam-se exclusivamente à validação de
-              perfil pela comissão de curadoria do evento. O THE BOARD não partilha dados de
-              perfil, performance ou estratégia com terceiros sem autorização.
+              Os dados fornecidos destinam-se exclusivamente à validação de perfil pela comissão de curadoria do evento. O THE BOARD não partilha dados de perfil, performance ou estratégia com terceiros sem autorização.
             </p>
           </div>
 
@@ -284,37 +284,21 @@ function AdmissaoPage() {
               </Field>
             </Section>
 
-            <Section title="02 — Perfil operacional">
-              <Field label="Experiência em mercados *" error={errors.experience}>
-                <Select
-                  value={form.experience}
-                  onChange={(v) => update("experience", v)}
-                  options={experienceOptions}
-                />
+            <Section title="02 — Perfil executivo e operacional">
+              <Field label="Experiência em mercados ou negócios *" error={errors.experience}>
+                <Select value={form.experience} onChange={(v) => update("experience", v)} options={experienceOptions} />
               </Field>
-              <Field label="Estilo operacional *" error={errors.style}>
-                <Select
-                  value={form.style}
-                  onChange={(v) => update("style", v)}
-                  options={styleOptions}
-                />
+              <Field label="Perfil predominante *" error={errors.style}>
+                <Select value={form.style} onChange={(v) => update("style", v)} options={styleOptions} />
               </Field>
               <Field label="Gestão de risco *" error={errors.risk}>
-                <Select
-                  value={form.risk}
-                  onChange={(v) => update("risk", v)}
-                  options={riskOptions}
-                />
+                <Select value={form.risk} onChange={(v) => update("risk", v)} options={riskOptions} />
               </Field>
             </Section>
 
-            <Section title="03 — Mesa pretendida">
+            <Section title="03 — Enquadramento na sala">
               <Field label="Categoria de assento *" error={errors.seat}>
-                <Select
-                  value={form.seat}
-                  onChange={(v) => update("seat", v)}
-                  options={seatOptions}
-                />
+                <Select value={form.seat} onChange={(v) => update("seat", v)} options={seatOptions} />
               </Field>
               <Field label="Observações estratégicas (opcional)">
                 <textarea
@@ -322,6 +306,7 @@ function AdmissaoPage() {
                   value={form.notes}
                   onChange={(e) => update("notes", e.target.value)}
                   className={`${inputCls} resize-none`}
+                  placeholder="Objetivos de networking, perfil institucional, interesses de investimento ou observações relevantes."
                 />
               </Field>
             </Section>
@@ -335,13 +320,10 @@ function AdmissaoPage() {
                   className="mt-1 accent-[color:var(--color-gold,#c9a449)]"
                 />
                 <span className="text-sm text-muted-foreground leading-relaxed">
-                  Declaro que as informações prestadas são verdadeiras e autorizo a comissão de
-                  curadoria do THE BOARD a avaliar o meu perfil para efeitos de admissão. *
+                  Declaro que as informações prestadas são verdadeiras e autorizo a comissão de curadoria do THE BOARD a avaliar o meu perfil para efeitos de admissão. *
                 </span>
               </label>
-              {errors.declaration && (
-                <p className="mt-2 text-xs text-destructive">{errors.declaration}</p>
-              )}
+              {errors.declaration && <p className="mt-2 text-xs text-destructive">{errors.declaration}</p>}
             </div>
 
             <div className="flex flex-col sm:flex-row gap-4 pt-2">
@@ -350,7 +332,7 @@ function AdmissaoPage() {
                 disabled={loading}
                 className="flex-1 px-8 py-4 bg-gradient-gold text-primary-foreground font-medium tracking-widest text-xs uppercase shadow-gold hover:opacity-90 transition disabled:opacity-60 disabled:cursor-not-allowed"
               >
-                {loading ? "Submetendo candidatura…" : "Submeter Candidatura à Mesa"}
+                {loading ? "Submetendo candidatura…" : "Submeter Candidatura Executiva"}
               </button>
               <Link
                 to="/"
@@ -366,6 +348,11 @@ function AdmissaoPage() {
   );
 }
 
+function inferSeat(ticketName: string): string {
+  if (ticketName.toLowerCase().includes("vip")) return "VIP / Board Member";
+  return "Early Investor";
+}
+
 const inputCls =
   "w-full bg-background/60 border border-border/60 focus:border-gold focus:outline-none px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground/60 transition";
 
@@ -378,15 +365,7 @@ function Section({ title, children }: { title: string; children: React.ReactNode
   );
 }
 
-function Field({
-  label,
-  error,
-  children,
-}: {
-  label: string;
-  error?: string;
-  children: React.ReactNode;
-}) {
+function Field({ label, error, children }: { label: string; error?: string; children: React.ReactNode }) {
   return (
     <div>
       <label className="block text-[11px] tracking-[0.2em] uppercase text-muted-foreground mb-2">
@@ -398,21 +377,9 @@ function Field({
   );
 }
 
-function Select({
-  value,
-  onChange,
-  options,
-}: {
-  value: string;
-  onChange: (v: string) => void;
-  options: string[];
-}) {
+function Select({ value, onChange, options }: { value: string; onChange: (v: string) => void; options: string[] }) {
   return (
-    <select
-      value={value}
-      onChange={(e) => onChange(e.target.value)}
-      className={`${inputCls} appearance-none cursor-pointer`}
-    >
+    <select value={value} onChange={(e) => onChange(e.target.value)} className={`${inputCls} appearance-none cursor-pointer`}>
       <option value="">— Selecionar —</option>
       {options.map((o) => (
         <option key={o} value={o} className="bg-background text-foreground">
@@ -423,13 +390,7 @@ function Select({
   );
 }
 
-function AccessGate({
-  variant,
-  reference,
-}: {
-  variant: "no-reference" | "pending-payment";
-  reference?: string;
-}) {
+function AccessGate({ variant, reference }: { variant: "no-reference" | "pending-payment"; reference?: string }) {
   const isPending = variant === "pending-payment";
   return (
     <div className="min-h-screen bg-background text-foreground overflow-x-hidden">
@@ -438,10 +399,7 @@ function AccessGate({
           <Link to="/" className="font-display text-lg tracking-[0.25em] text-foreground">
             THE <span className="text-gold">BOARD</span>
           </Link>
-          <Link
-            to="/"
-            className="text-[10px] tracking-[0.3em] uppercase text-muted-foreground hover:text-gold transition"
-          >
+          <Link to="/" className="text-[10px] tracking-[0.3em] uppercase text-muted-foreground hover:text-gold transition">
             ← Voltar
           </Link>
         </nav>
@@ -485,10 +443,7 @@ function AccessGate({
                 Criar Reserva
               </Link>
             )}
-            <Link
-              to="/"
-              className="px-8 py-4 border border-gold/40 text-gold text-xs tracking-widest uppercase hover:bg-gold/10 transition"
-            >
+            <Link to="/" className="px-8 py-4 border border-gold/40 text-gold text-xs tracking-widest uppercase hover:bg-gold/10 transition">
               Voltar ao início
             </Link>
           </div>
@@ -497,4 +452,3 @@ function AccessGate({
     </div>
   );
 }
-
