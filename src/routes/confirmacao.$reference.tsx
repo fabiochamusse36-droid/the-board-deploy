@@ -120,6 +120,9 @@ function Confirmacao() {
   const quantity = reservation?.quantity ?? readQuantityFromNotes(order.notes) ?? 1;
   const ticketName = reservation?.ticketName ?? order.ticket_type;
   const total = reservation?.amount ?? order.amount_mt;
+  const buyerName = reservation?.buyerName ?? order.buyer_name;
+  const buyerEmail = reservation?.buyerEmail ?? order.buyer_email;
+  const buyerPhone = reservation?.buyerPhone ?? order.buyer_phone;
   const content = stageCopy(stage);
 
   return (
@@ -174,21 +177,29 @@ function Confirmacao() {
           </div>
         )}
 
-        <div className="text-sm space-y-2 mb-10 px-2">
-          <p className="text-[10px] tracking-[0.3em] uppercase text-muted-foreground mb-3">Dados da reserva</p>
-          <div className="flex justify-between gap-4">
-            <span className="text-muted-foreground">Nome</span>
-            <span className="text-right">{order.buyer_name}</span>
+        {(buyerName || buyerEmail || buyerPhone) && (
+          <div className="text-sm space-y-2 mb-10 px-2">
+            <p className="text-[10px] tracking-[0.3em] uppercase text-muted-foreground mb-3">Dados da reserva</p>
+            {buyerName && (
+              <div className="flex justify-between gap-4">
+                <span className="text-muted-foreground">Nome</span>
+                <span className="text-right">{buyerName}</span>
+              </div>
+            )}
+            {buyerEmail && (
+              <div className="flex justify-between gap-4">
+                <span className="text-muted-foreground">Email</span>
+                <span className="text-right break-all">{buyerEmail}</span>
+              </div>
+            )}
+            {buyerPhone && (
+              <div className="flex justify-between gap-4">
+                <span className="text-muted-foreground">Telefone</span>
+                <span className="text-right">{buyerPhone}</span>
+              </div>
+            )}
           </div>
-          <div className="flex justify-between gap-4">
-            <span className="text-muted-foreground">Email</span>
-            <span className="text-right break-all">{order.buyer_email}</span>
-          </div>
-          <div className="flex justify-between gap-4">
-            <span className="text-muted-foreground">Telefone</span>
-            <span className="text-right">{order.buyer_phone}</span>
-          </div>
-        </div>
+        )}
 
         <div className="border border-border/40 bg-background/60 p-5 mb-10 text-xs text-muted-foreground leading-relaxed">
           A admissão final está sujeita à validação executiva. Caso o perfil não seja elegível para a categoria solicitada, o valor será reembolsado conforme a política do evento.
