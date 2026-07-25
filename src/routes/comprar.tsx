@@ -46,68 +46,84 @@ function Comprar() {
   }
 
   return (
-    <div className="min-h-screen bg-background text-foreground py-24 px-6">
-      <div className="max-w-2xl mx-auto">
+    <div className="min-h-screen bg-background text-foreground py-20 md:py-24 px-5 md:px-6">
+      <div className="max-w-3xl mx-auto">
         <Link to="/" className="text-xs tracking-[0.3em] uppercase text-muted-foreground hover:text-gold">
           ← Voltar
         </Link>
 
         <div className="mt-10 mb-10 text-center">
           <p className="text-[10px] tracking-[0.4em] uppercase text-gold mb-4">Criar Reserva</p>
-          <h1 className="font-display text-4xl md:text-5xl">Escolha Confirmada</h1>
-          <p className="mt-4 text-muted-foreground max-w-md mx-auto">
-            Confirme o acesso e a quantidade antes de avançar para os dados do participante.
+          <h1 className="font-display text-4xl md:text-6xl leading-tight">Escolha Confirmada</h1>
+          <p className="mt-4 text-muted-foreground max-w-lg mx-auto leading-relaxed">
+            Confirme o acesso e a quantidade. Os dados do participante serão solicitados na próxima etapa.
           </p>
         </div>
 
         <ReservationProgress active="escolha" />
 
-        <div className="border border-gold/40 bg-gradient-to-b from-card to-background p-6 md:p-8 mt-10 mb-8">
-          <div className="text-center">
-            <p className="text-[10px] tracking-[0.3em] uppercase text-gold/80">{ticket.tag}</p>
-            <h2 className="font-display text-2xl md:text-3xl mt-2">{ticket.name}</h2>
-            <p className="mt-2 text-sm text-muted-foreground">{ticket.description}</p>
-            <p className="mt-2 text-[10px] tracking-[0.3em] uppercase text-muted-foreground">{ticket.category}</p>
-            <p className="font-display text-4xl text-gradient-gold mt-5">
-              {formatMoney(ticket.price).replace(" MT", "")} <span className="text-base text-muted-foreground">MT</span>
-            </p>
-            <p className="mt-2 text-[10px] tracking-[0.3em] uppercase text-muted-foreground">Preço unitário</p>
-          </div>
-
-          <div className="mt-8 flex items-center justify-center gap-4">
-            <button
-              type="button"
-              onClick={decQty}
-              disabled={quantity <= 1}
-              aria-label="Diminuir quantidade"
-              className="w-11 h-11 border border-border/60 text-gold text-lg flex items-center justify-center hover:border-gold/60 hover:bg-gold/10 transition disabled:opacity-30 disabled:cursor-not-allowed"
-            >
-              −
-            </button>
-            <div aria-live="polite" className="min-w-[3rem] text-center font-display text-2xl tabular-nums">
-              {quantity}
+        <div className="mt-10 grid lg:grid-cols-[1fr_0.72fr] gap-6 items-stretch">
+          <section className="border border-gold/40 bg-gradient-to-b from-card to-background p-6 md:p-8">
+            <div className="text-center">
+              <p className="text-[10px] tracking-[0.3em] uppercase text-gold/80">{ticket.tag}</p>
+              <h2 className="font-display text-2xl md:text-4xl mt-3">{ticket.name}</h2>
+              <p className="mt-3 text-sm text-muted-foreground leading-relaxed">{ticket.description}</p>
+              <p className="mt-3 text-[10px] tracking-[0.3em] uppercase text-muted-foreground">{ticket.category}</p>
+              <p className="font-display text-4xl text-gradient-gold mt-6">
+                {formatMoney(ticket.price).replace(" MT", "")} <span className="text-base text-muted-foreground">MT</span>
+              </p>
+              <p className="mt-2 text-[10px] tracking-[0.3em] uppercase text-muted-foreground">Preço unitário</p>
             </div>
-            <button
-              type="button"
-              onClick={incQty}
-              disabled={quantity >= ticket.maxQuantity}
-              aria-label="Aumentar quantidade"
-              className="w-11 h-11 border border-border/60 text-gold text-lg flex items-center justify-center hover:border-gold/60 hover:bg-gold/10 transition disabled:opacity-30 disabled:cursor-not-allowed"
-            >
-              +
-            </button>
-          </div>
-          <p className="mt-2 text-center text-[10px] tracking-[0.2em] uppercase text-muted-foreground">
-            Máx. {ticket.maxQuantity} por reserva
-          </p>
 
-          <div className="mt-8 pt-5 border-t border-border/40 flex justify-between items-baseline">
-            <span className="text-[10px] tracking-[0.3em] uppercase text-muted-foreground">Total</span>
-            <span className="font-display text-3xl text-gradient-gold">{formatMoney(total)}</span>
-          </div>
+            <div className="mt-8 flex items-center justify-center gap-4">
+              <button
+                type="button"
+                onClick={decQty}
+                disabled={quantity <= 1}
+                aria-label="Diminuir quantidade"
+                className="w-12 h-12 border border-border/60 text-gold text-lg flex items-center justify-center hover:border-gold/60 hover:bg-gold/10 transition disabled:opacity-30 disabled:cursor-not-allowed"
+              >
+                −
+              </button>
+              <div aria-live="polite" className="min-w-[3.5rem] text-center font-display text-3xl tabular-nums">
+                {quantity}
+              </div>
+              <button
+                type="button"
+                onClick={incQty}
+                disabled={quantity >= ticket.maxQuantity}
+                aria-label="Aumentar quantidade"
+                className="w-12 h-12 border border-border/60 text-gold text-lg flex items-center justify-center hover:border-gold/60 hover:bg-gold/10 transition disabled:opacity-30 disabled:cursor-not-allowed"
+              >
+                +
+              </button>
+            </div>
+            <p className="mt-2 text-center text-[10px] tracking-[0.2em] uppercase text-muted-foreground">
+              Máx. {ticket.maxQuantity} por reserva
+            </p>
+
+            <div className="mt-8 pt-5 border-t border-border/40 flex justify-between items-baseline">
+              <span className="text-[10px] tracking-[0.3em] uppercase text-muted-foreground">Total</span>
+              <span className="font-display text-3xl md:text-4xl text-gradient-gold">{formatMoney(total)}</span>
+            </div>
+          </section>
+
+          <aside className="border border-border/40 bg-card/30 p-6 md:p-8 flex flex-col justify-between gap-8">
+            <div>
+              <p className="text-[10px] tracking-[0.4em] uppercase text-gold mb-4">Próximas etapas</p>
+              <div className="space-y-4 text-sm text-muted-foreground leading-relaxed">
+                <p><span className="text-foreground">1.</span> Informar dados do participante.</p>
+                <p><span className="text-foreground">2.</span> Rever a reserva e aceitar a política de admissão.</p>
+                <p><span className="text-foreground">3.</span> Continuar para pagamento seguro externo.</p>
+              </div>
+            </div>
+            <div className="text-xs text-muted-foreground leading-relaxed border-l border-gold/40 pl-4">
+              O THE BOARD cria a reserva e prepara a referência. A etapa financeira será tratada no ambiente seguro de pagamento.
+            </div>
+          </aside>
         </div>
 
-        <div className="mb-8 flex gap-3 text-[10px] tracking-widest uppercase justify-center">
+        <div className="my-8 flex gap-3 text-[10px] tracking-widest uppercase justify-center">
           {(Object.keys(TICKETS) as TicketId[]).map((id) => (
             <Link
               key={id}
@@ -127,7 +143,7 @@ function Comprar() {
           onClick={continueToData}
           className="w-full py-4 bg-gradient-gold text-primary-foreground tracking-widest text-xs uppercase shadow-gold hover:opacity-90 transition"
         >
-          Continuar
+          Continuar para dados do participante
         </button>
       </div>
     </div>
