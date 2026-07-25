@@ -92,3 +92,209 @@
   height: 1px;
   width: 100%;
 }
+
+@layer components {
+  .rw-motion-shell {
+    position: relative;
+    isolation: isolate;
+  }
+
+  .rw-section {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .rw-section::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.36;
+    background:
+      radial-gradient(circle at 18% 10%, oklch(0.80 0.15 85 / 0.10), transparent 26rem),
+      radial-gradient(circle at 82% 40%, oklch(0.80 0.15 85 / 0.055), transparent 24rem);
+    z-index: -1;
+  }
+
+  .capital-grid {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+    opacity: 0.72;
+    mask-image: radial-gradient(ellipse at center, black 0%, black 50%, transparent 76%);
+  }
+
+  .capital-grid::before {
+    content: "";
+    position: absolute;
+    inset: -20%;
+    background-image:
+      linear-gradient(oklch(0.82 0.15 88 / 0.10) 1px, transparent 1px),
+      linear-gradient(90deg, oklch(0.82 0.15 88 / 0.08) 1px, transparent 1px);
+    background-size: 82px 82px;
+    transform: perspective(900px) rotateX(64deg) translateY(12%);
+    transform-origin: center 58%;
+    animation: capital-grid-drift 18s linear infinite;
+  }
+
+  .capital-grid::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 53%;
+    width: min(78vw, 980px);
+    height: min(42vw, 420px);
+    transform: translate(-50%, -50%) perspective(1000px) rotateX(58deg) rotateZ(-8deg);
+    border: 1px solid oklch(0.82 0.15 88 / 0.14);
+    box-shadow:
+      0 0 80px oklch(0.82 0.15 88 / 0.12),
+      inset 0 0 50px oklch(0.82 0.15 88 / 0.04);
+  }
+
+  .market-ribbon {
+    position: absolute;
+    inset: auto 0 12% 0;
+    height: 230px;
+    pointer-events: none;
+    opacity: 0.46;
+    background:
+      linear-gradient(110deg, transparent 0 9%, oklch(0.82 0.15 88 / 0.28) 9.2% 9.4%, transparent 9.7% 22%, oklch(0.82 0.15 88 / 0.20) 22.3% 22.5%, transparent 22.8% 100%),
+      linear-gradient(160deg, transparent 0 34%, oklch(0.82 0.15 88 / 0.24) 34.3% 34.6%, transparent 35% 61%, oklch(0.82 0.15 88 / 0.16) 61.2% 61.5%, transparent 62% 100%);
+    animation: market-ribbon-float 9s ease-in-out infinite alternate;
+  }
+
+  .market-sculpture {
+    position: absolute;
+    right: max(4vw, 32px);
+    top: 18%;
+    width: min(32vw, 470px);
+    height: min(32vw, 470px);
+    pointer-events: none;
+    opacity: 0.36;
+    border: 1px solid oklch(0.82 0.15 88 / 0.18);
+    transform: perspective(1000px) rotateX(62deg) rotateZ(-18deg);
+    background:
+      linear-gradient(90deg, transparent 0 12%, oklch(0.82 0.15 88 / 0.22) 12.2% 12.6%, transparent 13% 29%, oklch(0.82 0.15 88 / 0.12) 29.2% 29.6%, transparent 30% 100%),
+      radial-gradient(circle, oklch(0.82 0.15 88 / 0.14), transparent 55%);
+    box-shadow: 0 0 120px oklch(0.82 0.15 88 / 0.10);
+    animation: sculpture-breathe 7s ease-in-out infinite alternate;
+  }
+
+  .market-sculpture::before,
+  .market-sculpture::after {
+    content: "";
+    position: absolute;
+    inset: 18% 10%;
+    border-top: 1px solid oklch(0.82 0.15 88 / 0.32);
+    border-bottom: 1px solid oklch(0.82 0.15 88 / 0.18);
+    transform: skewY(-16deg);
+  }
+
+  .market-sculpture::after {
+    inset: 34% 18% 28%;
+    transform: skewY(18deg);
+    opacity: 0.72;
+  }
+
+  .reveal-premium {
+    animation: reveal-premium 900ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  .reveal-delay-1 { animation-delay: 120ms; }
+  .reveal-delay-2 { animation-delay: 240ms; }
+  .reveal-delay-3 { animation-delay: 360ms; }
+
+  .premium-card {
+    position: relative;
+    overflow: hidden;
+    transform: translateZ(0);
+    transition: border-color 220ms ease, background-color 220ms ease, box-shadow 220ms ease, transform 220ms ease;
+  }
+
+  .premium-card::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    pointer-events: none;
+    background: linear-gradient(115deg, transparent, oklch(0.82 0.15 88 / 0.08), transparent 48%);
+    transform: translateX(-40%);
+    transition: opacity 220ms ease, transform 700ms ease;
+  }
+
+  .premium-card:hover {
+    border-color: oklch(0.82 0.15 88 / 0.42);
+    transform: translateY(-2px);
+  }
+
+  .premium-card:hover::after {
+    opacity: 1;
+    transform: translateX(40%);
+  }
+
+  .gold-orbit {
+    position: absolute;
+    inset: auto 8% 8% auto;
+    width: 180px;
+    height: 180px;
+    border: 1px solid oklch(0.82 0.15 88 / 0.12);
+    border-radius: 999px;
+    opacity: 0.6;
+    pointer-events: none;
+  }
+
+  .gold-orbit::before {
+    content: "";
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    border-radius: 999px;
+    background: var(--gold);
+    top: 16%;
+    left: 18%;
+    box-shadow: 0 0 24px oklch(0.82 0.15 88 / 0.65);
+    animation: orbit-pulse 3.8s ease-in-out infinite;
+  }
+}
+
+@keyframes reveal-premium {
+  from { opacity: 0; transform: translateY(18px); filter: blur(6px); }
+  to { opacity: 1; transform: translateY(0); filter: blur(0); }
+}
+
+@keyframes capital-grid-drift {
+  from { background-position: 0 0, 0 0; }
+  to { background-position: 0 82px, 82px 0; }
+}
+
+@keyframes market-ribbon-float {
+  from { transform: translateY(0) scaleX(1); opacity: 0.32; }
+  to { transform: translateY(-18px) scaleX(1.04); opacity: 0.52; }
+}
+
+@keyframes sculpture-breathe {
+  from { transform: perspective(1000px) rotateX(62deg) rotateZ(-18deg) translateY(0); opacity: 0.28; }
+  to { transform: perspective(1000px) rotateX(62deg) rotateZ(-18deg) translateY(-12px); opacity: 0.44; }
+}
+
+@keyframes orbit-pulse {
+  0%, 100% { transform: scale(1); opacity: 0.5; }
+  50% { transform: scale(1.4); opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .market-sculpture { display: none; }
+  .capital-grid { opacity: 0.38; }
+  .market-ribbon { opacity: 0.24; }
+}
