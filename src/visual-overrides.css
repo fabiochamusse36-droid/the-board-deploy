@@ -1,12 +1,4 @@
 @layer components {
-  .hero-section {
-    min-height: 100svh;
-  }
-
-  .hero-content-layer {
-    transform: translateZ(0);
-  }
-
   .hero-edition-badge {
     display: inline-flex;
     flex-direction: column;
@@ -34,24 +26,13 @@
     font-weight: 500;
   }
 
-  .hero-fact-card {
-    border-left: 1px solid oklch(0.82 0.15 88 / 0.4);
-    padding-left: 1rem;
-    background: linear-gradient(90deg, oklch(0.82 0.15 88 / 0.055), transparent 70%);
-  }
-
   .ticket-card.premium-card {
     overflow: visible;
-    min-height: 23rem;
   }
 
   .ticket-card.premium-card::before,
   .ticket-card.premium-card::after {
     border-radius: inherit;
-  }
-
-  .ticket-card__header {
-    min-height: 1.6rem;
   }
 
   .ticket-card .ticket-status {
@@ -61,56 +42,48 @@
     justify-content: center;
     white-space: nowrap;
     max-width: 100%;
-    padding: 0.38rem 0.56rem;
-    font-size: 0.55rem;
+    padding: 0.32rem 0.55rem;
+    font-size: 0.56rem;
     line-height: 1;
-    letter-spacing: 0.12em;
+    letter-spacing: 0.14em;
     text-transform: uppercase;
     transform: none !important;
-    box-shadow: none;
   }
 
-  .ticket-status--solid {
-    background: var(--gold);
-    color: var(--primary-foreground);
-  }
-
-  .ticket-status--outline {
-    border: 1px solid oklch(0.82 0.15 88 / 0.72);
-    color: var(--gold);
-    background: oklch(0.105 0.005 60 / 0.72);
+  #bilhetes .grid > .ticket-card {
+    min-height: 23rem;
   }
 
   .market-signal {
     position: absolute;
-    right: clamp(1.5rem, 6vw, 8rem);
-    top: clamp(7rem, 17vh, 11rem);
-    width: min(32vw, 460px);
-    height: min(30vw, 380px);
+    right: clamp(2rem, 7vw, 9rem);
+    top: clamp(7rem, 18vh, 11rem);
+    width: min(30vw, 420px);
+    height: min(28vw, 360px);
     pointer-events: none;
-    opacity: 0.44;
+    opacity: 0.45;
     filter: drop-shadow(0 0 36px oklch(0.82 0.15 88 / 0.16));
-    mask-image: linear-gradient(90deg, transparent, black 16%, black 86%, transparent);
+    mask-image: linear-gradient(90deg, transparent, black 16%, black 84%, transparent);
   }
 
   .market-signal__line {
     position: absolute;
-    left: 3%;
-    right: 3%;
+    left: 4%;
+    right: 4%;
     top: 55%;
     height: 1px;
     background: linear-gradient(90deg, transparent, oklch(0.82 0.15 88 / 0.25), oklch(0.82 0.15 88 / 0.65), transparent);
-    transform: perspective(760px) rotateX(58deg) rotateZ(-10deg);
+    transform: perspective(760px) rotateX(58deg) rotateZ(-11deg);
   }
 
   .market-signal__candles {
     position: absolute;
-    inset: 8% 3%;
+    inset: 8% 4%;
     display: grid;
     grid-template-columns: repeat(14, 1fr);
     align-items: center;
     gap: 0.55rem;
-    transform: perspective(760px) rotateX(58deg) rotateZ(-10deg);
+    transform: perspective(760px) rotateX(58deg) rotateZ(-11deg);
   }
 
   .market-signal__candles span {
@@ -123,150 +96,16 @@
   }
 
   .capital-grid {
-    opacity: 0.5;
+    opacity: 0.58;
   }
 
   .capital-grid::before {
-    background-size: 104px 104px;
-    opacity: 0.62;
+    background-size: 96px 96px;
+    opacity: 0.78;
   }
 
   .capital-grid::after {
-    opacity: 0.42;
-  }
-
-  .capital-corridor {
-    isolation: isolate;
-  }
-
-  .capital-corridor::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    z-index: 0;
-    background:
-      radial-gradient(circle at 20% 28%, oklch(0.82 0.15 88 / 0.10), transparent 24rem),
-      radial-gradient(circle at 86% 64%, oklch(0.82 0.15 88 / 0.08), transparent 24rem),
-      linear-gradient(180deg, oklch(0.12 0.006 60), oklch(0.08 0.005 60));
-  }
-
-  .capital-corridor__map {
-    position: absolute;
-    inset: 12% 6%;
-    pointer-events: none;
-    opacity: 0.5;
-    background:
-      linear-gradient(100deg, transparent 0 18%, oklch(0.82 0.15 88 / 0.32) 18.1% 18.25%, transparent 18.6% 52%, oklch(0.82 0.15 88 / 0.22) 52.1% 52.28%, transparent 52.6% 100%),
-      radial-gradient(circle at 22% 50%, oklch(0.82 0.15 88 / 0.35) 0 3px, transparent 4px),
-      radial-gradient(circle at 78% 42%, oklch(0.82 0.15 88 / 0.35) 0 3px, transparent 4px);
-    mask-image: radial-gradient(ellipse at center, black 0%, transparent 76%);
-  }
-
-  .capital-corridor__panel {
-    position: relative;
-    border: 1px solid oklch(0.82 0.15 88 / 0.24);
-    background: linear-gradient(180deg, oklch(0.145 0.008 60 / 0.76), oklch(0.08 0.005 60 / 0.74));
-    padding: clamp(1.5rem, 4vw, 2.5rem);
-    box-shadow: 0 28px 90px -62px oklch(0.82 0.15 88 / 0.72);
-    overflow: hidden;
-  }
-
-  .capital-corridor__axis {
-    position: absolute;
-    left: 12%;
-    right: 12%;
-    top: 49%;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, oklch(0.82 0.15 88 / 0.65), transparent);
-    transform: translateY(-50%);
-  }
-
-  .capital-corridor__node {
-    position: relative;
-    z-index: 1;
-    min-height: 8rem;
-    border: 1px solid oklch(0.82 0.15 88 / 0.16);
-    background: oklch(0.09 0.005 60 / 0.82);
-    padding: 1.25rem;
-  }
-
-  .capital-corridor__node::before {
-    content: "";
-    display: block;
-    width: 0.55rem;
-    height: 0.55rem;
-    border-radius: 999px;
-    background: var(--gold);
-    box-shadow: 0 0 24px oklch(0.82 0.15 88 / 0.45);
-    margin-bottom: 1.35rem;
-  }
-
-  .capital-corridor__node p {
-    font-size: 0.62rem;
-    letter-spacing: 0.32em;
-    text-transform: uppercase;
-    color: var(--gold);
-  }
-
-  .capital-corridor__node strong {
-    display: block;
-    margin-top: 0.45rem;
-    font-family: var(--font-display);
-    font-size: 1.45rem;
-    line-height: 1.1;
-    font-weight: 500;
-    color: var(--foreground);
-  }
-
-  .capital-kpi-strip {
-    margin-top: clamp(3rem, 7vw, 5rem);
-    display: grid;
-    grid-template-columns: repeat(5, minmax(0, 1fr));
-    border: 1px solid oklch(0.82 0.15 88 / 0.16);
-    background: oklch(0.07 0.005 60 / 0.6);
-  }
-
-  .capital-kpi-strip__item {
-    padding: clamp(1.2rem, 3vw, 2rem);
-    text-align: center;
-    border-right: 1px solid oklch(0.82 0.15 88 / 0.12);
-  }
-
-  .capital-kpi-strip__item:last-child {
-    border-right: 0;
-  }
-
-  .capital-kpi-strip__item strong {
-    display: block;
-    font-family: var(--font-display);
-    font-size: clamp(2.3rem, 5vw, 4.2rem);
-    line-height: 0.9;
-    font-weight: 500;
-    background: var(--gradient-gold);
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-  }
-
-  .capital-kpi-strip__item span {
-    display: block;
-    margin-top: 0.9rem;
-    font-size: 0.62rem;
-    line-height: 1.45;
-    letter-spacing: 0.26em;
-    text-transform: uppercase;
-    color: var(--muted-foreground);
-  }
-}
-
-@media (max-width: 1024px) {
-  .capital-kpi-strip {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .capital-kpi-strip__item:nth-child(2n) {
-    border-right: 0;
+    opacity: 0.52;
   }
 }
 
@@ -280,25 +119,7 @@
     display: none;
   }
 
-  .ticket-card.premium-card {
+  #bilhetes .grid > .ticket-card {
     min-height: auto;
-  }
-
-  .ticket-card__header {
-    align-items: flex-start;
-  }
-
-  .capital-kpi-strip {
-    grid-template-columns: 1fr;
-  }
-
-  .capital-kpi-strip__item,
-  .capital-kpi-strip__item:nth-child(2n) {
-    border-right: 0;
-    border-bottom: 1px solid oklch(0.82 0.15 88 / 0.12);
-  }
-
-  .capital-kpi-strip__item:last-child {
-    border-bottom: 0;
   }
 }
