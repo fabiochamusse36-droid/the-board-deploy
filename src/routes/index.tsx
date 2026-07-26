@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useState, type CSSProperties } from "react";
 import heroBg from "@/assets/hero-bg.jpg";
 import { useTickets, useSchedule, useSponsorTiers, useKpis } from "@/hooks/useEventContent";
 
@@ -41,8 +41,15 @@ const experiences = [
   { t: "Marketplace Exclusivo", d: "Apenas 6 expositores: corretoras, banca, imobiliário de luxo e marcas premium." },
 ];
 
+const corridorPoints = [
+  { label: "Maputo", value: "Capital Room" },
+  { label: "Luanda", value: "Institutional Flow" },
+  { label: "Mercado", value: "Deal-making" },
+];
+
 const navLinks = [
   { href: "#forum", label: "Fórum" },
+  { href: "#capital-corridor", label: "Capital" },
   { href: "#agenda", label: "Agenda" },
   { href: "#bilhetes", label: "Bilhetes" },
   { href: "#patrocinios", label: "Patrocínios" },
@@ -69,11 +76,10 @@ function Landing() {
           <a href="#top" className="font-display text-lg tracking-[0.25em] text-foreground">
             THE <span className="text-gold">BOARD</span>
           </a>
-          <div className="hidden md:flex items-center gap-8 text-xs tracking-widest uppercase text-muted-foreground">
+          <div className="hidden md:flex items-center gap-7 text-xs tracking-widest uppercase text-muted-foreground">
             {navLinks.map((l) => (
               <a key={l.href} href={l.href} className="hover:text-gold transition">{l.label}</a>
             ))}
-            <a href="#bilhetes" className="hover:text-gold transition">Processo</a>
           </div>
           <div className="flex items-center gap-3">
             <Link
@@ -114,14 +120,14 @@ function Landing() {
         )}
       </header>
 
-      <section id="top" className="relative min-h-screen flex items-center overflow-hidden">
-        <img src={heroBg} alt="" className="absolute inset-0 w-full h-full object-cover opacity-32" width={1920} height={1080} />
-        <div className="absolute inset-0 bg-gradient-to-b from-background/40 via-background/34 to-background" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,oklch(0.08_0.005_60_/_0.2)_42%,oklch(0.08_0.005_60)_84%)]" />
+      <section id="top" className="relative min-h-screen flex items-center overflow-hidden hero-section">
+        <img src={heroBg} alt="" className="absolute inset-0 w-full h-full object-cover opacity-34" width={1920} height={1080} />
+        <div className="absolute inset-0 bg-gradient-to-b from-background/38 via-background/30 to-background" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,oklch(0.08_0.005_60_/_0.18)_44%,oklch(0.08_0.005_60)_86%)]" />
         <div className="capital-grid" />
         <MarketSignal />
 
-        <div className="relative z-10 max-w-6xl mx-auto px-6 pt-28 pb-20 text-center">
+        <div className="relative z-10 max-w-6xl mx-auto px-6 pt-28 pb-20 text-center hero-content-layer">
           <div className="reveal-premium hero-edition-badge mx-auto mb-8">
             <span>Edição Especial</span>
             <strong>Moçambique &amp; Angola</strong>
@@ -161,10 +167,12 @@ function Landing() {
         </div>
       </section>
 
+      <CapitalCorridor kpis={kpis} />
+
       <section id="forum" className="py-28 relative scroll-mt-24 rw-section">
         <div className="max-w-6xl mx-auto px-6 grid md:grid-cols-12 gap-12 items-start">
           <div className="md:col-span-4 reveal-premium">
-            <p className="text-[10px] tracking-[0.4em] uppercase text-gold mb-4">01 — Visão</p>
+            <p className="text-[10px] tracking-[0.4em] uppercase text-gold mb-4">01 — A Sala</p>
             <h2 className="font-display text-4xl md:text-5xl leading-tight">
               Mais do que uma <em className="text-gold not-italic">conferência</em>.
               Uma sala de decisões.
@@ -191,7 +199,7 @@ function Landing() {
 
       <section className="py-24 bg-card/30 border-y border-border/40 rw-section">
         <div className="max-w-6xl mx-auto px-6">
-          <SectionTitle eyebrow="02 — Audiência" title="Perfil dos participantes" />
+          <SectionTitle eyebrow="02 — Os Players" title="Quem ocupa a sala" />
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-px bg-border/30 reveal-premium reveal-delay-1">
             {audience.map((a, i) => (
               <div key={i} className="bg-background p-8 hover:bg-card transition group premium-card">
@@ -206,7 +214,7 @@ function Landing() {
 
       <section id="agenda" className="py-28 scroll-mt-24 rw-section">
         <div className="max-w-5xl mx-auto px-6">
-          <SectionTitle eyebrow="03 — Agenda" title="Cronograma executivo" description="08 de Agosto de 2026 · Hotel ONOMO Maputo" />
+          <SectionTitle eyebrow="03 — A Sessão" title="O dia em que o mercado se encontra" description="08 de Agosto de 2026 · Hotel ONOMO Maputo" />
           {scheduleError ? (
             <p className="text-center text-sm text-destructive">{scheduleError}</p>
           ) : scheduleEmpty ? (
@@ -235,7 +243,7 @@ function Landing() {
 
       <section id="bilhetes" className="py-28 bg-card/30 border-y border-border/40 scroll-mt-24 rw-section">
         <div className="max-w-7xl mx-auto px-6">
-          <SectionTitle eyebrow="04 — Bilhética" title="Garanta o seu acesso" description="Capacidade rigorosamente limitada. Preços em meticais (MT)." />
+          <SectionTitle eyebrow="04 — O Acesso" title="Garanta o seu acesso" description="Capacidade rigorosamente limitada. Preços em meticais (MT)." />
           {ticketsError ? (
             <p className="text-center text-sm text-destructive">{ticketsError}</p>
           ) : ticketsEmpty ? (
@@ -253,10 +261,10 @@ function Landing() {
                       : "border-border/40 bg-background hover:border-gold/40 transition"
                   }`}
                 >
-                  <div className="flex items-start justify-between gap-3 mb-4">
+                  <div className="flex items-start justify-between gap-3 mb-4 ticket-card__header">
                     <p className="text-[10px] tracking-[0.3em] uppercase text-gold/80">{t.tag}</p>
-                    {t.featured && <span className="ticket-status bg-gold text-primary-foreground">Recomendado</span>}
-                    {t.available && !t.featured && <span className="ticket-status border border-gold/70 text-gold">À venda</span>}
+                    {t.featured && <span className="ticket-status ticket-status--solid">Recomendado</span>}
+                    {t.available && !t.featured && <span className="ticket-status ticket-status--outline">À venda</span>}
                   </div>
                   <h3 className="font-display text-2xl">{t.name}</h3>
                   <p className="text-sm text-muted-foreground mt-2 min-h-[40px]">{t.description}</p>
@@ -284,7 +292,7 @@ function Landing() {
 
       <section className="py-28 rw-section">
         <div className="max-w-6xl mx-auto px-6">
-          <SectionTitle eyebrow="05 — Experiência" title="Premium agregada" />
+          <SectionTitle eyebrow="05 — A Experiência" title="Premium agregada" />
           <div className="grid md:grid-cols-2 gap-px bg-border/30 reveal-premium reveal-delay-1">
             {experiences.map((e) => (
               <div key={e.t} className="bg-background p-8 group premium-card">
@@ -303,7 +311,7 @@ function Landing() {
 
       <section id="patrocinios" className="py-28 bg-card/30 border-y border-border/40 scroll-mt-24 rw-section">
         <div className="max-w-6xl mx-auto px-6">
-          <SectionTitle eyebrow="06 — Patrocínios" title="Cotas institucionais" description="Três níveis hierárquicos rígidos desenhados para máxima visibilidade setorial." />
+          <SectionTitle eyebrow="06 — As Parcerias" title="Cotas institucionais" description="Três níveis hierárquicos rígidos desenhados para máxima visibilidade setorial." />
           {tiersError ? (
             <p className="text-center text-sm text-destructive">{tiersError}</p>
           ) : tiersEmpty ? (
@@ -328,19 +336,6 @@ function Landing() {
               ))}
             </div>
           )}
-        </div>
-      </section>
-
-      <section className="py-20 rw-section">
-        <div className="max-w-6xl mx-auto px-6">
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-px bg-border/30 reveal-premium">
-            {kpis.map((k) => (
-              <div key={k.label} className="bg-background p-8 text-center premium-card">
-                <p className="font-display text-4xl md:text-6xl text-gradient-gold">{k.value}</p>
-                <p className="mt-3 text-[10px] tracking-[0.25em] uppercase text-muted-foreground">{k.label}</p>
-              </div>
-            ))}
-          </div>
         </div>
       </section>
 
@@ -371,8 +366,8 @@ function Landing() {
         <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row gap-6 justify-between items-center text-xs text-muted-foreground">
           <p className="font-display tracking-[0.25em] text-foreground">THE <span className="text-gold">BOARD</span> · BIG PLAYERS FORUM</p>
           <nav className="flex flex-wrap gap-x-6 gap-y-2 justify-center tracking-widest uppercase text-[10px]">
-            <a href="#bilhetes" className="hover:text-gold transition">Processo</a>
-            <Link to="/comprar" search={{ ticket: "early-investors" as const }} className="hover:text-gold transition">Bilhetes</Link>
+            <a href="#capital-corridor" className="hover:text-gold transition">Capital</a>
+            <a href="#bilhetes" className="hover:text-gold transition">Bilhetes</a>
             <Link to="/patrocinios" className="hover:text-gold transition">Patrocínios</Link>
             <a href="mailto:reservas@theboard-forum.com" className="hover:text-gold transition">Contacto</a>
           </nav>
@@ -383,13 +378,58 @@ function Landing() {
   );
 }
 
+function CapitalCorridor({ kpis }: { kpis: Array<{ value: string; label: string }> }) {
+  return (
+    <section id="capital-corridor" className="relative overflow-hidden border-y border-border/40 bg-background py-24 md:py-28 scroll-mt-24 capital-corridor">
+      <div className="capital-corridor__map" aria-hidden="true" />
+      <div className="relative z-10 max-w-6xl mx-auto px-6">
+        <div className="grid lg:grid-cols-[0.9fr_1.1fr] gap-12 items-center">
+          <div className="reveal-premium">
+            <p className="text-[10px] tracking-[0.45em] uppercase text-gold mb-5">Capital Corridor</p>
+            <h2 className="font-display text-4xl md:text-6xl leading-tight">
+              Moçambique <span className="text-gradient-gold">×</span> Angola no mesmo tabuleiro.
+            </h2>
+            <p className="mt-6 text-muted-foreground leading-relaxed text-base md:text-lg max-w-xl">
+              Dois mercados. Uma sala. Capital, conhecimento e influência reunidos num ambiente reservado para decisões de alto valor.
+            </p>
+          </div>
+
+          <div className="capital-corridor__panel reveal-premium reveal-delay-1">
+            <div className="capital-corridor__axis" />
+            <div className="grid sm:grid-cols-3 gap-4">
+              {corridorPoints.map((point) => (
+                <div key={point.label} className="capital-corridor__node">
+                  <p>{point.label}</p>
+                  <strong>{point.value}</strong>
+                </div>
+              ))}
+            </div>
+            <p className="mt-8 text-xs tracking-[0.28em] uppercase text-gold/75">
+              Deal flow · Instituições · Investors · Market intelligence
+            </p>
+          </div>
+        </div>
+
+        <div className="capital-kpi-strip reveal-premium reveal-delay-2">
+          {kpis.map((k) => (
+            <div key={k.label} className="capital-kpi-strip__item">
+              <strong>{k.value}</strong>
+              <span>{k.label}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function MarketSignal() {
   return (
     <div className="market-signal" aria-hidden="true">
       <div className="market-signal__line" />
       <div className="market-signal__candles">
         {Array.from({ length: 14 }).map((_, i) => (
-          <span key={i} style={{ "--i": i } as React.CSSProperties} />
+          <span key={i} style={{ "--i": i } as CSSProperties} />
         ))}
       </div>
     </div>
