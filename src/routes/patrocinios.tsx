@@ -8,7 +8,7 @@ export const Route = createFileRoute("/patrocinios")({
   head: () => ({
     meta: [
       { title: "Parcerias Institucionais — THE BOARD 2026" },
-      { name: "description", content: "Dossier de patrocínio e parcerias institucionais para o THE BOARD Big Players Forum 2026." },
+      { name: "description", content: "Pedido institucional para análise de parceria e acesso controlado ao dossier de patrocínio do THE BOARD Big Players Forum 2026." },
       { property: "og:title", content: "Parcerias Institucionais — THE BOARD 2026" },
       { property: "og:description", content: "Cotas Master, Gold, Silver e propostas personalizadas para instituições e marcas estratégicas." },
     ],
@@ -82,12 +82,21 @@ function SponsorsPage() {
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-full border border-gold mb-6">
             <span className="text-gold font-display text-2xl">✓</span>
           </div>
-          <p className="text-[10px] tracking-[0.4em] uppercase text-gold mb-3">Pedido recebido</p>
+          <p className="text-[10px] tracking-[0.4em] uppercase text-gold mb-3">Pedido institucional recebido</p>
           <h1 className="font-display text-3xl md:text-5xl">Parceria em análise</h1>
           {done.reference && <p className="mt-5 text-xs tracking-[0.25em] uppercase text-muted-foreground">Referência: <span className="text-gold">{done.reference}</span></p>}
           <p className="mt-6 text-muted-foreground leading-relaxed">
-            A Direção Comercial do THE BOARD irá analisar o enquadramento da marca e regressar com o dossier institucional, disponibilidade de cota e proposta adequada.
+            Recebemos o pedido institucional da sua empresa. A Direção Comercial do THE BOARD irá analisar o enquadramento da marca, o nível de interesse indicado e a disponibilidade de cotas.
           </p>
+          <p className="mt-4 text-muted-foreground leading-relaxed">
+            O dossier institucional completo não é disponibilizado automaticamente. Caso exista alinhamento com a curadoria do evento, a equipa entrará em contacto com o dossier adequado e a proposta comercial correspondente.
+          </p>
+          <div className="mt-8 border border-gold/25 bg-gold/5 p-4 text-left">
+            <p className="text-[10px] tracking-[0.3em] uppercase text-gold mb-2">Próxima etapa</p>
+            <p className="text-sm text-muted-foreground leading-relaxed">
+              Em produção, será enviado um email de confirmação via Resend informando que o pedido foi recebido e está sob análise comercial.
+            </p>
+          </div>
           <div className="mt-10 flex flex-col sm:flex-row gap-3 justify-center">
             <button
               onClick={() => navigate({ to: "/" })}
@@ -108,9 +117,9 @@ function SponsorsPage() {
 
         <div className="mt-10 mb-12 text-center">
           <p className="text-[10px] tracking-[0.4em] uppercase text-gold mb-4">Parcerias institucionais</p>
-          <h1 className="font-display text-4xl md:text-6xl leading-tight">Dossier de Patrocínio</h1>
+          <h1 className="font-display text-4xl md:text-6xl leading-tight">Análise de Patrocínio</h1>
           <p className="mt-5 text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-            Para bancos, corretoras, fintechs, gestoras, grupos empresariais e marcas que pretendem estar posicionadas diante de uma sala de decisão.
+            Para bancos, corretoras, fintechs, gestoras, grupos empresariais e marcas que pretendem estar posicionadas diante de uma sala de decisão. O dossier completo é enviado apenas após enquadramento institucional.
           </p>
         </div>
 
@@ -122,8 +131,8 @@ function SponsorsPage() {
               <p className="text-[10px] tracking-[0.35em] uppercase text-gold mb-5">Processo comercial</p>
               <ol className="space-y-5 text-sm text-muted-foreground">
                 <ProcessStep n="01" title="Enquadramento" body="A marca indica o nível de interesse e o perfil institucional." />
-                <ProcessStep n="02" title="Dossier" body="A equipa envia o dossier completo, entregáveis e disponibilidade de cota." />
-                <ProcessStep n="03" title="Proposta" body="A parceria é ajustada ao objetivo comercial, reputacional e de presença." />
+                <ProcessStep n="02" title="Análise" body="A Direção Comercial avalia aderência, categoria, disponibilidade e prioridade de cota." />
+                <ProcessStep n="03" title="Dossier" body="Caso exista alinhamento, a equipa envia o dossier institucional e a proposta adequada." />
               </ol>
             </div>
 
@@ -212,10 +221,10 @@ function SponsorsPage() {
               disabled={loading}
               className="w-full py-4 bg-gradient-gold text-primary-foreground tracking-widest text-xs uppercase shadow-gold hover:opacity-90 transition disabled:opacity-50"
             >
-              {loading ? "A enviar pedido…" : "Solicitar dossier institucional"}
+              {loading ? "A enviar pedido…" : "Solicitar análise institucional"}
             </button>
             <p className="text-xs text-muted-foreground text-center leading-relaxed">
-              Confidencial. Este pedido não representa compra automática de cota; a parceria é analisada e confirmada pela Direção Comercial do evento.
+              Confidencial. Este pedido não representa compra automática de cota nem liberação automática do dossier; a parceria é analisada e confirmada pela Direção Comercial do evento.
             </p>
           </form>
         </div>
