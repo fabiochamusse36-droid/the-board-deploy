@@ -107,6 +107,59 @@
   .capital-grid::after {
     opacity: 0.52;
   }
+
+  /* Final visual correction: preserve the room photo and remove noisy decorative lines from the hero. */
+  #top .capital-grid {
+    opacity: 0.2 !important;
+    mask-image: radial-gradient(ellipse at center, black 0%, black 44%, transparent 76%) !important;
+  }
+
+  #top .capital-grid::before {
+    opacity: 0.22 !important;
+    background-size: 132px 132px !important;
+  }
+
+  #top .capital-grid::after {
+    opacity: 0.08 !important;
+    background: none !important;
+    border-color: oklch(0.82 0.15 88 / 0.08) !important;
+    box-shadow: none !important;
+  }
+
+  #top .market-ribbon,
+  #top .market-sculpture {
+    display: none !important;
+  }
+
+  #top .market-signal {
+    opacity: 0.22 !important;
+    right: clamp(1rem, 5vw, 5rem) !important;
+    top: clamp(8rem, 20vh, 12rem) !important;
+  }
+
+  #top .market-signal__line,
+  #top .market-signal__candles span {
+    opacity: 0.65 !important;
+  }
+
+  #contacto .capital-grid {
+    display: none !important;
+  }
+
+  #contacto .relative > p:last-child {
+    font-size: 0 !important;
+    letter-spacing: normal !important;
+  }
+
+  #contacto .relative > p:last-child::after {
+    content: "Direção Executiva · Maputo, Julho de 2026";
+    display: inline-block;
+    font-size: 0.75rem;
+    letter-spacing: 0.3em;
+    line-height: 1.6;
+    text-transform: uppercase;
+    color: var(--muted-foreground);
+  }
 }
 
 @media (max-width: 768px) {
