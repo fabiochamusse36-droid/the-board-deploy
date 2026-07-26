@@ -20,10 +20,13 @@ export const createSponsorInquiry = createServerFn({ method: "POST" })
   .validator((input: unknown) => schema.parse(input))
   .handler(async ({ data }) => {
     // Temporary backend-ready response. When the real backend lands, replace this handler with an API call.
+    // Production flow: store sponsor inquiry, send Resend confirmation, then move through commercial review before sending the dossier.
     return {
       ok: true,
       inquiryReference: genSponsorReference(),
       status: "sponsor_inquiry_received" as const,
+      reviewStatus: "sponsor_under_review" as const,
+      dossierStatus: "dossier_pending" as const,
       tier: data.tier,
     };
   });
