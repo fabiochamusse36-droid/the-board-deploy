@@ -95,7 +95,7 @@ function CheckinPage() {
     const updated: Credential = {
       ...found,
       status: "checked_in",
-      checkedInAt: "Preparação · validação local",
+      checkedInAt: new Date().toLocaleString("pt-MZ", { dateStyle: "medium", timeStyle: "short" }),
       validatedBy: session?.operator ?? "Operador",
     };
 
@@ -144,7 +144,7 @@ function CheckinPage() {
           </button>
 
           <p className="mt-6 text-xs text-muted-foreground leading-relaxed">
-            A autenticação real será validada pelo backend com sessão segura e permissões de check-in.
+            Toda validação de entrada deve ser feita apenas por operador autorizado.
           </p>
         </form>
       </div>
@@ -172,7 +172,7 @@ function CheckinPage() {
               <p className="text-[10px] tracking-[0.4em] uppercase text-gold mb-3">Validação de entrada</p>
               <h1 className="font-display text-4xl md:text-6xl leading-tight">Check-in</h1>
               <p className="mt-4 text-sm text-muted-foreground max-w-2xl leading-relaxed">
-                Valide credenciais no acesso ao evento. Esta rota é separada do painel administrativo para proteger pagamentos, admissões e patrocínios.
+                Valide credenciais no acesso ao evento. Esta área é independente do painel de gestão e mostra apenas informação necessária para entrada.
               </p>
             </div>
             <div className="grid grid-cols-3 gap-px bg-border/30">
@@ -188,14 +188,14 @@ function CheckinPage() {
               <input
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                placeholder="BOARD-CHK-001, THB-PREP-003 ou nome"
+                placeholder="QR Code, credencial, referência ou nome"
                 className="w-full bg-background border border-border/60 px-4 py-4 text-sm focus:border-gold outline-none"
               />
               <button type="submit" className="mt-4 w-full py-4 border border-gold text-gold text-xs tracking-widest uppercase hover:bg-gold/10 transition">
                 Validar entrada
               </button>
               <p className="mt-5 text-xs text-muted-foreground leading-relaxed">
-                No backend, esta busca será feita por QR Code, referência, email ou código de credencial. Toda validação grava operador, hora e dispositivo.
+                Digite ou leia o código da credencial para confirmar a entrada do participante.
               </p>
             </form>
 
@@ -226,7 +226,7 @@ function CheckinPage() {
           </div>
 
           <div className="mt-8 border border-border/40 bg-card/20 p-5 text-xs text-muted-foreground leading-relaxed">
-            Rota operacional independente. A equipa de porta não precisa aceder ao painel administrativo completo.
+            Área exclusiva para validação de entrada no evento.
           </div>
         </div>
       </section>
