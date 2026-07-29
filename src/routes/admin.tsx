@@ -12,7 +12,7 @@ export const Route = createFileRoute("/admin")({
   component: AdminPage,
 });
 
-type Tab = "overview" | "reservations" | "payments" | "admissions" | "sponsors" | "credentials" | "checkin" | "audit";
+type Tab = "overview" | "reservations" | "payments" | "admissions" | "sponsors" | "credentials" | "audit";
 type Permission =
   | "*"
   | "reservations.read"
@@ -27,8 +27,6 @@ type Permission =
   | "sponsors.reject"
   | "credentials.read"
   | "credentials.issue"
-  | "checkin.validate"
-  | "reports.export"
   | "audit.read";
 
 type AdminSession = {
@@ -113,7 +111,7 @@ const initialReservations: Reservation[] = [
     paymentStatus: "payment_confirmed",
     admissionStatus: "admission_under_review",
     credentialStatus: "credential_not_ready",
-    createdAt: "Preparação · 29 Jul 2026",
+    createdAt: "29 Jul 2026",
   },
   {
     reference: "THB-PREP-002",
@@ -124,7 +122,7 @@ const initialReservations: Reservation[] = [
     paymentStatus: "payment_pending",
     admissionStatus: "admission_locked",
     credentialStatus: "credential_not_ready",
-    createdAt: "Preparação · 29 Jul 2026",
+    createdAt: "29 Jul 2026",
   },
   {
     reference: "THB-PREP-003",
@@ -135,7 +133,7 @@ const initialReservations: Reservation[] = [
     paymentStatus: "payment_confirmed",
     admissionStatus: "admission_approved",
     credentialStatus: "credential_ready",
-    createdAt: "Preparação · 28 Jul 2026",
+    createdAt: "28 Jul 2026",
   },
 ];
 
@@ -147,7 +145,7 @@ const initialAdmissions: Admission[] = [
     profile: "Empresário / Investidor",
     company: "Empresa em preparação",
     status: "admission_under_review",
-    submittedAt: "Preparação · 29 Jul 2026",
+    submittedAt: "29 Jul 2026",
   },
   {
     reference: "ADM-PREP-003",
@@ -156,7 +154,7 @@ const initialAdmissions: Admission[] = [
     profile: "Trader profissional",
     company: "Private Desk",
     status: "admission_approved",
-    submittedAt: "Preparação · 28 Jul 2026",
+    submittedAt: "28 Jul 2026",
   },
 ];
 
@@ -167,7 +165,7 @@ const initialSponsors: SponsorInquiry[] = [
     tier: "Master",
     contact: "Direção Comercial",
     status: "sponsor_under_review",
-    createdAt: "Preparação · 29 Jul 2026",
+    createdAt: "29 Jul 2026",
   },
   {
     reference: "SP-PREP-GOLD",
@@ -175,7 +173,7 @@ const initialSponsors: SponsorInquiry[] = [
     tier: "Gold",
     contact: "Head of Growth",
     status: "sponsor_inquiry_received",
-    createdAt: "Preparação · 29 Jul 2026",
+    createdAt: "29 Jul 2026",
   },
 ];
 
@@ -205,7 +203,6 @@ const tabs: { id: Tab; label: string; permission: Permission }[] = [
   { id: "admissions", label: "Admissões", permission: "admissions.read" },
   { id: "sponsors", label: "Patrocínios", permission: "sponsors.read" },
   { id: "credentials", label: "Credenciais", permission: "credentials.read" },
-  { id: "checkin", label: "Check-in", permission: "checkin.validate" },
   { id: "audit", label: "Auditoria", permission: "audit.read" },
 ];
 
@@ -216,22 +213,20 @@ function AdminPage() {
   const [admissions, setAdmissions] = useState(initialAdmissions);
   const [sponsors, setSponsors] = useState(initialSponsors);
   const [credentials, setCredentials] = useState(initialCredentials);
-  const [checkinQuery, setCheckinQuery] = useState("");
   const [auditLogs, setAuditLogs] = useState<AuditLog[]>([
     {
-      id: "AUD-PREP-001",
-      actor: "Sistema de preparação",
-      action: "Criou dados operacionais de teste",
+      id: "AUD-001",
+      actor: "Sistema",
+      action: "Painel operacional iniciado",
       target: "Painel Executivo",
-      timestamp: "Preparação · 29 Jul 2026",
+      timestamp: "29 Jul 2026",
     },
   ]);
 
   const can = (permission: Permission) => Boolean(session?.permissions.includes("*") || session?.permissions.includes(permission));
 
   function writeAudit(action: string, target: string, previousState?: string, nextState?: string) {
-    const now = new Date();
-    const timestamp = now.toLocaleString("pt-MZ", { dateStyle: "medium", timeStyle: "short" });
+    const timestamp = new Date().toLocaleString("pt-MZ", { dateStyle: "medium", timeStyle: "short" });
     setAuditLogs((items) => [
       {
         id: `AUD-${Date.now()}`,
@@ -251,7 +246,7 @@ function AdminPage() {
     const pendingPayments = reservations.filter((r) => r.paymentStatus === "payment_pending").length;
     const admissionsUnderReview = admissions.filter((a) => a.status === "admission_under_review").length;
     const sponsorsUnderReview = sponsors.filter((s) => s.status === "sponsor_under_review" || s.status === "sponsor_inquiry_received").length;
-    const credentialsIssued = credentials.filter((c) => c.status === "credential_issued" || c.checkinStatus === "checked_in").length;
+    const checkedIn = credentials.filter((c) => c.checkinStatus === "checked_in").length;
 
     return [
       { label: "Reservas", value: reservations.length, hint: "Pedidos de acesso criados." },
@@ -259,17 +254,9 @@ function AdminPage() {
       { label: "Admissões em análise", value: admissionsUnderReview, hint: "Perfis aguardando decisão." },
       { label: "Patrocínios pendentes", value: sponsorsUnderReview, hint: "Marcas aguardando curadoria." },
       { label: "Pagamentos pendentes", value: pendingPayments, hint: "Transações por validar." },
-      { label: "Check-ins validados", value: credentialsIssued, hint: "Entradas confirmadas no evento." },
+      { label: "Check-ins validados", value: checkedIn, hint: "Entradas confirmadas no evento." },
     ];
   }, [reservations, admissions, sponsors, credentials]);
-
-  const checkinResult = useMemo(() => {
-    const q = checkinQuery.trim().toLowerCase();
-    if (!q) return null;
-    return credentials.find((item) =>
-      [item.credentialCode, item.reservationReference, item.participant].some((value) => value.toLowerCase().includes(q)),
-    ) ?? null;
-  }, [checkinQuery, credentials]);
 
   function login(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -288,13 +275,12 @@ function AdminPage() {
           : item,
       ),
     );
-    writeAudit("Confirmou pagamento manualmente", reference, current.paymentStatus, "payment_confirmed");
+    writeAudit("Confirmou pagamento", reference, current.paymentStatus, "payment_confirmed");
   }
 
   function setAdmissionStatus(reference: string, status: AdmissionStatus) {
-    const requiredPermission = status === "admission_approved" ? "admissions.approve" : "admissions.reject";
-    if (!can(requiredPermission)) return;
-
+    const permission = status === "admission_approved" ? "admissions.approve" : "admissions.reject";
+    if (!can(permission)) return;
     const current = admissions.find((item) => item.reference === reference);
     if (!current || current.status === status) return;
 
@@ -319,17 +305,11 @@ function AdminPage() {
   function setSponsorStatus(reference: string, status: SponsorStatus) {
     const permission = status === "sponsor_qualified" ? "sponsors.qualify" : status === "dossier_sent" ? "sponsors.send_dossier" : "sponsors.reject";
     if (!can(permission)) return;
-
     const current = sponsors.find((item) => item.reference === reference);
     if (!current || current.status === status) return;
 
     setSponsors((items) => items.map((item) => (item.reference === reference ? { ...item, status } : item)));
-    writeAudit(
-      status === "sponsor_qualified" ? "Qualificou patrocinador" : status === "dossier_sent" ? "Marcou dossier enviado" : "Rejeitou patrocinador",
-      reference,
-      current.status,
-      status,
-    );
+    writeAudit(status === "sponsor_qualified" ? "Qualificou patrocinador" : status === "dossier_sent" ? "Marcou dossier enviado" : "Rejeitou patrocinador", reference, current.status, status);
   }
 
   function issueCredential(code: string) {
@@ -338,22 +318,6 @@ function AdminPage() {
     if (!current || current.status !== "credential_ready") return;
     setCredentials((items) => items.map((item) => (item.credentialCode === code ? { ...item, status: "credential_issued" } : item)));
     writeAudit("Emitiu credencial", code, current.status, "credential_issued");
-  }
-
-  function validateCheckin(code: string) {
-    if (!can("checkin.validate")) return;
-    const current = credentials.find((item) => item.credentialCode === code);
-    if (!current || current.status === "credential_not_ready" || current.checkinStatus === "checked_in") return;
-
-    const now = new Date().toLocaleString("pt-MZ", { dateStyle: "medium", timeStyle: "short" });
-    setCredentials((items) =>
-      items.map((item) =>
-        item.credentialCode === code
-          ? { ...item, status: "credential_issued", checkinStatus: "checked_in", validatedBy: session?.name, validatedAt: now }
-          : item,
-      ),
-    );
-    writeAudit("Validou check-in", code, current.checkinStatus, "checked_in");
   }
 
   if (!session) {
@@ -366,7 +330,7 @@ function AdminPage() {
           <p className="mt-10 text-[10px] tracking-[0.4em] uppercase text-gold">Área restrita</p>
           <h1 className="mt-3 font-display text-4xl">Acesso Executivo</h1>
           <p className="mt-4 text-sm text-muted-foreground leading-relaxed">
-            Entrada reservada ao proprietário e equipa autorizada. A autenticação real será ligada ao backend; esta tela prepara a experiência de gestão.
+            Entrada reservada ao proprietário e equipa autorizada para gestão do evento.
           </p>
           <form onSubmit={login} className="mt-8 space-y-5">
             <label className="block">
@@ -382,7 +346,7 @@ function AdminPage() {
             </button>
           </form>
           <p className="mt-5 text-xs text-muted-foreground leading-relaxed">
-            Preparação: qualquer credencial preenchida abre a sessão owner local. Segurança real será feita por API, sessão httpOnly e permissões.
+            Acesso administrativo sujeito a validação e registo de atividade.
           </p>
         </div>
       </div>
@@ -412,12 +376,12 @@ function AdminPage() {
               <p className="text-[10px] tracking-[0.4em] uppercase text-gold mb-3">Área restrita</p>
               <h1 className="font-display text-4xl md:text-6xl leading-tight">Painel Operacional</h1>
               <p className="mt-4 text-sm text-muted-foreground max-w-2xl leading-relaxed">
-                Gestão de reservas, pagamentos, admissões, patrocínios, credenciais e check-in. Os dados são de preparação, mas as regras já seguem a máquina de estados do negócio.
+                Gestão de reservas, pagamentos, admissões, patrocínios e credenciais do THE BOARD.
               </p>
             </div>
             <div className="border border-gold/30 bg-gold/5 p-5 text-sm text-muted-foreground leading-relaxed">
               <p className="text-[10px] tracking-[0.35em] uppercase text-gold mb-2">Regra de negócio</p>
-              Pagamento confirmado libera admissão. Admissão aprovada libera credencial. Credencial emitida permite check-in. Toda ação administrativa gera auditoria.
+              Pagamento confirmado libera admissão. Admissão aprovada libera credencial. Credencial emitida permite validação de entrada.
             </div>
           </div>
 
@@ -449,9 +413,9 @@ function AdminPage() {
           {activeTab === "overview" && (
             <Panel title="Visão geral" subtitle="Resumo operacional da organização do evento.">
               <div className="grid md:grid-cols-3 gap-4">
-                <OwnerCard title="Acesso" body="Owen entra por /admin com email e senha. Depois o backend validará sessão, permissões e auditoria." />
-                <OwnerCard title="RBAC" body="Existem apenas user e admin. Dentro de admin, permissões definem quem vê e altera cada módulo." />
-                <OwnerCard title="Check-in" body="Equipa autorizada valida credenciais no dia do evento e o sistema grava quem validou e quando." />
+                <OwnerCard title="Acesso" body="O proprietário entra pelo painel executivo. A equipa de porta usa uma rota separada de check-in." />
+                <OwnerCard title="Permissões" body="Existe utilizador comum e administrador. Dentro do administrador, permissões definem o que cada pessoa pode ver e alterar." />
+                <OwnerCard title="Auditoria" body="Ações sensíveis, como aprovar admissão, enviar dossier ou emitir credencial, ficam registadas." />
               </div>
             </Panel>
           )}
@@ -475,7 +439,7 @@ function AdminPage() {
           )}
 
           {activeTab === "payments" && (
-            <Panel title="Pagamentos" subtitle="Validação operacional temporária até integração com Gateway/Paysuite.">
+            <Panel title="Pagamentos" subtitle="Validação financeira e acompanhamento de transações.">
               <div className="space-y-3">
                 {reservations.map((item) => (
                   <Row key={item.reference}>
@@ -565,55 +529,6 @@ function AdminPage() {
             </Panel>
           )}
 
-          {activeTab === "checkin" && (
-            <Panel title="Check-in" subtitle="Validação de entrada no dia do evento. Regista quem validou e quando.">
-              <div className="grid lg:grid-cols-[0.85fr_1.15fr] gap-6">
-                <div className="border border-border/40 bg-background p-6">
-                  <p className="text-[10px] tracking-[0.35em] uppercase text-gold mb-4">Buscar credencial</p>
-                  <input
-                    value={checkinQuery}
-                    onChange={(e) => setCheckinQuery(e.target.value)}
-                    placeholder="BOARD-CHK-001, THB-PREP-003 ou nome"
-                    className={inputCls}
-                  />
-                  <p className="mt-4 text-xs text-muted-foreground leading-relaxed">
-                    No backend, esta busca será por QR code, referência, email ou código de credencial. A validação só será permitida para admins com permissão checkin.validate.
-                  </p>
-                </div>
-
-                <div className="border border-border/40 bg-background p-6 min-h-[220px]">
-                  {!checkinQuery.trim() ? (
-                    <EmptyState title="Aguardando credencial" body="Digite ou leia o código para validar a entrada." />
-                  ) : !checkinResult ? (
-                    <EmptyState title="Credencial não encontrada" body="Confirme o código ou procure pela referência da reserva." />
-                  ) : (
-                    <div>
-                      <p className="text-[10px] tracking-[0.35em] uppercase text-gold mb-2">Resultado</p>
-                      <h3 className="font-display text-3xl">{checkinResult.participant}</h3>
-                      <p className="mt-2 text-sm text-muted-foreground">{checkinResult.credentialCode} · {checkinResult.reservationReference} · {checkinResult.ticket}</p>
-                      <div className="mt-6 flex flex-wrap gap-3">
-                        <Status label={checkinResult.status} tone={checkinResult.status === "credential_not_ready" ? "bad" : "good"} />
-                        <Status label={checkinResult.checkinStatus} tone={checkinResult.checkinStatus === "checked_in" ? "good" : "warn"} />
-                      </div>
-                      {checkinResult.validatedAt && (
-                        <p className="mt-5 text-xs text-muted-foreground">
-                          Validado por {checkinResult.validatedBy} · {checkinResult.validatedAt}
-                        </p>
-                      )}
-                      <button
-                        onClick={() => validateCheckin(checkinResult.credentialCode)}
-                        disabled={checkinResult.status === "credential_not_ready" || checkinResult.checkinStatus === "checked_in"}
-                        className="mt-8 px-7 py-4 bg-gradient-gold text-primary-foreground text-xs tracking-widest uppercase disabled:opacity-40 disabled:cursor-not-allowed"
-                      >
-                        Validar entrada
-                      </button>
-                    </div>
-                  )}
-                </div>
-              </div>
-            </Panel>
-          )}
-
           {activeTab === "audit" && (
             <Panel title="Auditoria" subtitle="Registo de ações administrativas para controlo interno.">
               <div className="space-y-3">
@@ -630,10 +545,6 @@ function AdminPage() {
               </div>
             </Panel>
           )}
-
-          <div className="mt-12 border border-border/40 bg-card/30 p-6 text-xs text-muted-foreground leading-relaxed">
-            Próxima camada: autenticação real, API, PostgreSQL, Redis para idempotência, Resend para emails, logs de auditoria persistentes e integração com Gateway/Paysuite.
-          </div>
         </div>
       </section>
     </div>
@@ -679,15 +590,6 @@ function OwnerCard({ title, body }: { title: string; body: string }) {
     <div className="border border-border/40 bg-background p-5">
       <p className="text-[10px] tracking-[0.3em] uppercase text-gold mb-3">{title}</p>
       <p className="text-sm text-muted-foreground leading-relaxed">{body}</p>
-    </div>
-  );
-}
-
-function EmptyState({ title, body }: { title: string; body: string }) {
-  return (
-    <div className="h-full min-h-[180px] flex flex-col justify-center text-center">
-      <p className="font-display text-2xl">{title}</p>
-      <p className="mt-2 text-sm text-muted-foreground">{body}</p>
     </div>
   );
 }
