@@ -1,0 +1,200 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  user
+  admin
+}
+
+enum ReservationStatus {
+  reservation_created
+  payment_started
+  payment_pending
+  payment_confirmed
+  payment_failed
+  payment_cancelled
+  expired
+}
+
+enum PaymentStatus {
+  payment_session_created
+  payment_pending
+  payment_processing
+  payment_confirmed
+  payment_failed
+  payment_cancelled
+  payment_expired
+}
+
+enum AdmissionStatus {
+  admission_locked
+  admission_available
+  admission_submitted
+  admission_under_review
+  admission_approved
+  admission_rejected
+  credential_issued
+}
+
+enum SponsorStatus {
+  sponsor_inquiry_received
+  sponsor_under_review
+  sponsor_qualified
+  dossier_pending
+  dossier_sent
+  proposal_sent
+  negotiation
+  approved
+  rejected
+  closed_won
+  closed_lost
+}
+
+enum CredentialStatus {
+  credential_not_ready
+  credential_ready
+  credential_issued
+  credential_checked_in
+  credential_blocked
+}
+
+model User {
+  id           String   @id @default(cuid())
+  name         String
+  email        String   @unique
+  passwordHash String
+  role         UserRole @default(user)
+  permissions  String[] @default([])
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  auditLogs AuditLog[]
+}
+
+model Reservation {
+  id              String            @id @default(cuid())
+  reference       String            @unique
+  ticketId        String
+  ticketName      String
+  quantity        Int
+  unitPrice       Int
+  totalAmount     Int
+  currency        String            @default("MZN")
+  buyerName       String
+  buyerEmail      String
+  buyerPhone      String
+  country         String?
+  city            String?
+  status          ReservationStatus @default(reservation_created)
+  paymentStatus   PaymentStatus     @default(payment_pending)
+  admissionStatus AdmissionStatus   @default(admission_locked)
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+
+  payments    Payment[]
+  admissions  Admission[]
+  credentials Credential[]
+}
+
+model Payment {
+  id                String        @id @default(cuid())
+  reservationId     String
+  paymentSessionId  String?       @unique
+  gateway           String        @default("pending")
+  gatewayReference  String?
+  amount            Int
+  currency          String        @default("MZN")
+  status            PaymentStatus @default(payment_session_created)
+  method            String?
+  checkoutUrl       String?
+  expiresAt         DateTime?
+  paidAt            DateTime?
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+
+  reservation Reservation @relation(fields: [reservationId], references: [id])
+}
+
+model Admission {
+  id                   String          @id @default(cuid())
+  reference            String          @unique
+  reservationId        String
+  fullName             String
+  email                String
+  phone                String
+  profileType          String
+  company              String?
+  role                 String?
+  investmentExperience String?
+  motivation           String?
+  status               AdmissionStatus @default(admission_under_review)
+  submittedAt          DateTime        @default(now())
+  reviewedAt           DateTime?
+  reviewNotes          String?
+
+  reservation Reservation @relation(fields: [reservationId], references: [id])
+}
+
+model SponsorInquiry {
+  id            String        @id @default(cuid())
+  reference     String        @unique
+  tier          String
+  company       String
+  contactName   String
+  email         String
+  phone         String
+  message       String?
+  status        SponsorStatus @default(sponsor_inquiry_received)
+  dossierStatus String        @default("dossier_pending")
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+}
+
+model Credential {
+  id              String           @id @default(cuid())
+  credentialCode  String           @unique
+  reservationId   String
+  participantName String
+  ticketName      String
+  status          CredentialStatus @default(credential_not_ready)
+  checkedInAt     DateTime?
+  checkedInBy     String?
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+
+  reservation Reservation @relation(fields: [reservationId], references: [id])
+}
+
+model WebhookEvent {
+  id             String   @id @default(cuid())
+  provider       String
+  eventId        String   @unique
+  reference      String?
+  payload        Json
+  signatureValid Boolean  @default(false)
+  processed      Boolean  @default(false)
+  processedAt    DateTime?
+  createdAt      DateTime @default(now())
+}
+
+model AuditLog {
+  id            String   @id @default(cuid())
+  actorId       String?
+  actorEmail    String?
+  action        String
+  targetType    String
+  targetRef     String
+  previousState String?
+  nextState     String?
+  metadata      Json?
+  createdAt     DateTime @default(now())
+
+  actor User? @relation(fields: [actorId], references: [id])
+}
