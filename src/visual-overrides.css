@@ -160,6 +160,40 @@
     text-transform: uppercase;
     color: var(--muted-foreground);
   }
+
+  .admin-action,
+  .admin-action-muted {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 2.35rem;
+    padding: 0.7rem 0.9rem;
+    border: 1px solid oklch(0.82 0.15 88 / 0.5);
+    color: var(--gold);
+    background: oklch(0.82 0.15 88 / 0.06);
+    font-size: 0.62rem;
+    line-height: 1;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    transition: background-color 180ms ease, border-color 180ms ease, color 180ms ease;
+  }
+
+  .admin-action:hover {
+    background: oklch(0.82 0.15 88 / 0.13);
+    border-color: var(--gold);
+  }
+
+  .admin-action-muted {
+    border-color: oklch(0.78 0.12 85 / 0.18);
+    color: var(--muted-foreground);
+    background: transparent;
+  }
+
+  .admin-action-muted:hover {
+    border-color: oklch(0.60 0.22 25 / 0.45);
+    color: oklch(0.78 0.14 28);
+    background: oklch(0.60 0.22 25 / 0.05);
+  }
 }
 
 @media (max-width: 768px) {
