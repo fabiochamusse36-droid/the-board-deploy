@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useMemo, useState, type FormEvent } from "react";
 
 export const Route = createFileRoute("/admin")({
   head: () => ({
@@ -12,23 +12,53 @@ export const Route = createFileRoute("/admin")({
   component: AdminPage,
 });
 
-type Tab = "reservations" | "admissions" | "sponsors" | "payments";
-type PaymentStatus = "payment_pending" | "payment_confirmed" | "payment_failed";
+type Tab = "overview" | "reservations" | "payments" | "admissions" | "sponsors" | "credentials" | "checkin" | "audit";
+type Permission =
+  | "*"
+  | "reservations.read"
+  | "payments.read"
+  | "payments.manual_confirm"
+  | "admissions.read"
+  | "admissions.approve"
+  | "admissions.reject"
+  | "sponsors.read"
+  | "sponsors.qualify"
+  | "sponsors.send_dossier"
+  | "sponsors.reject"
+  | "credentials.read"
+  | "credentials.issue"
+  | "checkin.validate"
+  | "reports.export"
+  | "audit.read";
+
+type AdminSession = {
+  name: string;
+  email: string;
+  role: "admin";
+  permissions: Permission[];
+};
+
+type PaymentStatus = "payment_pending" | "payment_confirmed" | "payment_failed" | "payment_cancelled";
 type AdmissionStatus = "admission_locked" | "admission_under_review" | "admission_approved" | "admission_rejected";
-type SponsorStatus = "sponsor_inquiry_received" | "sponsor_under_review" | "sponsor_qualified" | "dossier_sent" | "rejected";
+type SponsorStatus = "sponsor_inquiry_received" | "sponsor_under_review" | "sponsor_qualified" | "dossier_pending" | "dossier_sent" | "proposal_sent" | "rejected";
+type CredentialStatus = "credential_not_ready" | "credential_ready" | "credential_issued";
+type CheckinStatus = "not_checked_in" | "checked_in";
 
 type Reservation = {
   reference: string;
   participant: string;
+  email: string;
   ticket: string;
   amount: string;
   paymentStatus: PaymentStatus;
   admissionStatus: AdmissionStatus;
+  credentialStatus: CredentialStatus;
   createdAt: string;
 };
 
 type Admission = {
   reference: string;
+  reservationReference: string;
   name: string;
   profile: string;
   company: string;
@@ -45,92 +75,183 @@ type SponsorInquiry = {
   createdAt: string;
 };
 
+type Credential = {
+  credentialCode: string;
+  reservationReference: string;
+  participant: string;
+  ticket: string;
+  status: CredentialStatus;
+  checkinStatus: CheckinStatus;
+  validatedBy?: string;
+  validatedAt?: string;
+};
+
+type AuditLog = {
+  id: string;
+  actor: string;
+  action: string;
+  target: string;
+  previousState?: string;
+  nextState?: string;
+  timestamp: string;
+};
+
+const ownerSession: AdminSession = {
+  name: "Owner THE BOARD",
+  email: "owner@theboard.co.mz",
+  role: "admin",
+  permissions: ["*"],
+};
+
 const initialReservations: Reservation[] = [
   {
-    reference: "THB-JL24A9F2",
-    participant: "Milton Marino",
+    reference: "THB-PREP-001",
+    participant: "Participante VIP #001",
+    email: "vip001@empresa.co.mz",
     ticket: "VIP Board Member",
     amount: "7.500 MT",
     paymentStatus: "payment_confirmed",
     admissionStatus: "admission_under_review",
-    createdAt: "29 Jul 2026 · 15:42",
+    credentialStatus: "credential_not_ready",
+    createdAt: "Preparação · 29 Jul 2026",
   },
   {
-    reference: "THB-JL24C18B",
-    participant: "Ana Chissano",
+    reference: "THB-PREP-002",
+    participant: "Participante Executivo #002",
+    email: "exec002@empresa.co.mz",
     ticket: "Investidores Iniciais",
     amount: "2.500 MT",
     paymentStatus: "payment_pending",
     admissionStatus: "admission_locked",
-    createdAt: "29 Jul 2026 · 16:05",
+    credentialStatus: "credential_not_ready",
+    createdAt: "Preparação · 29 Jul 2026",
   },
   {
-    reference: "THB-JL23F72D",
-    participant: "Carlos Mateus",
+    reference: "THB-PREP-003",
+    participant: "Participante Board #003",
+    email: "board003@empresa.co.mz",
     ticket: "VIP Board Member",
     amount: "7.500 MT",
     paymentStatus: "payment_confirmed",
     admissionStatus: "admission_approved",
-    createdAt: "28 Jul 2026 · 11:18",
+    credentialStatus: "credential_ready",
+    createdAt: "Preparação · 28 Jul 2026",
   },
 ];
 
 const initialAdmissions: Admission[] = [
   {
-    reference: "ADM-JL24A9F2",
-    name: "Milton Marino",
+    reference: "ADM-PREP-001",
+    reservationReference: "THB-PREP-001",
+    name: "Participante VIP #001",
     profile: "Empresário / Investidor",
-    company: "Rightware",
+    company: "Empresa em preparação",
     status: "admission_under_review",
-    submittedAt: "29 Jul 2026 · 15:58",
+    submittedAt: "Preparação · 29 Jul 2026",
   },
   {
-    reference: "ADM-JL23F72D",
-    name: "Carlos Mateus",
+    reference: "ADM-PREP-003",
+    reservationReference: "THB-PREP-003",
+    name: "Participante Board #003",
     profile: "Trader profissional",
     company: "Private Desk",
     status: "admission_approved",
-    submittedAt: "28 Jul 2026 · 12:02",
+    submittedAt: "Preparação · 28 Jul 2026",
   },
 ];
 
 const initialSponsors: SponsorInquiry[] = [
   {
-    reference: "SP-JL24MSTR",
-    company: "Banco Institucional",
+    reference: "SP-PREP-MASTER",
+    company: "Instituição Parceira #001",
     tier: "Master",
     contact: "Direção Comercial",
     status: "sponsor_under_review",
-    createdAt: "29 Jul 2026 · 14:20",
+    createdAt: "Preparação · 29 Jul 2026",
   },
   {
-    reference: "SP-JL24GOLD",
-    company: "Fintech Regional",
+    reference: "SP-PREP-GOLD",
+    company: "Marca Estratégica #002",
     tier: "Gold",
     contact: "Head of Growth",
     status: "sponsor_inquiry_received",
-    createdAt: "29 Jul 2026 · 16:11",
+    createdAt: "Preparação · 29 Jul 2026",
   },
 ];
 
-const tabs: { id: Tab; label: string }[] = [
-  { id: "reservations", label: "Reservas" },
-  { id: "payments", label: "Pagamentos" },
-  { id: "admissions", label: "Admissões" },
-  { id: "sponsors", label: "Patrocínios" },
+const initialCredentials: Credential[] = [
+  {
+    credentialCode: "BOARD-CHK-001",
+    reservationReference: "THB-PREP-003",
+    participant: "Participante Board #003",
+    ticket: "VIP Board Member",
+    status: "credential_ready",
+    checkinStatus: "not_checked_in",
+  },
+  {
+    credentialCode: "BOARD-CHK-002",
+    reservationReference: "THB-PREP-001",
+    participant: "Participante VIP #001",
+    ticket: "VIP Board Member",
+    status: "credential_not_ready",
+    checkinStatus: "not_checked_in",
+  },
+];
+
+const tabs: { id: Tab; label: string; permission: Permission }[] = [
+  { id: "overview", label: "Visão geral", permission: "reservations.read" },
+  { id: "reservations", label: "Reservas", permission: "reservations.read" },
+  { id: "payments", label: "Pagamentos", permission: "payments.read" },
+  { id: "admissions", label: "Admissões", permission: "admissions.read" },
+  { id: "sponsors", label: "Patrocínios", permission: "sponsors.read" },
+  { id: "credentials", label: "Credenciais", permission: "credentials.read" },
+  { id: "checkin", label: "Check-in", permission: "checkin.validate" },
+  { id: "audit", label: "Auditoria", permission: "audit.read" },
 ];
 
 function AdminPage() {
-  const [activeTab, setActiveTab] = useState<Tab>("reservations");
+  const [session, setSession] = useState<AdminSession | null>(null);
+  const [activeTab, setActiveTab] = useState<Tab>("overview");
   const [reservations, setReservations] = useState(initialReservations);
   const [admissions, setAdmissions] = useState(initialAdmissions);
   const [sponsors, setSponsors] = useState(initialSponsors);
+  const [credentials, setCredentials] = useState(initialCredentials);
+  const [checkinQuery, setCheckinQuery] = useState("");
+  const [auditLogs, setAuditLogs] = useState<AuditLog[]>([
+    {
+      id: "AUD-PREP-001",
+      actor: "Sistema de preparação",
+      action: "Criou dados operacionais de teste",
+      target: "Painel Executivo",
+      timestamp: "Preparação · 29 Jul 2026",
+    },
+  ]);
+
+  const can = (permission: Permission) => Boolean(session?.permissions.includes("*") || session?.permissions.includes(permission));
+
+  function writeAudit(action: string, target: string, previousState?: string, nextState?: string) {
+    const now = new Date();
+    const timestamp = now.toLocaleString("pt-MZ", { dateStyle: "medium", timeStyle: "short" });
+    setAuditLogs((items) => [
+      {
+        id: `AUD-${Date.now()}`,
+        actor: session?.name ?? "Admin",
+        action,
+        target,
+        previousState,
+        nextState,
+        timestamp,
+      },
+      ...items,
+    ]);
+  }
 
   const metrics = useMemo(() => {
     const confirmedPayments = reservations.filter((r) => r.paymentStatus === "payment_confirmed").length;
     const pendingPayments = reservations.filter((r) => r.paymentStatus === "payment_pending").length;
     const admissionsUnderReview = admissions.filter((a) => a.status === "admission_under_review").length;
     const sponsorsUnderReview = sponsors.filter((s) => s.status === "sponsor_under_review" || s.status === "sponsor_inquiry_received").length;
+    const credentialsIssued = credentials.filter((c) => c.status === "credential_issued" || c.checkinStatus === "checked_in").length;
 
     return [
       { label: "Reservas", value: reservations.length, hint: "Pedidos de acesso criados." },
@@ -138,11 +259,28 @@ function AdminPage() {
       { label: "Admissões em análise", value: admissionsUnderReview, hint: "Perfis aguardando decisão." },
       { label: "Patrocínios pendentes", value: sponsorsUnderReview, hint: "Marcas aguardando curadoria." },
       { label: "Pagamentos pendentes", value: pendingPayments, hint: "Transações por validar." },
-      { label: "Credenciais emitidas", value: 0, hint: "Será ativado após aprovação final." },
+      { label: "Check-ins validados", value: credentialsIssued, hint: "Entradas confirmadas no evento." },
     ];
-  }, [reservations, admissions, sponsors]);
+  }, [reservations, admissions, sponsors, credentials]);
+
+  const checkinResult = useMemo(() => {
+    const q = checkinQuery.trim().toLowerCase();
+    if (!q) return null;
+    return credentials.find((item) =>
+      [item.credentialCode, item.reservationReference, item.participant].some((value) => value.toLowerCase().includes(q)),
+    ) ?? null;
+  }, [checkinQuery, credentials]);
+
+  function login(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    setSession(ownerSession);
+  }
 
   function confirmPayment(reference: string) {
+    if (!can("payments.manual_confirm")) return;
+    const current = reservations.find((item) => item.reference === reference);
+    if (!current || current.paymentStatus === "payment_confirmed") return;
+
     setReservations((items) =>
       items.map((item) =>
         item.reference === reference
@@ -150,15 +288,108 @@ function AdminPage() {
           : item,
       ),
     );
+    writeAudit("Confirmou pagamento manualmente", reference, current.paymentStatus, "payment_confirmed");
   }
 
   function setAdmissionStatus(reference: string, status: AdmissionStatus) {
+    const requiredPermission = status === "admission_approved" ? "admissions.approve" : "admissions.reject";
+    if (!can(requiredPermission)) return;
+
+    const current = admissions.find((item) => item.reference === reference);
+    if (!current || current.status === status) return;
+
     setAdmissions((items) => items.map((item) => (item.reference === reference ? { ...item, status } : item)));
+    setReservations((items) =>
+      items.map((item) =>
+        item.reference === current.reservationReference
+          ? { ...item, admissionStatus: status, credentialStatus: status === "admission_approved" ? "credential_ready" : item.credentialStatus }
+          : item,
+      ),
+    );
+    setCredentials((items) =>
+      items.map((item) =>
+        item.reservationReference === current.reservationReference && status === "admission_approved"
+          ? { ...item, status: "credential_ready" }
+          : item,
+      ),
+    );
+    writeAudit(status === "admission_approved" ? "Aprovou admissão" : "Rejeitou admissão", reference, current.status, status);
   }
 
   function setSponsorStatus(reference: string, status: SponsorStatus) {
+    const permission = status === "sponsor_qualified" ? "sponsors.qualify" : status === "dossier_sent" ? "sponsors.send_dossier" : "sponsors.reject";
+    if (!can(permission)) return;
+
+    const current = sponsors.find((item) => item.reference === reference);
+    if (!current || current.status === status) return;
+
     setSponsors((items) => items.map((item) => (item.reference === reference ? { ...item, status } : item)));
+    writeAudit(
+      status === "sponsor_qualified" ? "Qualificou patrocinador" : status === "dossier_sent" ? "Marcou dossier enviado" : "Rejeitou patrocinador",
+      reference,
+      current.status,
+      status,
+    );
   }
+
+  function issueCredential(code: string) {
+    if (!can("credentials.issue")) return;
+    const current = credentials.find((item) => item.credentialCode === code);
+    if (!current || current.status !== "credential_ready") return;
+    setCredentials((items) => items.map((item) => (item.credentialCode === code ? { ...item, status: "credential_issued" } : item)));
+    writeAudit("Emitiu credencial", code, current.status, "credential_issued");
+  }
+
+  function validateCheckin(code: string) {
+    if (!can("checkin.validate")) return;
+    const current = credentials.find((item) => item.credentialCode === code);
+    if (!current || current.status === "credential_not_ready" || current.checkinStatus === "checked_in") return;
+
+    const now = new Date().toLocaleString("pt-MZ", { dateStyle: "medium", timeStyle: "short" });
+    setCredentials((items) =>
+      items.map((item) =>
+        item.credentialCode === code
+          ? { ...item, status: "credential_issued", checkinStatus: "checked_in", validatedBy: session?.name, validatedAt: now }
+          : item,
+      ),
+    );
+    writeAudit("Validou check-in", code, current.checkinStatus, "checked_in");
+  }
+
+  if (!session) {
+    return (
+      <div className="min-h-screen bg-background text-foreground flex items-center justify-center px-6">
+        <div className="w-full max-w-md border border-border/50 bg-card/40 p-8 md:p-10 shadow-elegant">
+          <Link to="/" className="font-display text-lg tracking-[0.25em]">
+            THE <span className="text-gold">BOARD</span>
+          </Link>
+          <p className="mt-10 text-[10px] tracking-[0.4em] uppercase text-gold">Área restrita</p>
+          <h1 className="mt-3 font-display text-4xl">Acesso Executivo</h1>
+          <p className="mt-4 text-sm text-muted-foreground leading-relaxed">
+            Entrada reservada ao proprietário e equipa autorizada. A autenticação real será ligada ao backend; esta tela prepara a experiência de gestão.
+          </p>
+          <form onSubmit={login} className="mt-8 space-y-5">
+            <label className="block">
+              <span className="text-[10px] tracking-[0.3em] uppercase text-muted-foreground">Email administrativo</span>
+              <input required type="email" placeholder="owner@theboard.co.mz" className={inputCls} />
+            </label>
+            <label className="block">
+              <span className="text-[10px] tracking-[0.3em] uppercase text-muted-foreground">Código de acesso</span>
+              <input required type="password" placeholder="••••••••" className={inputCls} />
+            </label>
+            <button className="w-full py-4 bg-gradient-gold text-primary-foreground text-xs tracking-widest uppercase shadow-gold">
+              Entrar no painel
+            </button>
+          </form>
+          <p className="mt-5 text-xs text-muted-foreground leading-relaxed">
+            Preparação: qualquer credencial preenchida abre a sessão owner local. Segurança real será feita por API, sessão httpOnly e permissões.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  const visibleTabs = tabs.filter((tab) => can(tab.permission));
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -167,7 +398,10 @@ function AdminPage() {
           <Link to="/" className="font-display text-lg tracking-[0.25em]">
             THE <span className="text-gold">BOARD</span>
           </Link>
-          <span className="text-[10px] tracking-[0.3em] uppercase text-muted-foreground">Painel Executivo</span>
+          <div className="flex items-center gap-5">
+            <span className="hidden sm:inline text-[10px] tracking-[0.25em] uppercase text-muted-foreground">{session.name}</span>
+            <button onClick={() => setSession(null)} className="text-[10px] tracking-[0.25em] uppercase text-gold hover:opacity-80">Sair</button>
+          </div>
         </nav>
       </header>
 
@@ -178,12 +412,12 @@ function AdminPage() {
               <p className="text-[10px] tracking-[0.4em] uppercase text-gold mb-3">Área restrita</p>
               <h1 className="font-display text-4xl md:text-6xl leading-tight">Painel Operacional</h1>
               <p className="mt-4 text-sm text-muted-foreground max-w-2xl leading-relaxed">
-                Frente de gestão para reservas, pagamentos, admissões e patrocínios. Nesta fase os dados são operacionais de preparação; no backend serão substituídos por API real, autenticação e base de dados.
+                Gestão de reservas, pagamentos, admissões, patrocínios, credenciais e check-in. Os dados são de preparação, mas as regras já seguem a máquina de estados do negócio.
               </p>
             </div>
             <div className="border border-gold/30 bg-gold/5 p-5 text-sm text-muted-foreground leading-relaxed">
               <p className="text-[10px] tracking-[0.35em] uppercase text-gold mb-2">Regra de negócio</p>
-              Pagamento confirmado libera admissão. Admissão aprovada libera credencial futura. Pedido de patrocínio qualificado libera envio controlado do dossier.
+              Pagamento confirmado libera admissão. Admissão aprovada libera credencial. Credencial emitida permite check-in. Toda ação administrativa gera auditoria.
             </div>
           </div>
 
@@ -198,7 +432,7 @@ function AdminPage() {
           </div>
 
           <div className="flex flex-wrap gap-2 mb-6">
-            {tabs.map((tab) => (
+            {visibleTabs.map((tab) => (
               <button
                 key={tab.id}
                 type="button"
@@ -212,6 +446,16 @@ function AdminPage() {
             ))}
           </div>
 
+          {activeTab === "overview" && (
+            <Panel title="Visão geral" subtitle="Resumo operacional da organização do evento.">
+              <div className="grid md:grid-cols-3 gap-4">
+                <OwnerCard title="Acesso" body="Owen entra por /admin com email e senha. Depois o backend validará sessão, permissões e auditoria." />
+                <OwnerCard title="RBAC" body="Existem apenas user e admin. Dentro de admin, permissões definem quem vê e altera cada módulo." />
+                <OwnerCard title="Check-in" body="Equipa autorizada valida credenciais no dia do evento e o sistema grava quem validou e quando." />
+              </div>
+            </Panel>
+          )}
+
           {activeTab === "reservations" && (
             <Panel title="Reservas" subtitle="Controlo de pedidos de acesso e estado de admissão.">
               <div className="space-y-3">
@@ -219,11 +463,11 @@ function AdminPage() {
                   <Row key={item.reference}>
                     <div>
                       <p className="font-display text-xl text-foreground">{item.participant}</p>
-                      <p className="mt-1 text-xs text-muted-foreground">{item.reference} · {item.ticket} · {item.createdAt}</p>
+                      <p className="mt-1 text-xs text-muted-foreground">{item.reference} · {item.ticket} · {item.email} · {item.createdAt}</p>
                     </div>
                     <div className="text-sm text-muted-foreground">{item.amount}</div>
                     <Status label={item.paymentStatus} tone={item.paymentStatus === "payment_confirmed" ? "good" : "warn"} />
-                    <Status label={item.admissionStatus} tone={item.admissionStatus === "admission_approved" ? "good" : "neutral"} />
+                    <Status label={item.admissionStatus} tone={item.admissionStatus === "admission_approved" ? "good" : item.admissionStatus === "admission_rejected" ? "bad" : "neutral"} />
                   </Row>
                 ))}
               </div>
@@ -285,7 +529,7 @@ function AdminPage() {
                       <p className="mt-1 text-xs text-muted-foreground">{item.reference} · {item.tier} · {item.contact}</p>
                     </div>
                     <div className="text-xs text-muted-foreground">{item.createdAt}</div>
-                    <Status label={item.status} tone={item.status === "dossier_sent" || item.status === "sponsor_qualified" ? "good" : item.status === "rejected" ? "bad" : "warn"} />
+                    <Status label={item.status} tone={item.status === "dossier_sent" || item.status === "proposal_sent" ? "good" : item.status === "rejected" ? "bad" : "warn"} />
                     <div className="flex flex-wrap justify-end gap-2">
                       <button onClick={() => setSponsorStatus(item.reference, "sponsor_qualified")} className="admin-action">Qualificar</button>
                       <button onClick={() => setSponsorStatus(item.reference, "dossier_sent")} className="admin-action">Dossier enviado</button>
@@ -297,8 +541,98 @@ function AdminPage() {
             </Panel>
           )}
 
-          <div className="mt-10 border border-border/40 bg-card/40 p-6 text-xs text-muted-foreground leading-relaxed">
-            Próxima camada: autenticação admin, API real, PostgreSQL, Redis para idempotência, Resend para emails e logs de auditoria para cada ação executiva.
+          {activeTab === "credentials" && (
+            <Panel title="Credenciais" subtitle="Emissão de credenciais após admissão aprovada.">
+              <div className="space-y-3">
+                {credentials.map((item) => (
+                  <Row key={item.credentialCode}>
+                    <div>
+                      <p className="font-display text-xl text-foreground">{item.participant}</p>
+                      <p className="mt-1 text-xs text-muted-foreground">{item.credentialCode} · {item.reservationReference} · {item.ticket}</p>
+                    </div>
+                    <Status label={item.status} tone={item.status === "credential_issued" || item.status === "credential_ready" ? "good" : "neutral"} />
+                    <Status label={item.checkinStatus} tone={item.checkinStatus === "checked_in" ? "good" : "neutral"} />
+                    <div className="flex justify-end">
+                      {item.status === "credential_ready" ? (
+                        <button onClick={() => issueCredential(item.credentialCode)} className="admin-action">Emitir credencial</button>
+                      ) : (
+                        <span className="text-xs text-muted-foreground">{item.status === "credential_not_ready" ? "Aguardando admissão" : "Emitida"}</span>
+                      )}
+                    </div>
+                  </Row>
+                ))}
+              </div>
+            </Panel>
+          )}
+
+          {activeTab === "checkin" && (
+            <Panel title="Check-in" subtitle="Validação de entrada no dia do evento. Regista quem validou e quando.">
+              <div className="grid lg:grid-cols-[0.85fr_1.15fr] gap-6">
+                <div className="border border-border/40 bg-background p-6">
+                  <p className="text-[10px] tracking-[0.35em] uppercase text-gold mb-4">Buscar credencial</p>
+                  <input
+                    value={checkinQuery}
+                    onChange={(e) => setCheckinQuery(e.target.value)}
+                    placeholder="BOARD-CHK-001, THB-PREP-003 ou nome"
+                    className={inputCls}
+                  />
+                  <p className="mt-4 text-xs text-muted-foreground leading-relaxed">
+                    No backend, esta busca será por QR code, referência, email ou código de credencial. A validação só será permitida para admins com permissão checkin.validate.
+                  </p>
+                </div>
+
+                <div className="border border-border/40 bg-background p-6 min-h-[220px]">
+                  {!checkinQuery.trim() ? (
+                    <EmptyState title="Aguardando credencial" body="Digite ou leia o código para validar a entrada." />
+                  ) : !checkinResult ? (
+                    <EmptyState title="Credencial não encontrada" body="Confirme o código ou procure pela referência da reserva." />
+                  ) : (
+                    <div>
+                      <p className="text-[10px] tracking-[0.35em] uppercase text-gold mb-2">Resultado</p>
+                      <h3 className="font-display text-3xl">{checkinResult.participant}</h3>
+                      <p className="mt-2 text-sm text-muted-foreground">{checkinResult.credentialCode} · {checkinResult.reservationReference} · {checkinResult.ticket}</p>
+                      <div className="mt-6 flex flex-wrap gap-3">
+                        <Status label={checkinResult.status} tone={checkinResult.status === "credential_not_ready" ? "bad" : "good"} />
+                        <Status label={checkinResult.checkinStatus} tone={checkinResult.checkinStatus === "checked_in" ? "good" : "warn"} />
+                      </div>
+                      {checkinResult.validatedAt && (
+                        <p className="mt-5 text-xs text-muted-foreground">
+                          Validado por {checkinResult.validatedBy} · {checkinResult.validatedAt}
+                        </p>
+                      )}
+                      <button
+                        onClick={() => validateCheckin(checkinResult.credentialCode)}
+                        disabled={checkinResult.status === "credential_not_ready" || checkinResult.checkinStatus === "checked_in"}
+                        className="mt-8 px-7 py-4 bg-gradient-gold text-primary-foreground text-xs tracking-widest uppercase disabled:opacity-40 disabled:cursor-not-allowed"
+                      >
+                        Validar entrada
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </Panel>
+          )}
+
+          {activeTab === "audit" && (
+            <Panel title="Auditoria" subtitle="Registo de ações administrativas para controlo interno.">
+              <div className="space-y-3">
+                {auditLogs.map((log) => (
+                  <Row key={log.id}>
+                    <div>
+                      <p className="font-display text-xl text-foreground">{log.action}</p>
+                      <p className="mt-1 text-xs text-muted-foreground">{log.actor} · {log.target} · {log.timestamp}</p>
+                    </div>
+                    <div className="text-xs text-muted-foreground">{log.previousState ?? "—"}</div>
+                    <div className="text-xs text-gold">{log.nextState ?? "—"}</div>
+                  </Row>
+                ))}
+              </div>
+            </Panel>
+          )}
+
+          <div className="mt-12 border border-border/40 bg-card/30 p-6 text-xs text-muted-foreground leading-relaxed">
+            Próxima camada: autenticação real, API, PostgreSQL, Redis para idempotência, Resend para emails, logs de auditoria persistentes e integração com Gateway/Paysuite.
           </div>
         </div>
       </section>
@@ -306,15 +640,17 @@ function AdminPage() {
   );
 }
 
+const inputCls = "w-full mt-2 bg-background border border-border/60 px-4 py-3 text-sm focus:border-gold outline-none";
+
 function Panel({ title, subtitle, children }: { title: string; subtitle: string; children: React.ReactNode }) {
   return (
-    <section className="border border-border/40 bg-card/30 p-5 md:p-6">
-      <div className="mb-6 flex flex-col md:flex-row md:items-end md:justify-between gap-4">
+    <section className="border border-border/40 bg-card/30 p-5 md:p-7">
+      <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-6">
         <div>
           <p className="text-[10px] tracking-[0.35em] uppercase text-gold mb-2">Gestão</p>
           <h2 className="font-display text-3xl">{title}</h2>
         </div>
-        <p className="text-sm text-muted-foreground max-w-xl leading-relaxed">{subtitle}</p>
+        <p className="text-xs text-muted-foreground max-w-md md:text-right">{subtitle}</p>
       </div>
       {children}
     </section>
@@ -322,20 +658,63 @@ function Panel({ title, subtitle, children }: { title: string; subtitle: string;
 }
 
 function Row({ children }: { children: React.ReactNode }) {
+  return <div className="grid lg:grid-cols-[1.4fr_0.7fr_0.8fr_1fr] gap-4 items-center border border-border/35 bg-background p-4">{children}</div>;
+}
+
+function Status({ label, tone }: { label: string; tone: "good" | "warn" | "bad" | "neutral" }) {
+  const cls =
+    tone === "good"
+      ? "border-emerald-500/50 text-emerald-300 bg-emerald-500/10"
+      : tone === "bad"
+      ? "border-red-500/50 text-red-300 bg-red-500/10"
+      : tone === "warn"
+      ? "border-gold/60 text-gold bg-gold/10"
+      : "border-border/60 text-muted-foreground bg-card/30";
+
+  return <span className={`inline-flex justify-center px-3 py-2 text-[10px] tracking-[0.22em] uppercase border ${cls}`}>{statusLabel(label)}</span>;
+}
+
+function OwnerCard({ title, body }: { title: string; body: string }) {
   return (
-    <div className="grid lg:grid-cols-[1.35fr_0.55fr_0.65fr_0.9fr] gap-4 items-center border border-border/40 bg-background p-4">
-      {children}
+    <div className="border border-border/40 bg-background p-5">
+      <p className="text-[10px] tracking-[0.3em] uppercase text-gold mb-3">{title}</p>
+      <p className="text-sm text-muted-foreground leading-relaxed">{body}</p>
     </div>
   );
 }
 
-function Status({ label, tone }: { label: string; tone: "good" | "warn" | "bad" | "neutral" }) {
-  const toneClass = {
-    good: "border-emerald-400/40 text-emerald-300 bg-emerald-400/5",
-    warn: "border-gold/50 text-gold bg-gold/5",
-    bad: "border-red-400/40 text-red-300 bg-red-400/5",
-    neutral: "border-border/60 text-muted-foreground bg-card/40",
-  }[tone];
+function EmptyState({ title, body }: { title: string; body: string }) {
+  return (
+    <div className="h-full min-h-[180px] flex flex-col justify-center text-center">
+      <p className="font-display text-2xl">{title}</p>
+      <p className="mt-2 text-sm text-muted-foreground">{body}</p>
+    </div>
+  );
+}
 
-  return <span className={`inline-flex justify-center px-3 py-2 border text-[10px] tracking-[0.18em] uppercase ${toneClass}`}>{label.replaceAll("_", " ")}</span>;
+function statusLabel(status: string) {
+  const labels: Record<string, string> = {
+    payment_pending: "Pagamento pendente",
+    payment_confirmed: "Pagamento confirmado",
+    payment_failed: "Pagamento falhado",
+    payment_cancelled: "Pagamento cancelado",
+    admission_locked: "Admissão bloqueada",
+    admission_under_review: "Admissão em análise",
+    admission_approved: "Admissão aprovada",
+    admission_rejected: "Admissão rejeitada",
+    sponsor_inquiry_received: "Pedido recebido",
+    sponsor_under_review: "Patrocínio em análise",
+    sponsor_qualified: "Patrocinador qualificado",
+    dossier_pending: "Dossier pendente",
+    dossier_sent: "Dossier enviado",
+    proposal_sent: "Proposta enviada",
+    rejected: "Rejeitado",
+    credential_not_ready: "Credencial indisponível",
+    credential_ready: "Credencial pronta",
+    credential_issued: "Credencial emitida",
+    not_checked_in: "Não entrou",
+    checked_in: "Entrada validada",
+  };
+
+  return labels[status] ?? status;
 }
