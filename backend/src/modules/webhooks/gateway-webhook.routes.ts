@@ -1,6 +1,7 @@
 import { createHmac, timingSafeEqual } from "node:crypto";
 import { z } from "zod";
 import type { FastifyInstance } from "fastify";
+import type { Prisma } from "@prisma/client";
 import { env } from "../../config/env.js";
 import { prisma } from "../../db/prisma.js";
 import { fail, ok } from "../../shared/http.js";
@@ -65,7 +66,7 @@ export async function gatewayWebhookRoutes(app: FastifyInstance) {
         ? "payment_processing"
         : "payment_pending";
 
-    await prisma.$transaction(async (tx) => {
+    await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
       const payment = await tx.payment.update({
         where: { paymentSessionId: payload.paymentSessionId },
         data: {
