@@ -65,7 +65,7 @@ if (Test-Path "backend/prisma") {
   Write-Host "Moved backend/prisma -> database/prisma"
 }
 
-@'
+$envExample = @'
 THE_BOARD_WEB_URL=http://localhost:8080
 THE_BOARD_API_URL=http://localhost:3333
 DATABASE_URL=postgresql://the_board:the_board_password@localhost:5432/the_board
@@ -76,7 +76,9 @@ GATEWAY_BASE_URL=
 GATEWAY_API_KEY=
 GATEWAY_WEBHOOK_SECRET=change-me
 JWT_SECRET=change-me
-'@ | Set-Content ".env.example" -Encoding UTF8
+'@
+
+$envExample | Set-Content ".env.example" -Encoding UTF8
 
 if (Test-Path ".env.local.backup") {
   Copy-Item ".env.local.backup" "frontend/.env" -Force
