@@ -7,6 +7,10 @@
     "build:frontend": "cd frontend && npm run build",
     "dev:backend": "cd backend && npm run dev",
     "build:backend": "cd backend && npm run build",
+    "prisma:generate": "cd backend && npm run prisma:generate",
+    "prisma:migrate": "cd backend && npm run prisma:migrate",
+    "prisma:deploy": "cd backend && npm run prisma:deploy",
+    "prisma:seed": "cd backend && npm run prisma:seed",
     "dev": "concurrently \"npm run dev:frontend\" \"npm run dev:backend\""
   },
   "devDependencies": {
