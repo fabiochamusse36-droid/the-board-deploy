@@ -9,22 +9,20 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as PatrociniosRouteImport } from './routes/patrocinios'
-import { Route as ComprarRouteImport } from './routes/comprar'
-import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AdminRouteImport } from './routes/admin'
+import { Route as CheckinRouteImport } from './routes/checkin'
+import { Route as ComprarRouteImport } from './routes/comprar'
+import { Route as PatrociniosRouteImport } from './routes/patrocinios'
 import { Route as AdmissaoIndexRouteImport } from './routes/admissao.index'
-import { Route as ConfirmacaoReferenceRouteImport } from './routes/confirmacao.$reference'
 import { Route as AdmissaoObrigadoRouteImport } from './routes/admissao.obrigado'
+import { Route as ConfirmacaoReferenceRouteImport } from './routes/confirmacao.$reference'
+import { Route as ReservaDadosRouteImport } from './routes/reserva.dados'
+import { Route as ReservaResumoRouteImport } from './routes/reserva.resumo'
 
-const PatrociniosRoute = PatrociniosRouteImport.update({
-  id: '/patrocinios',
-  path: '/patrocinios',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ComprarRoute = ComprarRouteImport.update({
-  id: '/comprar',
-  path: '/comprar',
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminRoute = AdminRouteImport.update({
@@ -32,9 +30,19 @@ const AdminRoute = AdminRouteImport.update({
   path: '/admin',
   getParentRoute: () => rootRouteImport,
 } as any)
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+const CheckinRoute = CheckinRouteImport.update({
+  id: '/checkin',
+  path: '/checkin',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ComprarRoute = ComprarRouteImport.update({
+  id: '/comprar',
+  path: '/comprar',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PatrociniosRoute = PatrociniosRouteImport.update({
+  id: '/patrocinios',
+  path: '/patrocinios',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdmissaoIndexRoute = AdmissaoIndexRouteImport.update({
@@ -42,43 +50,62 @@ const AdmissaoIndexRoute = AdmissaoIndexRouteImport.update({
   path: '/admissao/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdmissaoObrigadoRoute = AdmissaoObrigadoRouteImport.update({
+  id: '/admissao/obrigado',
+  path: '/admissao/obrigado',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ConfirmacaoReferenceRoute = ConfirmacaoReferenceRouteImport.update({
   id: '/confirmacao/$reference',
   path: '/confirmacao/$reference',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AdmissaoObrigadoRoute = AdmissaoObrigadoRouteImport.update({
-  id: '/admissao/obrigado',
-  path: '/admissao/obrigado',
+const ReservaDadosRoute = ReservaDadosRouteImport.update({
+  id: '/reserva/dados',
+  path: '/reserva/dados',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ReservaResumoRoute = ReservaResumoRouteImport.update({
+  id: '/reserva/resumo',
+  path: '/reserva/resumo',
   getParentRoute: () => rootRouteImport,
 } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
+  '/checkin': typeof CheckinRoute
   '/comprar': typeof ComprarRoute
   '/patrocinios': typeof PatrociniosRoute
   '/admissao/obrigado': typeof AdmissaoObrigadoRoute
   '/confirmacao/$reference': typeof ConfirmacaoReferenceRoute
+  '/reserva/dados': typeof ReservaDadosRoute
+  '/reserva/resumo': typeof ReservaResumoRoute
   '/admissao/': typeof AdmissaoIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
+  '/checkin': typeof CheckinRoute
   '/comprar': typeof ComprarRoute
   '/patrocinios': typeof PatrociniosRoute
   '/admissao/obrigado': typeof AdmissaoObrigadoRoute
   '/confirmacao/$reference': typeof ConfirmacaoReferenceRoute
+  '/reserva/dados': typeof ReservaDadosRoute
+  '/reserva/resumo': typeof ReservaResumoRoute
   '/admissao': typeof AdmissaoIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
+  '/checkin': typeof CheckinRoute
   '/comprar': typeof ComprarRoute
   '/patrocinios': typeof PatrociniosRoute
   '/admissao/obrigado': typeof AdmissaoObrigadoRoute
   '/confirmacao/$reference': typeof ConfirmacaoReferenceRoute
+  '/reserva/dados': typeof ReservaDadosRoute
+  '/reserva/resumo': typeof ReservaResumoRoute
   '/admissao/': typeof AdmissaoIndexRoute
 }
 export interface FileRouteTypes {
@@ -86,55 +113,60 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/admin'
+    | '/checkin'
     | '/comprar'
     | '/patrocinios'
     | '/admissao/obrigado'
     | '/confirmacao/$reference'
+    | '/reserva/dados'
+    | '/reserva/resumo'
     | '/admissao/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/admin'
+    | '/checkin'
     | '/comprar'
     | '/patrocinios'
     | '/admissao/obrigado'
     | '/confirmacao/$reference'
+    | '/reserva/dados'
+    | '/reserva/resumo'
     | '/admissao'
   id:
     | '__root__'
     | '/'
     | '/admin'
+    | '/checkin'
     | '/comprar'
     | '/patrocinios'
     | '/admissao/obrigado'
     | '/confirmacao/$reference'
+    | '/reserva/dados'
+    | '/reserva/resumo'
     | '/admissao/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRoute
+  CheckinRoute: typeof CheckinRoute
   ComprarRoute: typeof ComprarRoute
   PatrociniosRoute: typeof PatrociniosRoute
   AdmissaoObrigadoRoute: typeof AdmissaoObrigadoRoute
   ConfirmacaoReferenceRoute: typeof ConfirmacaoReferenceRoute
+  ReservaDadosRoute: typeof ReservaDadosRoute
+  ReservaResumoRoute: typeof ReservaResumoRoute
   AdmissaoIndexRoute: typeof AdmissaoIndexRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/patrocinios': {
-      id: '/patrocinios'
-      path: '/patrocinios'
-      fullPath: '/patrocinios'
-      preLoaderRoute: typeof PatrociniosRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/comprar': {
-      id: '/comprar'
-      path: '/comprar'
-      fullPath: '/comprar'
-      preLoaderRoute: typeof ComprarRouteImport
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin': {
@@ -144,11 +176,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
+    '/checkin': {
+      id: '/checkin'
+      path: '/checkin'
+      fullPath: '/checkin'
+      preLoaderRoute: typeof CheckinRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/comprar': {
+      id: '/comprar'
+      path: '/comprar'
+      fullPath: '/comprar'
+      preLoaderRoute: typeof ComprarRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/patrocinios': {
+      id: '/patrocinios'
+      path: '/patrocinios'
+      fullPath: '/patrocinios'
+      preLoaderRoute: typeof PatrociniosRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admissao/': {
@@ -158,6 +204,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdmissaoIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admissao/obrigado': {
+      id: '/admissao/obrigado'
+      path: '/admissao/obrigado'
+      fullPath: '/admissao/obrigado'
+      preLoaderRoute: typeof AdmissaoObrigadoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/confirmacao/$reference': {
       id: '/confirmacao/$reference'
       path: '/confirmacao/$reference'
@@ -165,11 +218,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ConfirmacaoReferenceRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/admissao/obrigado': {
-      id: '/admissao/obrigado'
-      path: '/admissao/obrigado'
-      fullPath: '/admissao/obrigado'
-      preLoaderRoute: typeof AdmissaoObrigadoRouteImport
+    '/reserva/dados': {
+      id: '/reserva/dados'
+      path: '/reserva/dados'
+      fullPath: '/reserva/dados'
+      preLoaderRoute: typeof ReservaDadosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reserva/resumo': {
+      id: '/reserva/resumo'
+      path: '/reserva/resumo'
+      fullPath: '/reserva/resumo'
+      preLoaderRoute: typeof ReservaResumoRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -178,12 +238,25 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRoute,
+  CheckinRoute: CheckinRoute,
   ComprarRoute: ComprarRoute,
   PatrociniosRoute: PatrociniosRoute,
   AdmissaoObrigadoRoute: AdmissaoObrigadoRoute,
   ConfirmacaoReferenceRoute: ConfirmacaoReferenceRoute,
+  ReservaDadosRoute: ReservaDadosRoute,
+  ReservaResumoRoute: ReservaResumoRoute,
   AdmissaoIndexRoute: AdmissaoIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
