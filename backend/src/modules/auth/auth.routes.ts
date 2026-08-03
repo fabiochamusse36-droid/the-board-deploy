@@ -1,30 +1,51 @@
-import { randomUUID } from "node:crypto";
 import { z } from "zod";
 import type { FastifyInstance } from "fastify";
-import { env } from "../../config/env.js";
+import { prisma } from "../../db/prisma.js";
 import { fail, ok } from "../../shared/http.js";
-import { permissions } from "../../shared/state-machine.js";
+import { verifyPassword } from "../../shared/password.js";
+import { accessTokenTtlSeconds, signAccessToken } from "../../shared/tokens.js";
 
 const loginSchema = z.object({
-  email: z.string().email(),
+  email: z.string().trim().email(),
   password: z.string().min(1),
 });
 
 export async function authRoutes(app: FastifyInstance) {
   app.post("/api/auth/login", async (request, reply) => {
     const input = loginSchema.parse(request.body);
+    const email = input.email.toLowerCase();
 
-    if (input.email !== env.ADMIN_OWNER_EMAIL || input.password !== env.ADMIN_OWNER_PASSWORD) {
+    const user = await prisma.user.findUnique({
+      where: { email },
+    });
+
+    if (!user || !user.isActive) {
       return fail(reply, "Credenciais inválidas", 401, "invalid_credentials");
     }
 
+    const passwordIsValid = verifyPassword(input.password, user.passwordHash);
+
+    if (!passwordIsValid) {
+      return fail(reply, "Credenciais inválidas", 401, "invalid_credentials");
+    }
+
+    const accessToken = await signAccessToken({
+      userId: user.id,
+      email: user.email,
+      role: user.role,
+      permissions: user.permissions,
+    });
+
     return ok(reply, {
-      accessToken: randomUUID(),
+      accessToken,
+      tokenType: "Bearer",
+      expiresIn: accessTokenTtlSeconds,
       user: {
-        name: "Owner THE BOARD",
-        email: input.email,
-        role: "admin",
-        permissions: ["*", ...permissions],
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        permissions: user.permissions,
       },
     });
   });

@@ -1,16 +1,10 @@
-import { scryptSync, randomBytes } from "node:crypto";
 import { PrismaClient } from "@prisma/client";
+import { hashPassword } from "../shared/password.js";
 
 const prisma = new PrismaClient();
 
-function hashPassword(password: string) {
-  const salt = randomBytes(16).toString("hex");
-  const hash = scryptSync(password, salt, 64).toString("hex");
-  return `scrypt:${salt}:${hash}`;
-}
-
 async function main() {
-  const email = process.env.ADMIN_OWNER_EMAIL;
+  const email = process.env.ADMIN_OWNER_EMAIL?.trim().toLowerCase();
   const password = process.env.ADMIN_OWNER_PASSWORD;
 
   if (!email || !password) {
@@ -18,17 +12,21 @@ async function main() {
     return;
   }
 
+  const passwordHash = await hashPassword(password);
+
   await prisma.user.upsert({
     where: { email },
     update: {
+      name: "Owner THE BOARD",
       role: "admin",
       permissions: ["*"],
       isActive: true,
+      passwordHash,
     },
     create: {
       name: "Owner THE BOARD",
       email,
-      passwordHash: hashPassword(password),
+      passwordHash,
       role: "admin",
       permissions: ["*"],
       isActive: true,

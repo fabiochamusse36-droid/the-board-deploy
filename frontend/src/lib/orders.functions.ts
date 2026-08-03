@@ -1,11 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
-const TICKETS: Record<string, { name: string; amount: number }> = {
-  "early-investors": { name: "Investidores Iniciais", amount: 2500 },
-  "vip-board": { name: "VIP Board Member", amount: 7500 },
-};
-
 const createSchema = z.object({
   ticket: z.enum(["early-investors", "vip-board"]),
   name: z.string().trim().min(2).max(120),
@@ -20,60 +15,114 @@ const getSchema = z.object({
   reference: z.string().min(4).max(40),
 });
 
-function genReference() {
-  const rand = Math.random().toString(36).slice(2, 8).toUpperCase();
-  const ts = Date.now().toString(36).slice(-4).toUpperCase();
-  return `THB-${ts}${rand}`;
+type ApiEnvelope<T> =
+  | { ok: true; data: T }
+  | { ok: false; error?: { code?: string; message?: string } };
+
+type BackendReservation = {
+  reference: string;
+  ticketId: string;
+  ticketName: string;
+  quantity: number;
+  unitPrice: number;
+  totalAmount: number;
+  currency: string;
+  buyerName: string;
+  buyerEmail: string;
+  buyerPhone: string;
+  country?: string | null;
+  city?: string | null;
+  status: string;
+  paymentStatus: string;
+  admissionStatus: string;
+  createdAt: string | Date;
+};
+
+function apiBaseUrl() {
+  return (import.meta.env.VITE_API_BASE_URL || "http://localhost:4000").replace(/\/$/, "");
+}
+
+async function readApi<T>(response: Response): Promise<T> {
+  let envelope: ApiEnvelope<T> | null = null;
+  try {
+    envelope = (await response.json()) as ApiEnvelope<T>;
+  } catch {
+    // handled below
+  }
+
+  if (!response.ok || !envelope?.ok) {
+    const message = envelope && !envelope.ok ? envelope.error?.message : null;
+    throw new Error(message || "Não foi possível comunicar com o backend do THE BOARD.");
+  }
+
+  return envelope.data;
 }
 
 /**
- * Temporary reservation creation boundary.
+ * Creates a real backend reservation.
  *
- * THE BOARD will not use Supabase as the final backend. For now this function
- * keeps the front-end flow operational and backend-ready without requiring
- * Supabase environment variables. When the real backend is introduced, replace
- * only this boundary with an API call that persists the reservation and creates
- * a payment session with the external gateway.
+ * Prices, reference generation, reservation status and payment readiness are
+ * controlled by the backend. The frontend only submits buyer/ticket intent.
  */
 export const createOrder = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => createSchema.parse(input))
   .handler(async ({ data }) => {
-    const ticket = TICKETS[data.ticket];
-    if (!ticket) throw new Error("Bilhete inválido");
+    const response = await fetch(`${apiBaseUrl()}/api/reservations`, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        ticketId: data.ticket,
+        quantity: data.quantity ?? 1,
+        buyerName: data.name,
+        buyerEmail: data.email,
+        buyerPhone: data.phone,
+        country: data.country,
+        city: data.city,
+      }),
+    });
 
-    const reference = genReference();
-    const quantity = data.quantity ?? 1;
+    const reservation = await readApi<BackendReservation>(response);
 
     return {
-      reference,
-      reservationStatus: "reservation_created" as const,
-      paymentStatus: "payment_pending" as const,
-      admissionStatus: "admission_form_locked" as const,
-      ticketType: ticket.name,
-      amountMt: ticket.amount * quantity,
+      reference: reservation.reference,
+      reservationStatus: reservation.status,
+      paymentStatus: reservation.paymentStatus,
+      admissionStatus: reservation.admissionStatus,
+      ticketType: reservation.ticketName,
+      amountMt: reservation.totalAmount,
     };
   });
 
 /**
- * Temporary read boundary for the confirmation page.
- *
- * The browser-side reservation store remains the source of truth during this
- * front-end phase. This server function only returns a safe fallback shape so
- * /confirmacao/$reference can render without Supabase.
+ * Reads a real backend reservation for the confirmation page.
  */
 export const getOrder = createServerFn({ method: "GET" })
   .inputValidator((input: unknown) => getSchema.parse(input))
   .handler(async ({ data }) => {
+    const response = await fetch(`${apiBaseUrl()}/api/reservations/${encodeURIComponent(data.reference)}`, {
+      method: "GET",
+      headers: { "accept": "application/json" },
+    });
+
+    const reservation = await readApi<BackendReservation>(response);
+
     return {
-      reference: data.reference,
-      buyer_name: "",
-      buyer_email: "",
-      buyer_phone: "",
-      ticket_type: "Reserva THE BOARD",
-      amount_mt: 0,
+      reference: reservation.reference,
+      buyer_name: reservation.buyerName,
+      buyer_email: reservation.buyerEmail,
+      buyer_phone: reservation.buyerPhone,
+      ticket_type: reservation.ticketName,
+      amount_mt: reservation.totalAmount,
       payment_method: "external_gateway",
-      status: "reservation_created",
-      notes: "{}",
-      created_at: new Date().toISOString(),
+      status: reservation.status,
+      notes: JSON.stringify({
+        ticketId: reservation.ticketId,
+        quantity: reservation.quantity,
+        unitPrice: reservation.unitPrice,
+        currency: reservation.currency,
+        paymentStatus: reservation.paymentStatus,
+        admissionStatus: reservation.admissionStatus,
+      }),
+      created_at: new Date(reservation.createdAt).toISOString(),
     };
   });

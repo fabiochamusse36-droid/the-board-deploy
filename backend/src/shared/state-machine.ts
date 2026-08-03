@@ -3,14 +3,17 @@ export const permissions = [
   "payments.read",
   "payments.manual_confirm",
   "admissions.read",
+  "admissions.review",
   "admissions.approve",
   "admissions.reject",
   "sponsors.read",
+  "sponsors.update",
   "sponsors.qualify",
   "sponsors.send_dossier",
   "sponsors.reject",
   "credentials.read",
   "credentials.issue",
+  "credentials.update",
   "checkin.validate",
   "reports.export",
   "audit.read",
@@ -52,6 +55,20 @@ export const sponsorTransitions = {
   closed_lost: [],
 } as const;
 
+export const credentialTransitions = {
+  credential_not_ready: ["credential_ready", "credential_issued", "credential_blocked"],
+  credential_ready: ["credential_issued", "credential_blocked"],
+  credential_issued: ["credential_ready", "credential_blocked"],
+  credential_checked_in: [],
+  credential_blocked: ["credential_ready", "credential_issued"],
+} as const;
+
 export function canTransition<T extends Record<string, readonly string[]>>(machine: T, from: keyof T, to: string) {
   return machine[from]?.includes(to) ?? false;
+}
+
+export function canTransitionFrom<T extends Record<string, readonly string[]>>(machine: T, from: string, to: string) {
+  if (from === to) return true;
+  if (!(from in machine)) return false;
+  return canTransition(machine, from as keyof T, to);
 }

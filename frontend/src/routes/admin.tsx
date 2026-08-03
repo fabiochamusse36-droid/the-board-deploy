@@ -12,6 +12,8 @@ export const Route = createFileRoute("/admin")({
   component: AdminPage,
 });
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:4000";
+
 type Tab = "overview" | "reservations" | "payments" | "admissions" | "sponsors" | "credentials" | "audit";
 type Permission =
   | "*"
@@ -19,21 +21,43 @@ type Permission =
   | "payments.read"
   | "payments.manual_confirm"
   | "admissions.read"
+  | "admissions.review"
   | "admissions.approve"
   | "admissions.reject"
   | "sponsors.read"
+  | "sponsors.update"
   | "sponsors.qualify"
   | "sponsors.send_dossier"
   | "sponsors.reject"
   | "credentials.read"
   | "credentials.issue"
+  | "credentials.update"
   | "audit.read";
 
 type AdminSession = {
+  id: string;
   name: string;
   email: string;
   role: "admin";
   permissions: Permission[];
+  accessToken: string;
+};
+
+type ApiSuccess<T> = { ok: true; data: T };
+type ApiFailure = { ok: false; error: { code: string; message: string } };
+type ApiResponse<T> = ApiSuccess<T> | ApiFailure;
+
+type LoginResponse = {
+  accessToken: string;
+  tokenType: "Bearer";
+  expiresIn: number;
+  user: {
+    id: string;
+    name: string;
+    email: string;
+    role: "admin" | "user";
+    permissions: string[];
+  };
 };
 
 type PaymentStatus = "payment_pending" | "payment_confirmed" | "payment_failed" | "payment_cancelled";
@@ -92,13 +116,6 @@ type AuditLog = {
   previousState?: string;
   nextState?: string;
   timestamp: string;
-};
-
-const ownerSession: AdminSession = {
-  name: "Owner THE BOARD",
-  email: "owner@theboard.co.mz",
-  role: "admin",
-  permissions: ["*"],
 };
 
 const initialReservations: Reservation[] = [
@@ -206,8 +223,31 @@ const tabs: { id: Tab; label: string; permission: Permission }[] = [
   { id: "audit", label: "Auditoria", permission: "audit.read" },
 ];
 
+function readInput(form: HTMLFormElement, name: string) {
+  const input = form.elements.namedItem(name);
+  return input instanceof HTMLInputElement ? input.value.trim() : "";
+}
+
+async function postJson<T>(path: string, body: unknown): Promise<ApiResponse<T>> {
+  const response = await fetch(`${API_BASE_URL}${path}`, {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify(body),
+  });
+
+  const payload = (await response.json().catch(() => null)) as ApiResponse<T> | null;
+
+  if (!payload) {
+    return { ok: false, error: { code: "invalid_response", message: "Resposta inválida do servidor." } };
+  }
+
+  return payload;
+}
+
 function AdminPage() {
   const [session, setSession] = useState<AdminSession | null>(null);
+  const [loginBusy, setLoginBusy] = useState(false);
+  const [loginError, setLoginError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<Tab>("overview");
   const [reservations, setReservations] = useState(initialReservations);
   const [admissions, setAdmissions] = useState(initialAdmissions);
@@ -258,9 +298,40 @@ function AdminPage() {
     ];
   }, [reservations, admissions, sponsors, credentials]);
 
-  function login(e: FormEvent<HTMLFormElement>) {
+  async function login(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    setSession(ownerSession);
+    setLoginError(null);
+    setLoginBusy(true);
+
+    const email = readInput(e.currentTarget, "email");
+    const password = readInput(e.currentTarget, "password");
+
+    try {
+      const payload = await postJson<LoginResponse>("/api/auth/login", { email, password });
+
+      if (!payload.ok) {
+        setLoginError(payload.error.message);
+        return;
+      }
+
+      if (payload.data.user.role !== "admin") {
+        setLoginError("Esta conta não tem acesso administrativo.");
+        return;
+      }
+
+      setSession({
+        id: payload.data.user.id,
+        name: payload.data.user.name,
+        email: payload.data.user.email,
+        role: "admin",
+        permissions: payload.data.user.permissions as Permission[],
+        accessToken: payload.data.accessToken,
+      });
+    } catch {
+      setLoginError("Não foi possível contactar o servidor. Verifique se o backend está ativo.");
+    } finally {
+      setLoginBusy(false);
+    }
   }
 
   function confirmPayment(reference: string) {
@@ -279,8 +350,7 @@ function AdminPage() {
   }
 
   function setAdmissionStatus(reference: string, status: AdmissionStatus) {
-    const permission = status === "admission_approved" ? "admissions.approve" : "admissions.reject";
-    if (!can(permission)) return;
+    if (!can("admissions.review")) return;
     const current = admissions.find((item) => item.reference === reference);
     if (!current || current.status === status) return;
 
@@ -303,8 +373,7 @@ function AdminPage() {
   }
 
   function setSponsorStatus(reference: string, status: SponsorStatus) {
-    const permission = status === "sponsor_qualified" ? "sponsors.qualify" : status === "dossier_sent" ? "sponsors.send_dossier" : "sponsors.reject";
-    if (!can(permission)) return;
+    if (!can("sponsors.update")) return;
     const current = sponsors.find((item) => item.reference === reference);
     if (!current || current.status === status) return;
 
@@ -335,14 +404,19 @@ function AdminPage() {
           <form onSubmit={login} className="mt-8 space-y-5">
             <label className="block">
               <span className="text-[10px] tracking-[0.3em] uppercase text-muted-foreground">Email administrativo</span>
-              <input required type="email" placeholder="owner@theboard.co.mz" className={inputCls} />
+              <input required name="email" type="email" placeholder="owner@theboard.co.mz" className={inputCls} />
             </label>
             <label className="block">
               <span className="text-[10px] tracking-[0.3em] uppercase text-muted-foreground">Código de acesso</span>
-              <input required type="password" placeholder="••••••••" className={inputCls} />
+              <input required name="password" type="password" placeholder="••••••••" className={inputCls} />
             </label>
-            <button className="w-full py-4 bg-gradient-gold text-primary-foreground text-xs tracking-widest uppercase shadow-gold">
-              Entrar no painel
+            {loginError ? (
+              <div className="border border-red-500/40 bg-red-500/10 px-4 py-3 text-xs text-red-200 leading-relaxed">
+                {loginError}
+              </div>
+            ) : null}
+            <button disabled={loginBusy} className="w-full py-4 bg-gradient-gold text-primary-foreground text-xs tracking-widest uppercase shadow-gold disabled:opacity-60">
+              {loginBusy ? "A validar..." : "Entrar no painel"}
             </button>
           </form>
           <p className="mt-5 text-xs text-muted-foreground leading-relaxed">
