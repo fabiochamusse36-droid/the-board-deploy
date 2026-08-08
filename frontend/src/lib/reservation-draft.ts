@@ -1,5 +1,15 @@
 export type TicketId = "early-investors" | "vip-board";
 
+export type TicketSnapshot = {
+  id: TicketId;
+  name: string;
+  category: string;
+  description: string;
+  price: number;
+  currency: string;
+  maxQuantity: number;
+};
+
 export type ReservationDraft = {
   ticketId: TicketId;
   ticketName: string;
@@ -8,7 +18,7 @@ export type ReservationDraft = {
   unitPrice: number;
   quantity: number;
   totalAmount: number;
-  currency: "MZN";
+  currency: string;
   buyerName?: string;
   buyerEmail?: string;
   buyerPhone?: string;
@@ -17,47 +27,25 @@ export type ReservationDraft = {
   updatedAt: string;
 };
 
-export const RESERVATION_DRAFT_KEY = "the_board_reservation_draft";
-
-export const TICKETS: Record<
-  TicketId,
-  {
-    id: TicketId;
-    name: string;
-    tag: string;
-    price: number;
-    category: string;
-    description: string;
-    maxQuantity: number;
-  }
-> = {
-  "early-investors": {
-    id: "early-investors",
-    name: "Investidores Iniciais",
-    tag: "Lote 1 · Reserva Presencial",
-    price: 2500,
-    category: "Participante presencial",
-    description: "Acesso geral antecipado ao Big Players Forum.",
-    maxQuantity: 5,
-  },
-  "vip-board": {
-    id: "vip-board",
-    name: "VIP Board Member",
-    tag: "VIP · Reserva Premium",
-    price: 7500,
-    category: "VIP sujeita a validação executiva",
-    description: "Lounge exclusivo, jantar executivo e mesa restrita.",
-    maxQuantity: 2,
-  },
-};
+export const RESERVATION_DRAFT_KEY =
+  "the_board_reservation_draft";
 
 function canUseStorage() {
-  return typeof window !== "undefined" && Boolean(window.sessionStorage);
+  return (
+    typeof window !== "undefined" &&
+    Boolean(window.sessionStorage)
+  );
 }
 
-export function buildDraft(ticketId: TicketId, quantity: number): ReservationDraft {
-  const ticket = TICKETS[ticketId];
-  const safeQuantity = Math.max(1, Math.min(quantity, ticket.maxQuantity));
+export function buildDraft(
+  ticket: TicketSnapshot,
+  quantity: number,
+): ReservationDraft {
+  const safeQuantity = Math.max(
+    1,
+    Math.min(quantity, ticket.maxQuantity),
+  );
+
   return {
     ticketId: ticket.id,
     ticketName: ticket.name,
@@ -66,43 +54,80 @@ export function buildDraft(ticketId: TicketId, quantity: number): ReservationDra
     unitPrice: ticket.price,
     quantity: safeQuantity,
     totalAmount: ticket.price * safeQuantity,
-    currency: "MZN",
+    currency: ticket.currency,
     updatedAt: new Date().toISOString(),
   };
 }
 
-export function saveReservationDraft(draft: ReservationDraft): ReservationDraft {
-  const ticket = TICKETS[draft.ticketId];
+export function saveReservationDraft(
+  draft: ReservationDraft,
+): ReservationDraft {
   const normalized: ReservationDraft = {
     ...draft,
-    ticketName: draft.ticketName || ticket.name,
-    ticketCategory: draft.ticketCategory || ticket.category,
-    ticketDescription: draft.ticketDescription || ticket.description,
-    totalAmount: draft.unitPrice * draft.quantity,
+    totalAmount:
+      draft.unitPrice * draft.quantity,
     updatedAt: new Date().toISOString(),
   };
+
   if (canUseStorage()) {
-    window.sessionStorage.setItem(RESERVATION_DRAFT_KEY, JSON.stringify(normalized));
+    window.sessionStorage.setItem(
+      RESERVATION_DRAFT_KEY,
+      JSON.stringify(normalized),
+    );
   }
+
   return normalized;
 }
 
-export function getReservationDraft(): ReservationDraft | null {
+export function getReservationDraft():
+  | ReservationDraft
+  | null {
   if (!canUseStorage()) return null;
+
   try {
-    const raw = window.sessionStorage.getItem(RESERVATION_DRAFT_KEY);
+    const raw =
+      window.sessionStorage.getItem(
+        RESERVATION_DRAFT_KEY,
+      );
+
     if (!raw) return null;
-    const parsed = JSON.parse(raw) as Partial<ReservationDraft>;
-    if (!parsed.ticketId || !parsed.ticketName || !parsed.unitPrice || !parsed.quantity) return null;
-    const ticket = TICKETS[parsed.ticketId];
-    if (!ticket) return null;
+
+    const parsed =
+      JSON.parse(raw) as Partial<ReservationDraft>;
+
+    if (
+      !parsed.ticketId ||
+      !parsed.ticketName ||
+      typeof parsed.unitPrice !== "number" ||
+      typeof parsed.quantity !== "number"
+    ) {
+      return null;
+    }
+
     return {
-      ticketCategory: ticket.category,
-      ticketDescription: ticket.description,
-      currency: "MZN",
-      updatedAt: new Date().toISOString(),
-      ...parsed,
-    } as ReservationDraft;
+      ticketId: parsed.ticketId,
+      ticketName: parsed.ticketName,
+      ticketCategory:
+        parsed.ticketCategory ?? "",
+      ticketDescription:
+        parsed.ticketDescription ?? "",
+      unitPrice: parsed.unitPrice,
+      quantity: parsed.quantity,
+      totalAmount:
+        typeof parsed.totalAmount === "number"
+          ? parsed.totalAmount
+          : parsed.unitPrice * parsed.quantity,
+      currency:
+        parsed.currency ?? "MZN",
+      buyerName: parsed.buyerName,
+      buyerEmail: parsed.buyerEmail,
+      buyerPhone: parsed.buyerPhone,
+      country: parsed.country,
+      city: parsed.city,
+      updatedAt:
+        parsed.updatedAt ??
+        new Date().toISOString(),
+    };
   } catch {
     return null;
   }
@@ -110,16 +135,35 @@ export function getReservationDraft(): ReservationDraft | null {
 
 export function clearReservationDraft() {
   if (canUseStorage()) {
-    window.sessionStorage.removeItem(RESERVATION_DRAFT_KEY);
+    window.sessionStorage.removeItem(
+      RESERVATION_DRAFT_KEY,
+    );
   }
 }
 
-export function updateReservationDraft(partial: Partial<ReservationDraft>): ReservationDraft | null {
+export function updateReservationDraft(
+  partial: Partial<ReservationDraft>,
+): ReservationDraft | null {
   const current = getReservationDraft();
+
   if (!current) return null;
-  return saveReservationDraft({ ...current, ...partial });
+
+  return saveReservationDraft({
+    ...current,
+    ...partial,
+  });
 }
 
-export function formatMoney(value: number) {
-  return `${value.toLocaleString("pt-PT")} MT`;
+export function formatMoney(
+  value: number,
+  currency = "MZN",
+) {
+  if (currency === "MZN") {
+    return `${value.toLocaleString("pt-PT")} MT`;
+  }
+
+  return new Intl.NumberFormat("pt-PT", {
+    style: "currency",
+    currency,
+  }).format(value);
 }
