@@ -1,8 +1,6 @@
 import { Resend } from "resend";
 import { env } from "../config/env.js";
 
-const resend = new Resend(env.RESEND_API_KEY);
-
 type SendEmailInput = {
   to: string;
   subject: string;
@@ -12,8 +10,16 @@ type SendEmailInput = {
 };
 
 export async function sendEmail(input: SendEmailInput) {
+  if (!env.RESEND_API_KEY) {
+    throw new Error(
+      "RESEND_API_KEY não está configurada no ambiente.",
+    );
+  }
+
+  const resend = new Resend(env.RESEND_API_KEY);
+
   const result = await resend.emails.send({
-    from: env.RESEND_FROM_EMAIL,
+    from: env.MAIL_FROM,
     to: input.to,
     subject: input.subject,
     html: input.html,
@@ -23,7 +29,8 @@ export async function sendEmail(input: SendEmailInput) {
 
   if (result.error) {
     throw new Error(
-      result.error.message || "Falha ao enviar email pelo Resend.",
+      result.error.message ||
+        "Falha ao enviar email pelo Resend.",
     );
   }
 
