@@ -1,7 +1,6 @@
 import {
   createFileRoute,
   Link,
-  useNavigate,
   useRouter,
 } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
@@ -70,7 +69,6 @@ type Stage =
 
 function Confirmacao() {
   const { reference } = Route.useParams();
-  const navigate = useNavigate();
 
   const [order, setOrder] =
     useState<Order | null>(null);
@@ -80,9 +78,6 @@ function Confirmacao() {
 
   const [error, setError] =
     useState<string | null>(null);
-
-  const [showFallback, setShowFallback] =
-    useState(false);
 
   async function loadOrder() {
     try {
@@ -175,33 +170,6 @@ function Confirmacao() {
 
   const stage = getStage(order);
 
-  /*
-   * Só avançamos para admissão quando o BACKEND
-   * confirmar efetivamente o pagamento.
-   */
-  useEffect(() => {
-    if (stage !== "payment_confirmed") {
-      setShowFallback(false);
-      return;
-    }
-
-    const redirect = window.setTimeout(() => {
-      navigate({
-        to: "/admissao",
-        search: { reference },
-      });
-    }, 1800);
-
-    const fallback = window.setTimeout(() => {
-      setShowFallback(true);
-    }, 3500);
-
-    return () => {
-      window.clearTimeout(redirect);
-      window.clearTimeout(fallback);
-    };
-  }, [stage, reference, navigate]);
-
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center text-muted-foreground text-xs tracking-widest uppercase">
@@ -255,6 +223,9 @@ function Confirmacao() {
   const total =
     readAmount(order);
 
+  const currency =
+    readCurrency(order);
+
   const buyerName =
     readBuyerName(order);
 
@@ -264,13 +235,19 @@ function Confirmacao() {
   const buyerPhone =
     readBuyerPhone(order);
 
+  const reservationReference =
+    readReference(order, reference);
+
+  const paymentStatus =
+    readPaymentStatus(order);
+
   const content =
     stageCopy(stage);
 
   return (
-    <div className="min-h-screen bg-background text-foreground py-24 px-6">
+    <div className="min-h-screen bg-background text-foreground py-24 px-6 print:bg-white print:text-black print:py-8">
       <div className="max-w-3xl mx-auto">
-        <div className="text-center mb-10">
+        <div className="text-center mb-10 print:hidden">
           <Link
             to="/"
             className="text-[10px] tracking-[0.3em] uppercase text-muted-foreground hover:text-gold"
@@ -280,27 +257,32 @@ function Confirmacao() {
         </div>
 
         <div className="text-center mb-10">
-          <p className="text-[10px] tracking-[0.4em] uppercase text-gold mb-4">
-            Estado da reserva
+          <p className="text-[10px] tracking-[0.4em] uppercase text-gold mb-4 print:text-black">
+            THE BOARD
           </p>
 
           <h1 className="font-display text-4xl md:text-5xl">
-            Confirmação
+            {stage === "payment_confirmed"
+              ? "Comprovativo da Reserva"
+              : "Estado da Reserva"}
           </h1>
 
-          <p className="mt-4 text-muted-foreground max-w-xl mx-auto">
-            Acompanhe o estado real do pagamento associado
-            à sua reserva.
+          <p className="mt-4 text-muted-foreground max-w-xl mx-auto print:text-black">
+            {stage === "payment_confirmed"
+              ? "Guarde este comprovativo e a sua referência THE BOARD."
+              : "Acompanhe o estado real do pagamento associado à sua reserva."}
           </p>
         </div>
 
-        <Journey stage={stage} />
+        <div className="print:hidden">
+          <Journey stage={stage} />
+        </div>
 
-        <div className="text-center mt-12 mb-10 border border-gold/40 bg-gradient-to-b from-card to-background p-8 md:p-10 shadow-gold">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full border border-gold mb-6">
+        <div className="text-center mt-12 mb-10 border border-gold/40 bg-gradient-to-b from-card to-background p-8 md:p-10 shadow-gold print:border-black print:bg-white print:shadow-none">
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full border border-gold mb-6 print:border-black">
             {stage === "payment_confirmed" ? (
               <span
-                className="text-gold font-display text-2xl"
+                className="text-gold font-display text-2xl print:text-black"
                 aria-hidden="true"
               >
                 ✓
@@ -315,13 +297,13 @@ function Confirmacao() {
               </span>
             ) : (
               <span
-                className="block w-5 h-5 border-2 border-gold border-t-transparent rounded-full animate-spin"
+                className="block w-5 h-5 border-2 border-gold border-t-transparent rounded-full animate-spin print:hidden"
                 aria-hidden="true"
               />
             )}
           </div>
 
-          <p className="text-[10px] tracking-[0.4em] uppercase text-gold mb-3">
+          <p className="text-[10px] tracking-[0.4em] uppercase text-gold mb-3 print:text-black">
             {content.eyebrow}
           </p>
 
@@ -331,23 +313,23 @@ function Confirmacao() {
 
           <p
             aria-live="polite"
-            className="mt-4 text-muted-foreground max-w-md mx-auto"
+            className="mt-4 text-muted-foreground max-w-md mx-auto print:text-black"
           >
             {content.body}
           </p>
         </div>
 
-        <div className="grid md:grid-cols-[1.15fr_0.85fr] gap-6 mb-8">
-          <section className="border border-gold/40 bg-background/70 p-6 md:p-8">
-            <p className="text-[10px] tracking-[0.3em] uppercase text-muted-foreground">
+        <div className="grid md:grid-cols-[1.15fr_0.85fr] gap-6 mb-8 print:grid-cols-2">
+          <section className="border border-gold/40 bg-background/70 p-6 md:p-8 print:border-black print:bg-white">
+            <p className="text-[10px] tracking-[0.3em] uppercase text-muted-foreground print:text-black">
               Referência da reserva
             </p>
 
-            <p className="font-display text-3xl text-gradient-gold mt-3 tracking-widest break-all">
-              {readReference(order, reference)}
+            <p className="font-display text-3xl text-gradient-gold mt-3 tracking-widest break-all print:text-black">
+              {reservationReference}
             </p>
 
-            <div className="hairline-gold my-6 max-w-[80px]" />
+            <div className="hairline-gold my-6 max-w-[80px] print:border-black" />
 
             <ReviewRow
               label="Acesso"
@@ -361,16 +343,17 @@ function Confirmacao() {
 
             <ReviewRow
               label="Total"
-              value={`${total.toLocaleString(
-                "pt-PT",
-              )} MT`}
+              value={formatMoney(
+                total,
+                currency,
+              )}
               strong
             />
 
             <ReviewRow
               label="Pagamento"
               value={paymentStatusLabel(
-                readPaymentStatus(order),
+                paymentStatus,
               )}
               strong={
                 stage ===
@@ -379,8 +362,8 @@ function Confirmacao() {
             />
           </section>
 
-          <section className="border border-border/40 bg-card/35 p-6 md:p-8">
-            <p className="text-[10px] tracking-[0.3em] uppercase text-gold mb-5">
+          <section className="border border-border/40 bg-card/35 p-6 md:p-8 print:border-black print:bg-white">
+            <p className="text-[10px] tracking-[0.3em] uppercase text-gold mb-5 print:text-black">
               Participante
             </p>
 
@@ -407,31 +390,61 @@ function Confirmacao() {
           </section>
         </div>
 
-        <div className="border border-border/40 bg-background/60 p-5 mb-8 text-xs text-muted-foreground leading-relaxed">
-          <p className="text-[10px] tracking-[0.3em] uppercase text-gold mb-3">
-            Próxima etapa
-          </p>
+        {stage === "payment_confirmed" ? (
+          <div className="border border-gold/40 bg-gold/5 p-5 mb-8 text-xs text-muted-foreground leading-relaxed print:border-black print:bg-white print:text-black">
+            <p className="text-[10px] tracking-[0.3em] uppercase text-gold mb-3 print:text-black">
+              Comprovativo
+            </p>
 
-          {stage === "payment_confirmed"
-            ? "O pagamento foi confirmado pelo backend. O Formulário de Admissão Executiva está disponível."
-            : "O sistema continuará a consultar o estado real da reserva. A admissão só será liberada depois da confirmação do pagamento pelo backend."}
-        </div>
+            <p>
+              O pagamento associado a esta reserva foi
+              confirmado pelo sistema THE BOARD.
+            </p>
 
-        {stage ===
-          "payment_confirmed" &&
-        showFallback ? (
-          <div className="text-center mb-10">
+            <p className="mt-3">
+              Guarde esta referência e este comprovativo.
+              A confirmação final de participação será
+              comunicada após a validação executiva.
+            </p>
+
+            <p className="mt-3">
+              No dia do evento, a organização poderá
+              validar a referência diretamente no sistema.
+            </p>
+          </div>
+        ) : (
+          <div className="border border-border/40 bg-background/60 p-5 mb-8 text-xs text-muted-foreground leading-relaxed print:hidden">
+            <p className="text-[10px] tracking-[0.3em] uppercase text-gold mb-3">
+              Próxima etapa
+            </p>
+
+            O sistema continuará a consultar o estado real
+            da reserva. A admissão só será liberada depois
+            da confirmação do pagamento pelo backend.
+          </div>
+        )}
+
+        {stage === "payment_confirmed" ? (
+          <div className="mb-10 grid sm:grid-cols-2 gap-3 print:hidden">
+            <button
+              type="button"
+              onClick={() => window.print()}
+              className="px-8 py-4 border border-gold text-gold text-[10px] tracking-widest uppercase hover:bg-gold/10 transition"
+            >
+              Imprimir / Guardar como PDF
+            </button>
+
             <Link
               to="/admissao"
               search={{ reference }}
-              className="inline-block px-8 py-4 bg-gradient-gold text-primary-foreground text-[10px] tracking-widest uppercase shadow-gold hover:opacity-90 transition"
+              className="px-8 py-4 bg-gradient-gold text-primary-foreground text-[10px] tracking-widest uppercase shadow-gold hover:opacity-90 transition text-center"
             >
               Continuar para admissão
             </Link>
           </div>
         ) : null}
 
-        <div className="flex flex-wrap gap-3 justify-center text-xs tracking-widest uppercase">
+        <div className="flex flex-wrap gap-3 justify-center text-xs tracking-widest uppercase print:hidden">
           {stage !==
           "payment_confirmed" ? (
             <button
@@ -452,6 +465,20 @@ function Confirmacao() {
             ← Voltar ao início
           </Link>
         </div>
+
+        <div className="hidden print:block mt-10 pt-6 border-t border-black text-center">
+          <p className="font-display text-xl">
+            THE BOARD
+          </p>
+
+          <p className="mt-2 text-xs">
+            Big Players Forum 2026
+          </p>
+
+          <p className="mt-4 text-xs">
+            Referência oficial: {reservationReference}
+          </p>
+        </div>
       </div>
     </div>
   );
@@ -467,13 +494,13 @@ function ReviewRow({
   strong?: boolean;
 }) {
   return (
-    <div className="flex justify-between gap-4 py-2 text-sm border-b border-border/20 last:border-b-0">
-      <span className="text-muted-foreground">
+    <div className="flex justify-between gap-4 py-2 text-sm border-b border-border/20 last:border-b-0 print:border-black/20">
+      <span className="text-muted-foreground print:text-black">
         {label}
       </span>
 
       <span
-        className={`text-right break-words ${
+        className={`text-right break-words print:text-black ${
           strong
             ? "font-display text-gold"
             : ""
@@ -483,6 +510,24 @@ function ReviewRow({
       </span>
     </div>
   );
+}
+
+function formatMoney(
+  value: number,
+  currency = "MZN",
+) {
+  if (currency === "MZN") {
+    return `${value.toLocaleString("pt-PT")} MT`;
+  }
+
+  try {
+    return new Intl.NumberFormat("pt-PT", {
+      style: "currency",
+      currency,
+    }).format(value);
+  } catch {
+    return `${value.toLocaleString("pt-PT")} ${currency}`;
+  }
 }
 
 function asRecord(
@@ -573,6 +618,17 @@ function readAmount(order: Order) {
     "total_amount",
     "amount",
     "amount_mt",
+  );
+}
+
+function readCurrency(order: Order) {
+  const data = asRecord(order);
+
+  return (
+    stringValue(
+      data,
+      "currency",
+    ) || "MZN"
   );
 }
 
@@ -760,9 +816,9 @@ function stageCopy(
         eyebrow:
           "Pagamento confirmado",
         title:
-          "Admissão disponível",
+          "Pagamento recebido",
         body:
-          "Pagamento confirmado pelo sistema. A encaminhar para o Formulário de Admissão Executiva.",
+          "O pagamento foi confirmado. Guarde este comprovativo e avance para a etapa de Admissão Executiva.",
       };
 
     case "payment_failed":
