@@ -360,6 +360,58 @@ function formatMoney(value: number, currency = "MZN") {
   }).format(value);
 }
 
+function normalizeWhatsAppPhone(value?: string | null) {
+  if (!value) return "";
+
+  let digits = value.replace(/\D/g, "");
+
+  if (digits.startsWith("00")) {
+    digits = digits.slice(2);
+  }
+
+  if (digits.length === 9 && digits.startsWith("8")) {
+    digits = `258${digits}`;
+  }
+
+  return digits;
+}
+
+function buildParticipantWhatsAppUrl(
+  admission: BackendAdmission,
+) {
+  const phone = normalizeWhatsAppPhone(
+    admission.phone || admission.reservation?.buyerPhone,
+  );
+
+  if (!phone) return null;
+
+  const reservationReference =
+    admission.reservation?.reference ?? admission.reference;
+
+  const ticketName =
+    admission.reservation?.ticketName ?? "Acesso THE BOARD";
+
+  const participantName =
+    admission.fullName ||
+    admission.reservation?.buyerName ||
+    "Participante";
+
+  const message = [
+    `Olá, ${participantName}.`,
+    "",
+    "A sua participação no THE BOARD foi confirmada.",
+    "",
+    `Referência: ${reservationReference}`,
+    `Acesso: ${ticketName}`,
+    "",
+    "Guarde esta mensagem e a sua referência para apresentação no check-in.",
+    "",
+    "THE BOARD",
+  ].join("\n");
+
+  return `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
+}
+
 function AdminPage() {
   const [session, setSession] =
     useState<AdminSession | null>(null);
@@ -1117,6 +1169,9 @@ function AdminPage() {
                       actionBusy ===
                       `admission:${item.reference}`;
 
+                    const whatsappUrl =
+                      buildParticipantWhatsAppUrl(item);
+
                     return (
                       <Row key={item.reference}>
                         <div>
@@ -1151,33 +1206,52 @@ function AdminPage() {
                         />
 
                         <div className="flex flex-wrap justify-end gap-2">
-                          <button
-                            disabled={busy}
-                            onClick={() =>
-                              void setAdmissionStatus(
-                                item.reference,
-                                "admission_approved",
-                              )
-                            }
-                            className="admin-action disabled:opacity-40"
-                          >
-                            {busy
-                              ? "A guardar..."
-                              : "Aprovar"}
-                          </button>
+                          {item.status === "admission_approved" ? (
+                            whatsappUrl ? (
+                              <a
+                                href={whatsappUrl}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="admin-action"
+                              >
+                                Contactar no WhatsApp
+                              </a>
+                            ) : (
+                              <span className="text-xs text-muted-foreground">
+                                Telefone indisponível
+                              </span>
+                            )
+                          ) : (
+                            <>
+                              <button
+                                disabled={busy}
+                                onClick={() =>
+                                  void setAdmissionStatus(
+                                    item.reference,
+                                    "admission_approved",
+                                  )
+                                }
+                                className="admin-action disabled:opacity-40"
+                              >
+                                {busy
+                                  ? "A guardar..."
+                                  : "Aprovar"}
+                              </button>
 
-                          <button
-                            disabled={busy}
-                            onClick={() =>
-                              void setAdmissionStatus(
-                                item.reference,
-                                "admission_rejected",
-                              )
-                            }
-                            className="admin-action-muted disabled:opacity-40"
-                          >
-                            Rejeitar
-                          </button>
+                              <button
+                                disabled={busy}
+                                onClick={() =>
+                                  void setAdmissionStatus(
+                                    item.reference,
+                                    "admission_rejected",
+                                  )
+                                }
+                                className="admin-action-muted disabled:opacity-40"
+                              >
+                                Rejeitar
+                              </button>
+                            </>
+                          )}
                         </div>
                       </Row>
                     );
